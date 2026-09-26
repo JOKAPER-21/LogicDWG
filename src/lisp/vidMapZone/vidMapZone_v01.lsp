@@ -1,0 +1,27 @@
+(defun c:vidmapzone (/ zone csName)
+  (initget "Z43 Z44 Off")
+  (setq zone (getkword "\nEnter UTM Zone [Z43/Z44/Off] <Z43>: "))
+  (if (null zone)
+    (setq zone "Z43")
+  )
+  (cond
+    ;; If user selects Off -> switch off GeoMap
+    ((= zone "Off")
+     (command "._GEOMAP" "_Off")
+     (princ "\nGeoMap turned Off.")
+    )
+    ;; Zone 43
+    ((= zone "Z43")
+     (command "._MAPCSASSIGN" "UTM84-43N")
+     (command "._GEOMAP" "_Hybrid")
+     (command "._ZOOM" "_E")
+    )
+    ;; Zone 44
+    ((= zone "Z44")
+     (command "._MAPCSASSIGN" "UTM84-44N")
+     (command "._GEOMAP" "_Hybrid")
+     (command "._ZOOM" "_E")
+    )
+  )
+  (princ)
+)
