@@ -1,47 +1,131 @@
-;;;===========================================================================
-;;; loader.lsp
+;;; ============================================================================
+;;; LogicDWG - loader.lsp
+;;; ============================================================================
+;;; Purpose:
+;;;   Load the LogicDWG LISP tools from the standard Civil 3D 2026
+;;;   user Support\vid folder.
 ;;;
-;;; Loads the entire LogicDWG toolset in one shot.
+;;; Default folder:
+;;;   %APPDATA%\Autodesk\C3D 2026\enu\Support\vid
 ;;;
-;;;   Load this file (APPLOAD, or via a startup suite / acaddoc.lsp entry)
-;;;   and then type VIDLOGICDWG to open the launcher dialog.
+;;; Files expected in that folder:
+;;;   logicDwg.lsp
+;;;   vidDgpsToLine.lsp
+;;;   vidDgpsToSp.lsp
+;;;   vidMapZone.lsp
 ;;;
-;;; Commands made available after loading:
-;;;   VIDLOGICDWG   - launcher dialog (Zone / DGPS to Survey Point / Rail Tracks)
-;;;   SM          - Zone / GeoMap tool (43 / 44 / Off)
-;;;   VIDDGPSTOSP   - DGPS CSV -> survey points
-;;;   DGPS2PLINE  - DGPS CSV -> survey points + polyline / 3D polyline
-;;;===========================================================================
+;;; Commands provided:
+;;;   VIDLOGICDWG
+;;;   VIDDGPSTOLINE
+;;;   VIDDGPSTOSP
+;;;   VIDMAPZONE
+;;; ============================================================================
 
-(defun LogicDWG:this-dir ( / p)
-  ;; Directory this loader.lsp itself lives in, so the package can be
-  ;; loaded from any drive/path without editing this file.
-  (setq p (findfile "loader.lsp"))
-  (if p
-      (vl-filename-directory p)
-      (getvar "DWGPREFIX")
+(vl-load-com)
+
+;;; ---------------------------------------------------------------------------
+;;; Get the LogicDWG installation folder.
+;;; ---------------------------------------------------------------------------
+(defun LogicDWG:GetInstallPath (/ appdata)
+  (setq appdata (getenv "APPDATA"))
+  (if (and appdata (/= appdata ""))
+    (strcat appdata "\\Autodesk\\C3D 2026\\enu\\Support\\vid")
+    nil
   )
 )
 
-(defun LogicDWG:load1 (relpath / base full)
-  (setq base (LogicDWG:this-dir))
-  (setq full (strcat base "\\" relpath))
+;;; ---------------------------------------------------------------------------
+;;; Load one LISP file and report the result.
+;;; ---------------------------------------------------------------------------
+(defun LogicDWG:LoadFile (folder filename / full result)
+  (setq full (strcat folder "\\" filename))
   (if (findfile full)
-      (progn (load full) T)
-      (progn (princ (strcat "\nLogicDWG WARNING: file not found: " full)) nil)
+    (progn
+      (setq result (load full))
+      (princ (strcat "\n  [OK] " filename))
+      T
+    )
+    (progn
+      (princ (strcat "\n  [MISSING] " full))
+      nil
+    )
   )
 )
 
-(princ "\n----------------------------------------")
-(princ "\nLoading LogicDWG toolset...")
-(princ "\n----------------------------------------")
+;;; ---------------------------------------------------------------------------
+;;; Main loader.
+;;; ---------------------------------------------------------------------------
+(defun LogicDWG:LoadAll (/ folder loaded missing)
+  (setq folder (LogicDWG:GetInstallPath))
+  (setq loaded 0
+        missing 0)
 
-(LogicDWG:load1 "src\\lisp\\sm\\sm.lsp")
-(LogicDWG:load1 "src\\lisp\\vdgpstosp\\vdgpstosp_v01.lsp")
-(LogicDWG:load1 "src\\lisp\\dgps2pline\\DGPS2PLINE_v12.LSP")
-(LogicDWG:load1 "src\\lisp\\logicdwg\\logicdwg_v03.lsp")
+  (princ "\n")
+  (princ "\n============================================================")
+  (princ "\n LogicDWG - Civil 3D 2026 Loader")
+  (princ "\n============================================================")
 
-(princ "\n----------------------------------------")
-(princ "\nLogicDWG ready. Type VIDLOGICDWG to open the launcher.")
-(princ "\n----------------------------------------")
+  (if (null folder)
+    (progn
+      (princ "\nERROR: Windows APPDATA environment variable was not found.")
+      (princ)
+    )
+    (progn
+      (princ (strcat "\nFolder: " folder))
+
+      ;; Main launcher
+      (if (LogicDWG:LoadFile folder "logicDwg.lsp")
+        (setq loaded (1+ loaded))
+        (setq missing (1+ missing))
+      )
+
+      ;; DGPS CSV -> line
+      (if (LogicDWG:LoadFile folder "vidDgpsToLine.lsp")
+        (setq loaded (1+ loaded))
+        (setq missing (1+ missing))
+      )
+
+      ;; DGPS CSV -> survey points
+      (if (LogicDWG:LoadFile folder "vidDgpsToSp.lsp")
+        (setq loaded (1+ loaded))
+        (setq missing (1+ missing))
+      )
+
+      ;; UTM / GeoMap zone
+      (if (LogicDWG:LoadFile folder "vidMapZone.lsp")
+        (setq loaded (1+ loaded))
+        (setq missing (1+ missing))
+      )
+
+      (princ "\n------------------------------------------------------------")
+      (princ (strcat "\nLoaded : " (itoa loaded) " / 4"))
+      (princ (strcat "\nMissing: " (itoa missing)))
+
+      (if (= missing 0)
+        (progn
+          (princ "\n")
+          (princ "\nLogicDWG is ready.")
+          (princ "\nCommands:")
+          (princ "\n  VIDLOGICDWG")
+          (princ "\n  VIDDGPSTOLINE")
+          (princ "\n  VIDDGPSTOSP")
+          (princ "\n  VIDMAPZONE")
+        )
+        (progn
+          (princ "\n")
+          (princ "\nWARNING: One or more LogicDWG files are missing.")
+          (princ "\nCopy the required published LISP files into:")
+          (princ (strcat "\n" folder))
+        )
+      )
+
+      (princ "\n============================================================")
+      (princ)
+    )
+  )
+)
+
+;;; Run automatically when APPLOAD loads loader.lsp.
+(LogicDWG:LoadAll)
+
 (princ)

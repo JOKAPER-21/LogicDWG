@@ -6,7 +6,7 @@
 ;;;
 ;;;   Zone                    -> [43] [44] [Off]      -> MAPCSASSIGN/GEOMAP
 ;;;   DGPS to Survey Point    -> [Generate Points]     -> VIDDGPSTOSP
-;;;   Rail Tracks             -> [Generate Track]      -> DGPS2PLINE
+;;;   Rail Tracks             -> [Generate Track]      -> VIDDGPSTOLINE
 ;;;
 ;;; V03 FIX: calling a custom LISP command by name through (command "...")
 ;;; from deep inside another already-running command (here, right after
@@ -14,8 +14,8 @@
 ;;; "Unknown command", even though the same command works fine when typed
 ;;; directly at the command line straight afterwards. To avoid this:
 ;;;
-;;;   - VIDDGPSTOSP and DGPS2PLINE are now invoked as plain LISP function
-;;;     calls - (c:VIDDGPSTOSP) / (c:DGPS2PLINE) - instead of dispatching
+;;;   - VIDDGPSTOSP and VIDDGPSTOLINE are now invoked as plain LISP function
+;;;     calls - (c:VIDDGPSTOSP) / (c:VIDDGPSTOLINE) - instead of dispatching
 ;;;     through AutoCAD's command-name lookup. A command defined with
 ;;;     (defun c:NAME ...) is just a normal function named "C:NAME" and
 ;;;     can always be called directly like any other function, which
@@ -133,7 +133,7 @@
       )
       ((= code 2)
        (princ "\nRunning: Rail Tracks...")
-       (c:DGPS2PLINE)
+       (c:VIDDGPSTOLINE)
       )
       ((= code 3)
        (princ "\nSetting Zone 43...")
