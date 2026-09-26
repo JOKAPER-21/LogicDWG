@@ -1,8 +1,8 @@
 ;;; ============================================================================
-;;; DGPS2PLINE_v07.LSP
+;;; VIDDGPSTOLINE_v10.LSP
 ;;; Production DGPS CSV importer for AutoCAD / Civil 3D
 ;;;
-;;; Command: DGPS2PLINE
+;;; Command: VIDDGPSTOLINE
 ;;;
 ;;; Features:
 ;;;   - Reads ALL CSV rows until EOF
@@ -323,12 +323,45 @@
 )
 
 ;; Reads one logical CSV record. Supports quoted multiline fields.
+(defun DGPS-ReadPhysicalLine (fh / b s gotLine)
+  ;; Binary reader: unlike text read-line, this does NOT treat byte 0x1A
+  ;; (Ctrl-Z / SUB) as end-of-file. The survey CSV contains 0x1A in
+  ;; Latitude/Longitude fields, which was the reason previous versions
+  ;; stopped after the first data row.
+  (setq s ""
+        gotLine nil)
+  (while (and (not gotLine) (setq b (read-char fh)))
+    (cond
+      ;; LF
+      ((= b 10)
+       (setq gotLine T)
+      )
+      ;; CR: consume optional LF for CRLF files.
+      ((= b 13)
+       (setq b (read-char fh))
+       (if (and b (/= b 10))
+         ;; This file is expected to use CRLF. If a lone CR is encountered,
+         ;; the next byte cannot be unread, so retain it in the current line.
+         (setq s (strcat s (chr b)))
+       )
+       (setq gotLine T)
+      )
+      ;; Normal byte, including 0x1A.
+      (T
+       (setq s (strcat s (chr b)))
+      )
+    )
+  )
+  (if (or gotLine (> (strlen s) 0)) s nil)
+)
+
+;; Reads one logical CSV record. Supports quoted multiline fields.
 (defun DGPS-ReadRecord (fh / s next)
-  (setq s (read-line fh))
+  (setq s (DGPS-ReadPhysicalLine fh))
   (if s
     (progn
       (while (= (rem (DGPS-QuoteCount s) 2) 1)
-        (setq next (read-line fh))
+        (setq next (DGPS-ReadPhysicalLine fh))
         (if next
           (setq s (strcat s "\n" next))
           (setq next nil)
@@ -363,56 +396,17 @@
 ;; If UTF-8 is explicitly detected, use UTF-8.
 ;; For no BOM, try UTF-8 and fall back to ANSI if opening/reading fails.
 ;; ---------------------------------------------------------------------------
-(defun DGPS-OpenCSV (file / fh enc test)
+(defun DGPS-OpenCSV (file / fh)
   ;; IMPORTANT:
-  ;; Survey CSV files exported by some DGPS/controller software contain
-  ;; Windows-1252/ANSI characters (for example degree symbols).  A BOM-less
-  ;; ANSI file can be incorrectly accepted as UTF-8 by AutoCAD and then stop
-  ;; being readable after the first line.  Therefore ANSI is intentionally
-  ;; tried FIRST.
-  (setq fh nil enc nil)
-
-  ;; 1) If the file has a UTF-8 BOM, use UTF-8.
-  (if (DGPS-HasUTF8BOM file)
-    (progn
-      (setq test (vl-catch-all-apply 'open (list file "r" "utf8")))
-      (if (not (vl-catch-all-error-p test))
-        (progn
-          (setq fh test)
-          (setq enc "UTF-8 (BOM)")
-        )
-      )
-    )
+  ;; Use binary mode. AutoLISP text-mode reading can interpret byte 0x1A
+  ;; (Ctrl-Z / SUB) as EOF. This DGPS CSV contains 0x1A characters in its
+  ;; latitude/longitude fields, so text-mode reading stops after Pt1.
+  ;; Binary mode lets DGPS-ReadPhysicalLine handle the actual CR/LF bytes.
+  (setq fh (open file "rb"))
+  (if fh
+    (list fh "ANSI/BINARY")
+    (list nil nil)
   )
-
-  ;; 2) Normal DGPS export: ANSI / Windows-1252.
-  ;; User-converted ANSI CSV files will therefore be read correctly.
-  (if (null fh)
-    (progn
-      (setq test (vl-catch-all-apply 'open (list file "r" "ansi")))
-      (if (not (vl-catch-all-error-p test))
-        (progn
-          (setq fh test)
-          (setq enc "ANSI/Windows-1252")
-        )
-      )
-    )
-  )
-
-  ;; 3) UTF-8 fallback for BOM-less UTF-8 files.
-  (if (null fh)
-    (progn
-      (setq test (vl-catch-all-apply 'open (list file "r" "utf8")))
-      (if (not (vl-catch-all-error-p test))
-        (progn
-          (setq fh test)
-          (setq enc "UTF-8")
-        )
-      )
-    )
-  )
-
-  (list fh enc)
 )
 
 ;; ---------------------------------------------------------------------------
@@ -523,7 +517,7 @@
     (setq code (DGPS-R-Code rec))
     (setq cell (assoc code groups))
     (if cell
-      (setcdr cell (append (cdr cell) (list rec)))
+      (setq groups (subst (append cell (list rec)) cell groups))
       (setq groups (append groups (list (cons code (list rec)))))
     )
   )
@@ -548,8 +542,8 @@
   (if (and msg
            (/= msg "Function cancelled")
            (/= msg "quit / exit abort"))
-    (princ (strcat "\nDGPS2PLINE ERROR: " msg))
-    (princ "\nDGPS2PLINE cancelled.")
+    (princ (strcat "\nVIDDGPSTOLINE ERROR: " msg))
+    (princ "\nVIDDGPSTOLINE cancelled.")
   )
   (princ)
 )
@@ -557,7 +551,7 @@
 ;; ---------------------------------------------------------------------------
 ;; Main command
 ;; ---------------------------------------------------------------------------
-(defun c:DGPS2PLINE
+(defun c:VIDDGPSTOLINE
   (/ outType csvFile openResult enc fh
      headerLine headers headerUpper
      idxP idxC idxN idxE idxZ idxT
@@ -612,7 +606,7 @@
   (setq enc (cadr openResult))
   (if (null fh)
     (progn
-      (DGPS-Error "Could not open CSV as UTF-8 or ANSI.")
+      (DGPS-Error "Could not open CSV in binary mode.")
       (exit)
     )
   )
@@ -621,7 +615,7 @@
   ;; -------------------------------------------------------------------------
   ;; Header
   ;; -------------------------------------------------------------------------
-  (setq headerLine (read-line fh))
+  (setq headerLine (DGPS-ReadRecord fh))
   (if (null headerLine)
     (progn
       (DGPS-Error "CSV file is empty.")
@@ -703,7 +697,7 @@
   ;; Report input
   ;; -------------------------------------------------------------------------
   (princ "\n========================================")
-  (princ "\nDGPS2PLINE CSV IMPORT")
+  (princ "\nVIDDGPSTOLINE CSV IMPORT")
   (princ "\n========================================")
   (princ (strcat "\nFile: " csvFile))
   (princ (strcat "\nEncoding: " enc))
@@ -779,7 +773,7 @@
     ;; Point Name - Middle Right
     (if
       (DGPS-MakeMText
-        (list (+ x 0.75) (+ y 0.50) z)
+        p
         (DGPS-R-PName rec)
         0.5
         spLayer
@@ -791,7 +785,7 @@
     ;; Code - Top Left
     (if
       (DGPS-MakeMText
-        (list (- x 0.75) (- y 0.75) z)
+        p
         code
         0.5
         spLayer
@@ -803,7 +797,7 @@
     ;; Elevation - Bottom Left
     (if
       (DGPS-MakeMText
-        (list (+ x 0.75) (- y 0.75) z)
+        p
         (DGPS-R-Elev rec)
         0.5
         spLayer
@@ -897,7 +891,7 @@
   ;; Final integrity checks
   ;; -------------------------------------------------------------------------
   (princ "\n\n========================================")
-  (princ "\nDGPS2PLINE COMPLETE")
+  (princ "\nVIDDGPSTOLINE COMPLETE")
   (princ "\n========================================")
   (princ (strcat "\nRows read:              " (itoa dataRows)))
   (princ (strcat "\nValid records:          " (itoa validRows)))
@@ -938,9 +932,9 @@
   (setvar "PDSIZE" dgps-*old-pdsize*)
   (setvar "PDMODE" dgps-*old-pdmode*)
   (setq *error* dgps-*old-error*)
-  (princ "\nDGPS2PLINE finished successfully.")
+  (princ "\nVIDDGPSTOLINE finished successfully.")
   (princ)
 )
 
-(princ "\nDGPS2PLINE_v05 loaded. Type DGPS2PLINE to run.")
+(princ "\nVIDDGPSTOLINE_v12 loaded. Type VIDDGPSTOLINE to run.")
 (princ)
