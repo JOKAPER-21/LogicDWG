@@ -17,7 +17,7 @@
 (vl-load-com)
 
 (defun LogicDWG:GetLoaderDir (/ p)
-  (setq p (findfile "vidLoader_v02.lsp"))
+  (setq p (findfile "vidLoader.lsp"))
   (if p
     (vl-filename-directory p)
     nil
@@ -54,10 +54,10 @@
   ;; Tool files
   (setq files
     '(
-      "logicDwg_v01.lsp"
-      "vidDgpsToLine_v01.lsp"
-      "vidDgpsToSp_v01.lsp"
-      "vidMapZone_v01.lsp"
+      "logicDwg.lsp"
+      "vidDgpsToLine.lsp"
+      "vidDgpsToSp.lsp"
+      "vidMapZone.lsp"
     )
   )
 
