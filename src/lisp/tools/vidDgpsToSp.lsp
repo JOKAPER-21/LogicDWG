@@ -139,6 +139,92 @@
 )
 
 ;; ---------------------------------------------------------------------------
+;; Layer-name option dialog
+;; [Custom]   -> one layer for everything, name typed in the text box
+;;               (default "1-SURVEY"). Box is selected on entry / click,
+;;               so typing or double-click + type renames it.
+;; [CSV Code] -> existing behaviour: one "sp_<Code>" layer per CSV code.
+;; Returns (MODE NAME) where MODE is "CUSTOM" or "CSV", or nil if cancelled.
+;; ---------------------------------------------------------------------------
+(setq dgps-*lm* "CUSTOM")          ; last used mode
+(setq dgps-*ln* "1-SURVEY")        ; last used custom name
+
+(defun DGPS-AskLayerMode (/ dclFile fh dclId res)
+  (setq dclFile (vl-filename-mktemp "dgpslyr" nil ".dcl"))
+  (setq fh (open dclFile "w"))
+  (if (null fh)
+    nil
+    (progn
+      (write-line "dgpslayer : dialog {" fh)
+      (write-line "  label = \"Survey Point Layer\";" fh)
+      (write-line "  : boxed_radio_row {" fh)
+      (write-line "    label = \"Name type\";" fh)
+      (write-line "    : radio_button { key = \"rb_custom\"; label = \"Custom Name\"; }" fh)
+      (write-line "    : radio_button { key = \"rb_csv\"; label = \"CSV Code\"; }" fh)
+      (write-line "  }" fh)
+      (write-line "  : edit_box {" fh)
+      (write-line "    key = \"eb_layer\"; label = \"Custom layer:\";" fh)
+      (write-line "    edit_width = 26; allow_accept = true;" fh)
+      (write-line "  }" fh)
+      (write-line "  ok_cancel;" fh)
+      (write-line "}" fh)
+      (close fh)
+
+      (setq dclId (load_dialog dclFile))
+      (if (or (null dclId) (< dclId 0) (not (new_dialog "dgpslayer" dclId)))
+        (progn
+          (if (and dclId (>= dclId 0)) (unload_dialog dclId))
+          (vl-file-delete dclFile)
+          nil
+        )
+        (progn
+          ;; Initial state.
+          (set_tile "eb_layer" dgps-*ln*)
+          (if (= dgps-*lm* "CSV")
+            (progn
+              (set_tile "rb_csv" "1")
+              (mode_tile "eb_layer" 1)
+            )
+            (progn
+              (set_tile "rb_custom" "1")
+              (mode_tile "eb_layer" 0)
+              (mode_tile "eb_layer" 2)
+            )
+          )
+
+          ;; Show / hide (enable / disable) the text box.
+          (action_tile "rb_custom"
+            "(mode_tile \"eb_layer\" 0)(mode_tile \"eb_layer\" 2)")
+          (action_tile "rb_csv"
+            "(mode_tile \"eb_layer\" 1)")
+
+          (action_tile "accept"
+            (strcat
+              "(setq dgps-*lm* (if (= (get_tile \"rb_csv\") \"1\") \"CSV\" \"CUSTOM\"))"
+              "(setq dgps-*ln* (get_tile \"eb_layer\"))"
+              "(done_dialog 1)"))
+          (action_tile "cancel" "(done_dialog 0)")
+
+          (setq res (start_dialog))
+          (unload_dialog dclId)
+          (vl-file-delete dclFile)
+
+          (if (= res 1)
+            (progn
+              (if (= (DGPS-Trim dgps-*ln*) "")
+                (setq dgps-*ln* "1-SURVEY")
+              )
+              (list dgps-*lm* (DGPS-SanitizeLayerName dgps-*ln*))
+            )
+            nil
+          )
+        )
+      )
+    )
+  )
+)
+
+;; ---------------------------------------------------------------------------
 ;; POINT / MTEXT creation
 ;; ---------------------------------------------------------------------------
 (defun DGPS-MakePoint (pt layer)
@@ -545,7 +631,7 @@
      line fields rowNo dataRows validRows skippedRows
      allRev allRecords rec pname code north east elev localTime
      groups g spLayer spPt spName spCode spElev spLayers
-     p x y z sampleCount i)
+     p x y z sampleCount i layerOpt layerMode customLayer)
 
   (setq dgps-*old-error* *error*)
   (setq *error* VIDDGPSTOSP-Error)
@@ -559,6 +645,14 @@
   (setvar "OSMODE" 0)
   (setvar "PDSIZE" 0.5)
   (setvar "PDMODE" 3)
+
+  ;; Ask layer option: [Custom] / [CSV Code].
+  (setq layerOpt (DGPS-AskLayerMode))
+  (if (null layerOpt)
+    (progn (VIDDGPSTOSP-Error "Function cancelled") (exit))
+  )
+  (setq layerMode   (car layerOpt))
+  (setq customLayer (cadr layerOpt))
 
   ;; Select CSV.
   (setq csvFile (getfiled "Select DGPS CSV File" "" "csv" 4))
@@ -686,7 +780,12 @@
 
   (foreach rec allRecords
     (setq code (DGPS-R-Code rec))
-    (setq spLayer (strcat "sp_" (DGPS-SanitizeLayerName code)))
+    (setq spLayer
+      (if (= layerMode "CUSTOM")
+        customLayer                                        ; [Custom]
+        (strcat "sp_" (DGPS-SanitizeLayerName code))       ; [CSV Code]
+      )
+    )
 
     (if (not (tblsearch "LAYER" spLayer))
       (DGPS-EnsureLayer spLayer 4)
