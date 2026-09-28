@@ -1,19 +1,7 @@
 ;;; ============================================================================
-;;; VIDDGPSTOSP_v01.LSP
-;;; Production DGPS CSV importer for AutoCAD / Civil 3D
-;;;
-;;; Command: VIDDGPSTOSP
-;;;
-;;; Features:
-;;;   - Reads ALL CSV rows until EOF
-;;;   - ANSI/Windows-1252 and UTF-8/UTF-8 BOM support
-;;;   - Header-name based column lookup
-;;;   - Proper CSV quoted-field parser
-;;;   - Creates POINT + Point Name + Code + Elevation MTEXT for every row
-;;;   - Groups ALL records by Code
-;;;   - Sorts geometry by Local Time, then CSV row number
-;;;   - Creates 2D LWPOLYLINE or true 3D POLYLINE
-;;;   - Verifies entity creation and reports counts
+;;; Vid Dgps To Survey Points
+;;; Release: 1.1.2 | Civil 3D 2026
+;;; Version: 02
 ;;; ============================================================================
 
 (vl-load-com)

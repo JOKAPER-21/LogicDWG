@@ -1,14 +1,7 @@
 // ============================================================================
-// logicDwg.dcl  -  Logic DWG launcher dialog
-//
-// Used by logicDwg.lsp (command LOGICDWG / VIDLOGICDWG).
-// Keep this file in the same folder as logicDwg.lsp.
-//
-// Keys returned to logicDwg.lsp:
-//   z43 / z44 / zoff   Zone buttons
-//   sp                 Generate Points
-//   track              Generate Track
-//   close              Close
+// LogicDWG.dcl
+// Release: 1.1.2 | Civil 3D 2026
+// Version: 02
 // ============================================================================
 
 logicDwg : dialog {

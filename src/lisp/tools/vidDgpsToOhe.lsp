@@ -1,17 +1,8 @@
-;;; ================================================================
-;;; DgpsToOhe.lsp
-;;; Version: 01
-;;; Civil 3D 2026 / AutoCAD AutoLISP
-;;;
-;;; CSV reader:
-;;;   - Detects Code, Northing, Easting by HEADER NAME
-;;;   - Reads ONLY those 3 columns
-;;;   - Ignores all other columns
-;;;   - Removes unreadable/control characters and continues
-;;;   - Bad row does not stop the entire CSV
-;;;
-;;; Command: DgpsToOhe
-;;; ================================================================
+;;; ============================================================================
+;;; Vid Dgps To Ohe
+;;; Release: 1.1.2 | Civil 3D 2026
+;;; Version: 02
+;;; ============================================================================
 
 (vl-load-com)
 

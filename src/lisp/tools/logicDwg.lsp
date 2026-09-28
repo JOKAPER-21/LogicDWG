@@ -1,21 +1,7 @@
 ;;; ============================================================================
-;;; logicDwg.lsp  -  Logic DWG launcher
-;;;
-;;; Commands : LOGICDWG, VIDLOGICDWG
-;;; Dialog   : logicDwg.dcl (same folder as this file)
-;;;
-;;;   Zone                  [43] [44] [Off]     -> assigns UTM84-43N / 44N and
-;;;                                                turns GeoMap on / off
-;;;   DGPS to Survey Point  [Generate Points]   -> VIDDGPSTOSP
-;;;   Rail Tracks           [Generate Track]    -> VIDDGPSTOLINE
-;;;
-;;; Notes
-;;;   - Tools are started AFTER the dialog has closed (never from inside a
-;;;     dialog callback), and a fresh new_dialog is created for every show.
-;;;   - The DCL is looked up next to this file / vidLoader.lsp. If it cannot
-;;;     be found, an identical copy is written to the TEMP folder, so the
-;;;     dialog always opens.
-;;;   - No usernames, no absolute paths, no hard-coded Civil 3D version.
+;;; LogicDWG.lsp
+;;; Release: 1.1.2 | Civil 3D 2026
+;;; Version: 02
 ;;; ============================================================================
 
 (vl-load-com)

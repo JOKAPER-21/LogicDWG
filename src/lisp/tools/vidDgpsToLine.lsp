@@ -1,20 +1,7 @@
 ;;; ============================================================================
-;;; vidDgpsToLine.lsp  (VIDDGPSTOLINE v15)
-;;; DGPS CSV -> Polyline / 3D Polyline (one per Code)
-;;;
-;;; Command: VIDDGPSTOLINE
-;;;
-;;; Features:
-;;;   - Reads ALL CSV rows until EOF (binary reader, 0x1A safe)
-;;;   - Header-name based column lookup, quoted-field CSV parser
-;;;   - Groups ALL records by Code
-;;;   - Sorts each Code by Local Time, then CSV row number
-;;;   - Then re-orders each Code FORWARD (no back-and-forth): when the
-;;;     survey team missed a point and came back to it later, the point
-;;;     is put back where it belongs using Easting/Northing distance
-;;;   - Creates 2D LWPOLYLINE on layer pl_<Code>, or
-;;;     true 3D POLYLINE on layer 3dpl_<Code>
-;;;   - NO points and NO text are created
+;;; Vid Dgps To Line
+;;; Release: 1.1.2 | Civil 3D 2026
+;;; Version: 02
 ;;; ============================================================================
 
 (vl-load-com)

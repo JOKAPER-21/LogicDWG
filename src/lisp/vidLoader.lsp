@@ -1,17 +1,7 @@
 ;;; ============================================================================
-;;; LogicDWG - vidLoader_v02.lsp
+;;; LogicDWG
 ;;; Release: 1.1.2 | Civil 3D 2026
-;;;
-;;; Folder structure:
-;;;
-;;; vid\
-;;; │   vidLoader_v02.lsp
-;;; │
-;;; └───tools\
-;;;         logicDwg_v01.lsp
-;;;         vidDgpsToLine_v01.lsp
-;;;         vidDgpsToSp_v01.lsp
-;;;         vidMapZone_v01.lsp
+;;; Version: 01
 ;;; ============================================================================
 
 (vl-load-com)
@@ -56,6 +46,7 @@
     '(
       "logicDwg.lsp"
       "vidDgpsToLine.lsp"
+      "vidDgpsToOhe.lsp"
       "vidDgpsToSp.lsp"
       "vidMapZone.lsp"
     )
@@ -65,7 +56,7 @@
   (setq missing 0)
 
   (princ "\n============================================================")
-  (princ "\n LogicDWG 1.1.2 - Loader v02")
+  (princ "\n LogicDWG 1.1.2")
   (princ "\n============================================================")
 
   (princ "\nFolder: .\\tools\\")
