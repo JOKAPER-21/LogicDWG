@@ -1,168 +1,255 @@
-;;;===========================================================================
-;;; logicdwg_v03.lsp
+;;; ============================================================================
+;;; logicDwg.lsp  -  Logic DWG launcher
 ;;;
-;;; Command : VIDLOGICDWG
-;;; Purpose : Launcher dialog ("Logic DWG") for the survey toolset.
+;;; Commands : LOGICDWG, VIDLOGICDWG
+;;; Dialog   : logicDwg.dcl (same folder as this file)
 ;;;
-;;;   Zone                    -> [43] [44] [Off]      -> MAPCSASSIGN/GEOMAP
-;;;   DGPS to Survey Point    -> [Generate Points]     -> VIDDGPSTOSP
-;;;   Rail Tracks             -> [Generate Track]      -> VIDDGPSTOLINE
+;;;   Zone                  [43] [44] [Off]     -> assigns UTM84-43N / 44N and
+;;;                                                turns GeoMap on / off
+;;;   DGPS to Survey Point  [Generate Points]   -> VIDDGPSTOSP
+;;;   Rail Tracks           [Generate Track]    -> VIDDGPSTOLINE
 ;;;
-;;; V03 FIX: calling a custom LISP command by name through (command "...")
-;;; from deep inside another already-running command (here, right after
-;;; this dialog's start_dialog returns) can fail with AutoCAD reporting
-;;; "Unknown command", even though the same command works fine when typed
-;;; directly at the command line straight afterwards. To avoid this:
-;;;
-;;;   - VIDDGPSTOSP and VIDDGPSTOLINE are now invoked as plain LISP function
-;;;     calls - (c:VIDDGPSTOSP) / (c:VIDDGPSTOLINE) - instead of dispatching
-;;;     through AutoCAD's command-name lookup. A command defined with
-;;;     (defun c:NAME ...) is just a normal function named "C:NAME" and
-;;;     can always be called directly like any other function, which
-;;;     sidesteps the command-table timing issue entirely.
-;;;   - The Zone buttons no longer re-dispatch to SM (which would hit the
-;;;     same issue, plus SM reads its answer via getkword which can't be
-;;;     pre-fed from a direct function call). Instead the launcher issues
-;;;     the same native AutoCAD/Civil3D commands SM itself uses for each
-;;;     branch (MAPCSASSIGN / GEOMAP / ZOOM). These are built-in commands,
-;;;     not custom ones, so dispatching to them via (command) is reliable.
-;;;     sm.lsp itself is unmodified and still works standalone as before.
-;;;
-;;; The DCL definition is written to a temp file at runtime (no
-;;; separate .dcl file to distribute) and cleaned up afterwards. The
-;;; dialog stays open after each run so any tool can be launched
-;;; repeatedly; click Close to exit.
-;;;
-;;; Load : APPLOAD -> logicdwg_v03.lsp   (or via loader.lsp)
-;;; Run  : VIDLOGICDWG
-;;;===========================================================================
+;;; Notes
+;;;   - Tools are started AFTER the dialog has closed (never from inside a
+;;;     dialog callback), and a fresh new_dialog is created for every show.
+;;;   - The DCL is looked up next to this file / vidLoader.lsp. If it cannot
+;;;     be found, an identical copy is written to the TEMP folder, so the
+;;;     dialog always opens.
+;;;   - No usernames, no absolute paths, no hard-coded Civil 3D version.
+;;; ============================================================================
 
 (vl-load-com)
 
-(defun c:VIDLOGICDWG (/ *error* dclfile dclid f code running old-cmdecho)
 
-  (setq old-cmdecho (getvar "CMDECHO"))
+;;; ----------------------------------------------------------------------------
+;;; DCL lookup
+;;; ----------------------------------------------------------------------------
 
-  (defun *error* (msg)
-    (if (and msg
-             (not (wcmatch (strcase msg) "*CANCEL*"))
-             (not (wcmatch (strcase msg) "*QUIT*"))
-             (not (wcmatch (strcase msg) "*ESC*"))
-        )
-        (princ (strcat "\nVIDLOGICDWG ERROR: " msg))
-    )
-    (if (and dclid (> dclid 0)) (unload_dialog dclid))
-    (if (and dclfile (findfile dclfile)) (vl-file-delete dclfile))
-    (setvar "CMDECHO" old-cmdecho)
-    (princ)
+(defun LogicDWG:TryDir (baseFile subPath / p)
+  ;; Directory of (findfile baseFile) + subPath, returned only if it exists.
+  (if (setq p (findfile baseFile))
+    (findfile (strcat (vl-filename-directory p) subPath))
+    nil
   )
+)
 
-  (setvar "CMDECHO" 0)
-
-  ;; -------------------------------------------------------------
-  ;; Write the DCL definition to a temp file.
-  ;; -------------------------------------------------------------
-  (setq dclfile (strcat (getenv "TEMP") "\\vlogicdwg_" (itoa (getvar "MILLISECS")) ".dcl"))
-  (setq f (open dclfile "w"))
-  (if (not f) (error (strcat "Could not create temporary DCL file: " dclfile)))
-
-  (write-line "vlogicdwg_dlg : dialog {" f)
-  (write-line "  label = \"Logic DWG\";" f)
-  (write-line "  : boxed_column {" f)
-  (write-line "    label = \"\";" f)
-
-  ;; --- Zone row (on top of everything else) ---
-  (write-line "    : row {" f)
-  (write-line "      : text { label = \"Zone\"; width = 10; }" f)
-  (write-line "      : button { key = \"btn_z43\"; label = \"43\"; width = 8; fixed_width = true; }" f)
-  (write-line "      : button { key = \"btn_z44\"; label = \"44\"; width = 8; fixed_width = true; }" f)
-  (write-line "      : button { key = \"btn_zoff\"; label = \"Off\"; width = 8; fixed_width = true; }" f)
-  (write-line "    }" f)
-  (write-line "    spacer_1;" f)
-
-  ;; --- DGPS to Survey Point row ---
-  (write-line "    : row {" f)
-  (write-line "      : text { label = \"DGPS to Survey Point\"; width = 28; }" f)
-  (write-line "      : button { key = \"btn_sp\"; label = \"Generate Points\"; width = 18; fixed_width = true; }" f)
-  (write-line "    }" f)
-  (write-line "    spacer_1;" f)
-
-  ;; --- Rail Tracks row ---
-  (write-line "    : row {" f)
-  (write-line "      : text { label = \"Rail Tracks\"; width = 28; }" f)
-  (write-line "      : button { key = \"btn_track\"; label = \"Generate Track\"; width = 18; fixed_width = true; }" f)
-  (write-line "    }" f)
-
-  (write-line "  }" f)
-  (write-line "  spacer_1;" f)
-  (write-line "  : row {" f)
-  (write-line "    fixed_width = true;" f)
-  (write-line "    alignment = centered;" f)
-  (write-line "    : button { key = \"cancel\"; label = \"Close\"; is_cancel = true; width = 12; }" f)
-  (write-line "  }" f)
-  (write-line "}" f)
-  (close f)
-
-  ;; -------------------------------------------------------------
-  ;; Load and run the dialog. It is only built once; start_dialog
-  ;; is called repeatedly so the dialog reopens after each tool run.
-  ;; -------------------------------------------------------------
-  (setq dclid (load_dialog dclfile))
-  (if (or (not dclid) (< dclid 0))
-      (error (strcat "Could not load dialog definition: " dclfile))
+(defun LogicDWG:FindDcl ( / p)
+  (cond
+    ((setq p (findfile "logicDwg.dcl")) p)
+    ((setq p (LogicDWG:TryDir "logicDwg.lsp" "\\logicDwg.dcl")) p)
+    ((setq p (LogicDWG:TryDir "vidLoader.lsp" "\\tools\\logicDwg.dcl")) p)
+    ((setq p (LogicDWG:TryDir "vidLoader.lsp" "\\logicDwg.dcl")) p)
+    (T nil)
   )
+)
 
-  (if (not (new_dialog "vlogicdwg_dlg" dclid))
-      (error "Could not initialize the Logic DWG dialog.")
+
+;;; ----------------------------------------------------------------------------
+;;; Fallback DCL (identical to logicDwg.dcl) - used only if the file is missing
+;;; ----------------------------------------------------------------------------
+
+(defun LogicDWG:DclLines ()
+  (list
+    "logicDwg : dialog {"
+    "  label = \"Logic DWG\";"
+    "  : boxed_row {"
+    "    label = \"Zone\";"
+    "    : button { key = \"z43\";  label = \"43\";  width = 10; fixed_width = true; }"
+    "    : button { key = \"z44\";  label = \"44\";  width = 10; fixed_width = true; }"
+    "    : button { key = \"zoff\"; label = \"Off\"; width = 10; fixed_width = true; }"
+    "  }"
+    "  : boxed_row {"
+    "    label = \"DGPS to Survey Point\";"
+    "    : button { key = \"sp\"; label = \"Generate Points\"; width = 34; fixed_width = true; }"
+    "  }"
+    "  : boxed_row {"
+    "    label = \"Rail Tracks\";"
+    "    : button { key = \"track\"; label = \"Generate Track\"; width = 34; fixed_width = true; }"
+    "  }"
+    "  spacer_1;"
+    "  : row {"
+    "    alignment = centered;"
+    "    : button { key = \"close\"; label = \"Close\"; width = 12; fixed_width = true; is_cancel = true; }"
+    "  }"
+    "}"
   )
+)
 
-  (action_tile "btn_z43" "(done_dialog 3)")
-  (action_tile "btn_z44" "(done_dialog 4)")
-  (action_tile "btn_zoff" "(done_dialog 5)")
-  (action_tile "btn_sp" "(done_dialog 1)")
-  (action_tile "btn_track" "(done_dialog 2)")
-  (action_tile "cancel" "(done_dialog 0)")
-
-  (setq running T)
-  (while running
-    (setq code (start_dialog))
+(defun LogicDWG:WriteTempDcl (/ dir path f)
+  (setq dir
     (cond
-      ((= code 1)
-       (princ "\nRunning: DGPS to Survey Point...")
-       (c:VIDDGPSTOSP)
-      )
-      ((= code 2)
-       (princ "\nRunning: Rail Tracks...")
-       (c:VIDDGPSTOLINE)
-      )
-      ((= code 3)
-       (princ "\nSetting Zone 43...")
-       (command "._MAPCSASSIGN" "UTM84-43N")
-       (command "._GEOMAP" "_Hybrid")
-       (command "._ZOOM" "_E")
-      )
-      ((= code 4)
-       (princ "\nSetting Zone 44...")
-       (command "._MAPCSASSIGN" "UTM84-44N")
-       (command "._GEOMAP" "_Hybrid")
-       (command "._ZOOM" "_E")
-      )
-      ((= code 5)
-       (princ "\nTurning Zone Off...")
-       (command "._GEOMAP" "_Off")
-      )
-      (T (setq running nil))
+      ((getenv "TEMP"))
+      ((getenv "TMP"))
+      (T (getvar "DWGPREFIX"))
+    )
+  )
+  (setq path (strcat dir "\\logicDwg_" (itoa (getvar "MILLISECS")) ".dcl"))
+  (setq f (open path "w"))
+  (if f
+    (progn
+      (foreach ln (LogicDWG:DclLines) (write-line ln f))
+      (close f)
+      path
+    )
+    nil
+  )
+)
+
+
+;;; ----------------------------------------------------------------------------
+;;; Show the dialog once. Returns the done_dialog code (0 = closed).
+;;;   1 Generate Points   2 Generate Track   3 Zone 43   4 Zone 44   5 Zone Off
+;;; ----------------------------------------------------------------------------
+
+(defun LogicDWG:Show (/ dclFile tempFile dclId code)
+  (setq code 0)
+  (setq dclFile (LogicDWG:FindDcl))
+
+  (if (null dclFile)
+    (progn
+      (setq tempFile (LogicDWG:WriteTempDcl))
+      (setq dclFile tempFile)
     )
   )
 
-  (unload_dialog dclid)
-  (setq dclid nil)
-  (if (findfile dclfile) (vl-file-delete dclfile))
+  (if (null dclFile)
+    (alert "LogicDWG: the dialog file could not be found or created.")
+    (progn
+      (setq dclId (load_dialog dclFile))
+      (if (or (null dclId) (< dclId 1))
+        (alert (strcat "LogicDWG: unable to load dialog file:\n" dclFile))
+        (progn
+          (if (new_dialog "logicDwg" dclId)
+            (progn
+              (action_tile "z43"   "(done_dialog 3)")
+              (action_tile "z44"   "(done_dialog 4)")
+              (action_tile "zoff"  "(done_dialog 5)")
+              (action_tile "sp"    "(done_dialog 1)")
+              (action_tile "track" "(done_dialog 2)")
+              (action_tile "close" "(done_dialog 0)")
+              (setq code (start_dialog))
+            )
+            (alert (strcat "LogicDWG: dialog \"logicDwg\" not found in:\n" dclFile))
+          )
+          (unload_dialog dclId)
+        )
+      )
+    )
+  )
 
-  (setvar "CMDECHO" old-cmdecho)
-  (setq *error* nil)
+  (if tempFile (vl-file-delete tempFile))
+  (if (numberp code) code 0)
+)
+
+
+;;; ----------------------------------------------------------------------------
+;;; Zone buttons (same native commands the old SM tool used)
+;;; ----------------------------------------------------------------------------
+
+(defun LogicDWG:ZoneApply (mode / cs)
+  (cond
+    ((= mode "OFF")
+     (command "._GEOMAP" "_Off")
+    )
+    (T
+     (setq cs (if (= mode "44") "UTM84-44N" "UTM84-43N"))
+     (command "._MAPCSASSIGN" cs)
+     (command "._GEOMAP" "_Hybrid")
+     (command "._ZOOM" "_E")
+    )
+  )
+  T
+)
+
+(defun LogicDWG:Zone (mode / oldEcho res)
+  (setq oldEcho (getvar "CMDECHO"))
+  (setvar "CMDECHO" 0)
+  (setq res (vl-catch-all-apply 'LogicDWG:ZoneApply (list mode)))
+  ;; If a command was left waiting for input, cancel it.
+  (repeat 3
+    (if (> (getvar "CMDACTIVE") 0) (command))
+  )
+  (setvar "CMDECHO" oldEcho)
+  (if (vl-catch-all-error-p res)
+    (princ (strcat "\nLogicDWG zone error: " (vl-catch-all-error-message res)))
+    (princ
+      (cond
+        ((= mode "OFF") "\nGeoMap turned Off.")
+        ((= mode "44") "\nZone 44 (UTM84-44N) set.")
+        (T "\nZone 43 (UTM84-43N) set.")
+      )
+    )
+  )
   (princ)
 )
 
-(princ "\nlogicdwg_v03.lsp loaded. Type VIDLOGICDWG to run.")
+
+;;; ----------------------------------------------------------------------------
+;;; Start a tool command by name (no "._" prefix - these are custom commands).
+;;; Called only after the dialog is closed.
+;;; ----------------------------------------------------------------------------
+
+(defun LogicDWG:RunCmd (name / sym)
+  (setq sym (read (strcat "c:" name)))
+  (if (and (boundp sym)
+           (member (type (eval sym)) '(USR SUBR EXRXSUBR))
+      )
+    (eval (list sym))
+    (alert
+      (strcat
+        "Command " (strcase name) " is not loaded.\n\n"
+        "Load the LogicDWG tools first (vidLoader.lsp)."
+      )
+    )
+  )
+)
+
+
+;;; ----------------------------------------------------------------------------
+;;; Command
+;;; ----------------------------------------------------------------------------
+
+(defun c:LOGICDWG (/ *error* again code)
+
+  ;; Quiet handler: ESC / cancel inside a tool is not reported as an error.
+  (defun *error* (msg)
+    (if (and msg
+             (not (member (strcase msg) '("FUNCTION CANCELLED" "QUIT / EXIT ABORT")))
+        )
+      (princ (strcat "\nLogicDWG error: " msg))
+    )
+    (princ)
+  )
+
+  (setq again T)
+  (while again
+    (setq code (LogicDWG:Show))
+    (cond
+      ((= code 3) (LogicDWG:Zone "43"))
+      ((= code 4) (LogicDWG:Zone "44"))
+      ((= code 5) (LogicDWG:Zone "OFF"))
+      ((= code 1)
+       (setq again nil)
+       (LogicDWG:RunCmd "VIDDGPSTOSP")
+      )
+      ((= code 2)
+       (setq again nil)
+       (LogicDWG:RunCmd "VIDDGPSTOLINE")
+      )
+      (T (setq again nil))
+    )
+  )
+  (princ)
+)
+
+(defun c:VIDLOGICDWG ()
+  (c:LOGICDWG)
+)
+
+
+;;; ----------------------------------------------------------------------------
+;;; Load message
+;;; ----------------------------------------------------------------------------
+
+(princ "\n[OK] LogicDWG loaded. Type VIDLOGICDWG to open.")
 (princ)
