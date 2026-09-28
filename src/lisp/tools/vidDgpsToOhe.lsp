@@ -9,8 +9,8 @@
 (setq *DGO-RECT-SIZE* 0.300)
 (setq *DGO-TEXT-HEIGHT* 1.500)
 (setq *DGO-TRACK-LAYER* "1-track")
-(setq *DGO-RECT-LAYER* "DGPS_OHE_RECTANGLE")
-(setq *DGO-TEXT-LAYER* "DGPS_OHE_TEXT")
+(setq *DGO-RECT-LAYER* "1-OHE-CSV")
+(setq *DGO-TEXT-LAYER* "1-OHE-CSV")
 
 ;;; ------------------------------------------------
 ;;; String helpers
@@ -558,7 +558,7 @@
 ;;; Main command
 ;;; ------------------------------------------------
 
-(defun c:DgpsToOhe (/ *error* oldcmdecho oldosmode rows tracks
+(defun c:vidDgpsToOhe (/ *error* oldcmdecho oldosmode rows tracks
                        mode ss i e item p best cp tangent rect
                        v1 v2 v3 v4 textpt ident textstr ent1 ent2
                        madeRect madeText failCount tooFar)
