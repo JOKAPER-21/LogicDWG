@@ -1,5 +1,5 @@
 ;;; ============================================================================
-;;; vidDgpsToLine.lsp  (VIDDGPSTOLINE v14)
+;;; vidDgpsToLine.lsp  (VIDDGPSTOLINE v15)
 ;;; DGPS CSV -> Polyline / 3D Polyline (one per Code)
 ;;;
 ;;; Command: VIDDGPSTOLINE
@@ -9,6 +9,9 @@
 ;;;   - Header-name based column lookup, quoted-field CSV parser
 ;;;   - Groups ALL records by Code
 ;;;   - Sorts each Code by Local Time, then CSV row number
+;;;   - Then re-orders each Code FORWARD (no back-and-forth): when the
+;;;     survey team missed a point and came back to it later, the point
+;;;     is put back where it belongs using Easting/Northing distance
 ;;;   - Creates 2D LWPOLYLINE on layer pl_<Code>, or
 ;;;     true 3D POLYLINE on layer 3dpl_<Code>
 ;;;   - NO points and NO text are created
@@ -24,6 +27,13 @@
 (setq dgps-*old-clayer* nil)
 (setq dgps-*old-cmdecho* nil)
 (setq dgps-*old-osmode* nil)
+
+;; Forward re-ordering look-ahead: how many of the next (time-ordered)
+;; unvisited points are considered when choosing the next vertex.
+;; Larger = repairs points surveyed much later; smaller = stays closer to
+;; the raw time order. Can be changed at the command line, e.g.
+;;   (setq DGPS-ForwardWindow 12)
+(if (null DGPS-ForwardWindow) (setq DGPS-ForwardWindow 8))
 
 ;; ---------------------------------------------------------------------------
 ;; Basic string helpers
@@ -442,6 +452,68 @@
 )
 
 ;; ---------------------------------------------------------------------------
+;; Forward ordering (no backward / back-and-forth vertices)
+;;
+;; Input : records already sorted by Local Time.
+;; Method: start at the earliest point. At each step look only at the next
+;;         DGPS-ForwardWindow unvisited points (in time order) and move to
+;;         the one NEAREST in Easting/Northing. Ties keep the earlier time.
+;;         Example: times give 1,3,2,4,5 -> from 1 the nearest of {3,2,4,..}
+;;         is 2, then 3, then 4 ... => 1,2,3,4,5 (forward).
+;; No record is ever dropped or duplicated.
+;; ---------------------------------------------------------------------------
+(defun DGPS-Dist2D (a b / dx dy)
+  (setq dx (- (atof (DGPS-R-East a)) (atof (DGPS-R-East b)))
+        dy (- (atof (DGPS-R-North a)) (atof (DGPS-R-North b))))
+  (sqrt (+ (* dx dx) (* dy dy)))
+)
+
+(defun DGPS-OrderForward (recs win / remaining result cur cand k best bestD d c)
+  (if (or (null recs) (null (cdr recs)))
+    recs
+    (progn
+      (if (or (null win) (< win 2)) (setq win 2))
+      (setq cur (car recs)
+            remaining (cdr recs)
+            result (list cur))
+      (while remaining
+        ;; candidates: first "win" unvisited points in time order
+        (setq cand '() k 0)
+        (foreach c remaining
+          (if (< k win)
+            (progn (setq cand (cons c cand)) (setq k (1+ k)))
+          )
+        )
+        (setq cand (reverse cand))
+        (setq best nil bestD nil)
+        (foreach c cand
+          (setq d (DGPS-Dist2D cur c))
+          (if (or (null bestD) (< d bestD))
+            (setq best c bestD d)
+          )
+        )
+        (setq result (cons best result))
+        (setq remaining (vl-remove best remaining))
+        (setq cur best)
+      )
+      (reverse result)
+    )
+  )
+)
+
+;; Number of positions where the forward order differs from the time order.
+(defun DGPS-CountMoved (a b / n)
+  (setq n 0)
+  (while (and a b)
+    (if (/= (DGPS-R-Row (car a)) (DGPS-R-Row (car b)))
+      (setq n (1+ n))
+    )
+    (setq a (cdr a) b (cdr b))
+  )
+  n
+)
+
+;; ---------------------------------------------------------------------------
 ;; Error handler
 ;; ---------------------------------------------------------------------------
 (defun DGPS-Error (msg)
@@ -473,7 +545,7 @@
      idxP idxC idxN idxE idxZ idxT
      line fields rowNo dataRows validRows skippedRows
      allRev allRecords rec pname code north east elev localTime key
-     groups g codeRecs sortedRecs pts x y z
+     groups g codeRecs sortedRecs orderedRecs moved totalMoved pts x y z
      plLayer geomCount singleCount plLayers geomFailures
      result i sampleCount)
 
@@ -637,7 +709,7 @@
   ;; -------------------------------------------------------------------------
   ;; Geometry: one pass over every Code group (no points, no text)
   ;; -------------------------------------------------------------------------
-  (setq geomCount 0 singleCount 0 geomFailures 0 plLayers '())
+  (setq geomCount 0 singleCount 0 geomFailures 0 totalMoved 0 plLayers '())
 
   (foreach g groups
     (setq codeRecs (cdr g))
@@ -667,10 +739,21 @@
           (setq plLayers (cons plLayer plLayers))
         )
 
+        ;; 1) Local Time order (then CSV row number)
         (setq sortedRecs (vl-sort codeRecs 'DGPS-TimeLess))
+        ;; 2) Forward order using Easting/Northing (no back-and-forth)
+        (setq orderedRecs (DGPS-OrderForward sortedRecs DGPS-ForwardWindow))
+        (setq moved (DGPS-CountMoved sortedRecs orderedRecs))
+        (setq totalMoved (+ totalMoved moved))
+        (if (> moved 0)
+          (princ
+            (strcat "\nRe-ordered forward: " code " | "
+                    (itoa moved) " position(s) changed")
+          )
+        )
         (setq pts '())
 
-        (foreach rec sortedRecs
+        (foreach rec orderedRecs
           (setq x (atof (DGPS-R-East rec)))
           (setq y (atof (DGPS-R-North rec)))
           (setq z (atof (DGPS-R-Elev rec)))
@@ -729,6 +812,7 @@
   (princ (strcat "\nGeometry created:       " (itoa geomCount)))
   (princ (strcat "\nGeometry failures:      " (itoa geomFailures)))
   (princ (strcat "\nSingle-point Codes:     " (itoa singleCount)))
+  (princ (strcat "\nPoints re-ordered:      " (itoa totalMoved)))
 
   (if (> geomFailures 0)
     (princ "\nWARNING: One or more geometry entities failed to create.")
@@ -745,5 +829,5 @@
   (princ)
 )
 
-(princ "\nVIDDGPSTOLINE_v14 loaded. Type VIDDGPSTOLINE to run.")
+(princ "\nVIDDGPSTOLINE_v15 loaded. Type VIDDGPSTOLINE to run.")
 (princ)
