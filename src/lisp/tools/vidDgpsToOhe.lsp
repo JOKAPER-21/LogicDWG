@@ -1,6 +1,5 @@
 ;;; ================================================================
 ;;; DgpsToOhe.lsp
-;;; Version: 01
 ;;; Civil 3D 2026 / AutoCAD AutoLISP
 ;;;
 ;;; CSV reader:
