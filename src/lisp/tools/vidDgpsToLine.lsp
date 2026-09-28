@@ -1,19 +1,17 @@
 ;;; ============================================================================
-;;; VIDDGPSTOLINE_v10.LSP
-;;; Production DGPS CSV importer for AutoCAD / Civil 3D
+;;; vidDgpsToLine.lsp  (VIDDGPSTOLINE v14)
+;;; DGPS CSV -> Polyline / 3D Polyline (one per Code)
 ;;;
 ;;; Command: VIDDGPSTOLINE
 ;;;
 ;;; Features:
-;;;   - Reads ALL CSV rows until EOF
-;;;   - ANSI/Windows-1252 and UTF-8/UTF-8 BOM support
-;;;   - Header-name based column lookup
-;;;   - Proper CSV quoted-field parser
-;;;   - Creates POINT + Point Name + Code + Elevation MTEXT for every row
+;;;   - Reads ALL CSV rows until EOF (binary reader, 0x1A safe)
+;;;   - Header-name based column lookup, quoted-field CSV parser
 ;;;   - Groups ALL records by Code
-;;;   - Sorts geometry by Local Time, then CSV row number
-;;;   - Creates 2D LWPOLYLINE or true 3D POLYLINE
-;;;   - Verifies entity creation and reports counts
+;;;   - Sorts each Code by Local Time, then CSV row number
+;;;   - Creates 2D LWPOLYLINE on layer pl_<Code>, or
+;;;     true 3D POLYLINE on layer 3dpl_<Code>
+;;;   - NO points and NO text are created
 ;;; ============================================================================
 
 (vl-load-com)
@@ -26,8 +24,6 @@
 (setq dgps-*old-clayer* nil)
 (setq dgps-*old-cmdecho* nil)
 (setq dgps-*old-osmode* nil)
-(setq dgps-*old-pdsize* nil)
-(setq dgps-*old-pdmode* nil)
 
 ;; ---------------------------------------------------------------------------
 ;; Basic string helpers
@@ -102,7 +98,6 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Layer-name sanitization
-;; Original Code is never changed for displayed text.
 ;; ---------------------------------------------------------------------------
 (defun DGPS-SanitizeLayerName (s / src i ch out)
   (setq src (DGPS-Trim s)
@@ -121,7 +116,6 @@
     (setq i (1+ i))
   )
   (if (= out "") (setq out "_NOCODE"))
-  ;; Layer names should not begin with a space.
   (vl-string-trim " " out)
 )
 
@@ -151,47 +145,7 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; POINT / MTEXT creation
-;; ---------------------------------------------------------------------------
-(defun DGPS-MakePoint (pt layer)
-  (entmakex
-    (list
-      '(0 . "POINT")
-      '(100 . "AcDbEntity")
-      (cons 8 layer)
-      '(100 . "AcDbPoint")
-      (cons 10 pt)
-      '(210 0.0 0.0 1.0)
-    )
-  )
-)
-
-;; attach:
-;; 1 TopLeft, 2 TopCenter, 3 TopRight
-;; 4 MiddleLeft, 5 MiddleCenter, 6 MiddleRight
-;; 7 BottomLeft, 8 BottomCenter, 9 BottomRight
-(defun DGPS-MakeMText (pt txt ht layer attach)
-  (entmakex
-    (list
-      '(0 . "MTEXT")
-      '(100 . "AcDbEntity")
-      (cons 8 layer)
-      '(100 . "AcDbMText")
-      (cons 10 pt)
-      (cons 40 ht)
-      (cons 41 0.0)
-      (cons 71 attach)
-      (cons 72 1)
-      (cons 1 (if txt txt ""))
-      '(7 . "Standard")
-      '(210 0.0 0.0 1.0)
-    )
-  )
-)
-
-;; ---------------------------------------------------------------------------
-;; 2D polyline
-;; Uses LWPOLYLINE because it is a real 2D polyline and is compact.
+;; 2D polyline (LWPOLYLINE)
 ;; ---------------------------------------------------------------------------
 (defun DGPS-Make2DPolyline (pts layer / data e)
   (if (>= (length pts) 2)
@@ -226,7 +180,7 @@
 ;; ---------------------------------------------------------------------------
 ;; True 3D POLYLINE
 ;; ---------------------------------------------------------------------------
-(defun DGPS-Make3DPolyline (pts layer / head verts e v)
+(defun DGPS-Make3DPolyline (pts layer / head verts e)
   (if (>= (length pts) 2)
     (progn
       (setq head
@@ -279,10 +233,9 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; CSV parser
-;; Properly handles quoted commas and escaped quotes.
+;; CSV parser - handles quoted commas and escaped quotes.
 ;; ---------------------------------------------------------------------------
-(defun DGPS-ParseCSV (s / i n ch next inquote cur fields)
+(defun DGPS-ParseCSV (s / i n ch inquote cur fields)
   (setq i 1 n (strlen s) inquote nil cur "" fields '())
   (while (<= i n)
     (setq ch (substr s i 1))
@@ -322,31 +275,23 @@
   count
 )
 
-;; Reads one logical CSV record. Supports quoted multiline fields.
+;; Reads one physical line. Binary reader: does NOT treat byte 0x1A
+;; (Ctrl-Z) as end-of-file, unlike text-mode read-line.
 (defun DGPS-ReadPhysicalLine (fh / b s gotLine)
-  ;; Binary reader: unlike text read-line, this does NOT treat byte 0x1A
-  ;; (Ctrl-Z / SUB) as end-of-file. The survey CSV contains 0x1A in
-  ;; Latitude/Longitude fields, which was the reason previous versions
-  ;; stopped after the first data row.
   (setq s ""
         gotLine nil)
   (while (and (not gotLine) (setq b (read-char fh)))
     (cond
-      ;; LF
       ((= b 10)
        (setq gotLine T)
       )
-      ;; CR: consume optional LF for CRLF files.
       ((= b 13)
        (setq b (read-char fh))
        (if (and b (/= b 10))
-         ;; This file is expected to use CRLF. If a lone CR is encountered,
-         ;; the next byte cannot be unread, so retain it in the current line.
          (setq s (strcat s (chr b)))
        )
        (setq gotLine T)
       )
-      ;; Normal byte, including 0x1A.
       (T
        (setq s (strcat s (chr b)))
       )
@@ -374,34 +319,9 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; UTF-8 BOM detection
-;; ---------------------------------------------------------------------------
-(defun DGPS-HasUTF8BOM (file / f a b c result)
-  (setq result nil)
-  (setq f (open file "r"))
-  (if f
-    (progn
-      (setq a (read-char f) b (read-char f) c (read-char f))
-      (close f)
-      (if (and (= a 239) (= b 187) (= c 191))
-        (setq result T)
-      )
-    )
-  )
-  result
-)
-
-;; ---------------------------------------------------------------------------
-;; Open CSV using AutoCAD text encoding support.
-;; If UTF-8 is explicitly detected, use UTF-8.
-;; For no BOM, try UTF-8 and fall back to ANSI if opening/reading fails.
+;; Open CSV in binary mode (0x1A safe).
 ;; ---------------------------------------------------------------------------
 (defun DGPS-OpenCSV (file / fh)
-  ;; IMPORTANT:
-  ;; Use binary mode. AutoLISP text-mode reading can interpret byte 0x1A
-  ;; (Ctrl-Z / SUB) as EOF. This DGPS CSV contains 0x1A characters in its
-  ;; latitude/longitude fields, so text-mode reading stops after Pt1.
-  ;; Binary mode lets DGPS-ReadPhysicalLine handle the actual CR/LF bytes.
   (setq fh (open file "rb"))
   (if fh
     (list fh "ANSI/BINARY")
@@ -410,7 +330,7 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; BOM stripping from first header field when necessary.
+;; UTF-8 BOM stripping from the first header field.
 ;; ---------------------------------------------------------------------------
 (defun DGPS-StripBOM (s)
   (if (and s (>= (strlen s) 3)
@@ -450,11 +370,9 @@
 (defun DGPS-R-Key   (r) (nth 7 r))
 
 ;; ---------------------------------------------------------------------------
-;; Time sort key.
-;; Extract only the time part when possible. For this CSV, the date portion
-;; is constant/irrelevant; time is what controls survey order.
+;; Time sort key (time part only; falls back to CSV row number).
 ;; ---------------------------------------------------------------------------
-(defun DGPS-TimeKey (s / timeStr pos h m sec ms parts p2 p3)
+(defun DGPS-TimeKey (s / timeStr pos h m sec ms p2 p3)
   (setq timeStr (DGPS-Trim s))
   (setq pos (vl-string-search " " timeStr))
   (if pos
@@ -507,8 +425,7 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; Group records by Code WITHOUT sorting the master list.
-;; This prevents string comparison/type bugs and guarantees no record loss.
+;; Group records by Code (master list is not sorted or modified).
 ;; Result: ((code rec1 rec2 ...) ...)
 ;; ---------------------------------------------------------------------------
 (defun DGPS-GroupByCode (records / groups code cell)
@@ -528,16 +445,15 @@
 ;; Error handler
 ;; ---------------------------------------------------------------------------
 (defun DGPS-Error (msg)
-  (if (and dgps-*fh* (not (vl-catch-all-error-p
-                            (vl-catch-all-apply 'close (list dgps-*fh*)))))
-    nil
+  (if dgps-*fh*
+    (progn
+      (vl-catch-all-apply 'close (list dgps-*fh*))
+      (setq dgps-*fh* nil)
+    )
   )
-  (setq dgps-*fh* nil)
   (if dgps-*old-clayer* (setvar "CLAYER" dgps-*old-clayer*))
   (if dgps-*old-cmdecho* (setvar "CMDECHO" dgps-*old-cmdecho*))
   (if dgps-*old-osmode* (setvar "OSMODE" dgps-*old-osmode*))
-  (if dgps-*old-pdsize* (setvar "PDSIZE" dgps-*old-pdsize*))
-  (if dgps-*old-pdmode* (setvar "PDMODE" dgps-*old-pdmode*))
   (setq *error* dgps-*old-error*)
   (if (and msg
            (/= msg "Function cancelled")
@@ -553,16 +469,13 @@
 ;; ---------------------------------------------------------------------------
 (defun c:VIDDGPSTOLINE
   (/ outType csvFile openResult enc fh
-     headerLine headers headerUpper
+     headerLine headers
      idxP idxC idxN idxE idxZ idxT
      line fields rowNo dataRows validRows skippedRows
      allRev allRecords rec pname code north east elev localTime key
-     groups group codeRecs sortedRecs pts p x y z
-     spLayer gplLayer layer
-     spPt spName spCode spElev geomCount singleCount
-     spLayers gplLayers geomFailures
-     result n i sampleCount
-     oldLayer)
+     groups g codeRecs sortedRecs pts x y z
+     plLayer geomCount singleCount plLayers geomFailures
+     result i sampleCount)
 
   (setq dgps-*old-error* *error*)
   (setq *error* DGPS-Error)
@@ -570,13 +483,9 @@
   (setq dgps-*old-clayer* (getvar "CLAYER"))
   (setq dgps-*old-cmdecho* (getvar "CMDECHO"))
   (setq dgps-*old-osmode* (getvar "OSMODE"))
-  (setq dgps-*old-pdsize* (getvar "PDSIZE"))
-  (setq dgps-*old-pdmode* (getvar "PDMODE"))
 
   (setvar "CMDECHO" 0)
   (setvar "OSMODE" 0)
-  (setvar "PDSIZE" 0.5)
-  (setvar "PDMODE" 3)
 
   ;; -------------------------------------------------------------------------
   ;; Output type
@@ -669,7 +578,6 @@
                  (DGPS-NumericP elev))
           (progn
             (setq key (DGPS-TimeKey localTime))
-            ;; Every valid row gets one record. No deduplication.
             (setq allRev
               (cons
                 (list pname code north east elev localTime rowNo key)
@@ -687,10 +595,6 @@
   (close fh)
   (setq dgps-*fh* nil)
   (setq allRecords (reverse allRev))
-
-  ;; -------------------------------------------------------------------------
-  ;; Group ALL records
-  ;; -------------------------------------------------------------------------
   (setq groups (DGPS-GroupByCode allRecords))
 
   ;; -------------------------------------------------------------------------
@@ -701,23 +605,16 @@
   (princ "\n========================================")
   (princ (strcat "\nFile: " csvFile))
   (princ (strcat "\nEncoding: " enc))
+  (princ (strcat "\nOutput type: " outType))
   (princ (strcat "\nData rows read: " (itoa dataRows)))
   (princ (strcat "\nValid records: " (itoa validRows)))
   (princ (strcat "\nSkipped rows: " (itoa skippedRows)))
   (princ (strcat "\nUnique Codes: " (itoa (length groups))))
   (princ "\n----------------------------------------")
   (foreach g groups
-    (princ
-      (strcat
-        "\n"
-        (car g)
-        " -> "
-        (itoa (length (cdr g)))
-      )
-    )
+    (princ (strcat "\n" (car g) " -> " (itoa (length (cdr g)))))
   )
 
-  ;; First five records
   (princ "\n\nFIRST FIVE RECORDS")
   (setq sampleCount (min 5 (length allRecords))
         i 0)
@@ -725,116 +622,51 @@
     (setq rec (nth i allRecords))
     (princ
       (strcat
-        "\n"
-        (itoa (1+ i))
-        ": "
-        (DGPS-R-PName rec)
-        " | "
-        (DGPS-R-Code rec)
-        " | E="
-        (DGPS-R-East rec)
-        " | N="
-        (DGPS-R-North rec)
-        " | Z="
-        (DGPS-R-Elev rec)
-        " | T="
-        (DGPS-R-Time rec)
+        "\n" (itoa (1+ i))
+        ": " (DGPS-R-PName rec)
+        " | " (DGPS-R-Code rec)
+        " | E=" (DGPS-R-East rec)
+        " | N=" (DGPS-R-North rec)
+        " | Z=" (DGPS-R-Elev rec)
+        " | T=" (DGPS-R-Time rec)
       )
     )
     (setq i (1+ i))
   )
 
   ;; -------------------------------------------------------------------------
-  ;; SURVEY GRAPHICS: one pass over ALL records
+  ;; Geometry: one pass over every Code group (no points, no text)
   ;; -------------------------------------------------------------------------
-  (setq spPt 0 spName 0 spCode 0 spElev 0 spLayers '())
-
-  (foreach rec allRecords
-    (setq code (DGPS-R-Code rec))
-    (setq spLayer (strcat "sp_" (DGPS-SanitizeLayerName code)))
-
-    (if (not (tblsearch "LAYER" spLayer))
-      (DGPS-EnsureLayer spLayer 4)
-    )
-    (if (null (member spLayer spLayers))
-      (setq spLayers (cons spLayer spLayers))
-    )
-
-    (setq x (atof (DGPS-R-East rec)))
-    (setq y (atof (DGPS-R-North rec)))
-    (setq z (atof (DGPS-R-Elev rec)))
-    (setq p (list x y z))
-
-    ;; POINT at E,N,Z
-    (if (DGPS-MakePoint p spLayer)
-      (setq spPt (1+ spPt))
-    )
-
-    ;; Point Name - Middle Right
-    (if
-      (DGPS-MakeMText
-        p
-        (DGPS-R-PName rec)
-        0.5
-        spLayer
-        6
-      )
-      (setq spName (1+ spName))
-    )
-
-    ;; Code - Top Left
-    (if
-      (DGPS-MakeMText
-        p
-        code
-        0.5
-        spLayer
-        1
-      )
-      (setq spCode (1+ spCode))
-    )
-
-    ;; Elevation - Bottom Left
-    (if
-      (DGPS-MakeMText
-        p
-        (DGPS-R-Elev rec)
-        0.5
-        spLayer
-        7
-      )
-      (setq spElev (1+ spElev))
-    )
-  )
-
-  ;; -------------------------------------------------------------------------
-  ;; Geometry: one independent pass over every Code group
-  ;; -------------------------------------------------------------------------
-  (setq geomCount 0 singleCount 0 geomFailures 0 gplLayers '())
+  (setq geomCount 0 singleCount 0 geomFailures 0 plLayers '())
 
   (foreach g groups
     (setq codeRecs (cdr g))
     (setq code (car g))
-    (setq gplLayer (strcat "gpl_" (DGPS-SanitizeLayerName code)))
-
-    (if (not (tblsearch "LAYER" gplLayer))
-      (DGPS-EnsureLayer gplLayer 3)
-    )
-    (if (null (member gplLayer gplLayers))
-      (setq gplLayers (cons gplLayer gplLayers))
-    )
 
     (if (< (length codeRecs) 2)
       (progn
         (setq singleCount (1+ singleCount))
         (princ
-          (strcat
-            "\nGeometry: " code
-            " | Points: 1 | SKIPPED (single point)"
-          )
+          (strcat "\nGeometry: " code " | Points: 1 | SKIPPED (single point)")
         )
       )
       (progn
+        ;; Layer prefix depends on the selected output type:
+        ;;   Polyline   -> pl_<Code>
+        ;;   3Dpolyline -> 3dpl_<Code>
+        (setq plLayer
+          (strcat
+            (if (= outType "3Dpolyline") "3dpl_" "pl_")
+            (DGPS-SanitizeLayerName code)
+          )
+        )
+        (if (not (tblsearch "LAYER" plLayer))
+          (DGPS-EnsureLayer plLayer 3)
+        )
+        (if (null (member plLayer plLayers))
+          (setq plLayers (cons plLayer plLayers))
+        )
+
         (setq sortedRecs (vl-sort codeRecs 'DGPS-TimeLess))
         (setq pts '())
 
@@ -856,8 +688,8 @@
 
         (setq result
           (if (= outType "3Dpolyline")
-            (DGPS-Make3DPolyline pts gplLayer)
-            (DGPS-Make2DPolyline pts gplLayer)
+            (DGPS-Make3DPolyline pts plLayer)
+            (DGPS-Make2DPolyline pts plLayer)
           )
         )
 
@@ -865,21 +697,17 @@
           (progn
             (setq geomCount (1+ geomCount))
             (princ
-              (strcat
-                "\nGeometry: " code
-                " | Points: " (itoa (length sortedRecs))
-                " | " outType " | CREATED"
-              )
+              (strcat "\nGeometry: " code
+                      " | Points: " (itoa (length sortedRecs))
+                      " | " outType " | CREATED")
             )
           )
           (progn
             (setq geomFailures (1+ geomFailures))
             (princ
-              (strcat
-                "\nGeometry: " code
-                " | Points: " (itoa (length sortedRecs))
-                " | " outType " | FAILED"
-              )
+              (strcat "\nGeometry: " code
+                      " | Points: " (itoa (length sortedRecs))
+                      " | " outType " | FAILED")
             )
           )
         )
@@ -888,7 +716,7 @@
   )
 
   ;; -------------------------------------------------------------------------
-  ;; Final integrity checks
+  ;; Final report
   ;; -------------------------------------------------------------------------
   (princ "\n\n========================================")
   (princ "\nVIDDGPSTOLINE COMPLETE")
@@ -897,27 +725,10 @@
   (princ (strcat "\nValid records:          " (itoa validRows)))
   (princ (strcat "\nSkipped rows:           " (itoa skippedRows)))
   (princ (strcat "\nUnique Codes:           " (itoa (length groups))))
-  (princ (strcat "\nPOINT entities:         " (itoa spPt)))
-  (princ (strcat "\nPoint Name MTEXT:       " (itoa spName)))
-  (princ (strcat "\nCode MTEXT:             " (itoa spCode)))
-  (princ (strcat "\nElevation MTEXT:        " (itoa spElev)))
-  (princ (strcat "\nSurvey layers:           " (itoa (length spLayers))))
-  (princ (strcat "\nGeometry layers:         " (itoa (length gplLayers))))
-  (princ (strcat "\nGeometry created:        " (itoa geomCount)))
-  (princ (strcat "\nGeometry failures:       " (itoa geomFailures)))
-  (princ (strcat "\nSingle-point Codes:      " (itoa singleCount)))
-
-  (if (and (= validRows spPt)
-           (= validRows spName)
-           (= validRows spCode)
-           (= validRows spElev))
-    (princ "\n\nSurvey record integrity: OK")
-    (princ "\n\nWARNING: Survey entity count does not match valid record count.")
-  )
-
-  (if (= validRows 666)
-    (princ "\nTest CSV check: 666 valid rows detected.")
-  )
+  (princ (strcat "\nGeometry layers:        " (itoa (length plLayers))))
+  (princ (strcat "\nGeometry created:       " (itoa geomCount)))
+  (princ (strcat "\nGeometry failures:      " (itoa geomFailures)))
+  (princ (strcat "\nSingle-point Codes:     " (itoa singleCount)))
 
   (if (> geomFailures 0)
     (princ "\nWARNING: One or more geometry entities failed to create.")
@@ -929,12 +740,10 @@
   (setvar "CLAYER" dgps-*old-clayer*)
   (setvar "CMDECHO" dgps-*old-cmdecho*)
   (setvar "OSMODE" dgps-*old-osmode*)
-  (setvar "PDSIZE" dgps-*old-pdsize*)
-  (setvar "PDMODE" dgps-*old-pdmode*)
   (setq *error* dgps-*old-error*)
   (princ "\nVIDDGPSTOLINE finished successfully.")
   (princ)
 )
 
-(princ "\nVIDDGPSTOLINE_v12 loaded. Type VIDDGPSTOLINE to run.")
+(princ "\nVIDDGPSTOLINE_v14 loaded. Type VIDDGPSTOLINE to run.")
 (princ)
