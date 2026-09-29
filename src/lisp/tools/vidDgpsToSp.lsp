@@ -300,7 +300,7 @@
 ;; ---------------------------------------------------------------------------
 ;; True 3D POLYLINE
 ;; ---------------------------------------------------------------------------
-(defun DGPS-Make3DPolyline (pts layer / head verts e v)
+(defun DGPSSP-Make3DPolyline (pts layer / head verts e v)
   (if (>= (length pts) 2)
     (progn
       (setq head
@@ -356,7 +356,7 @@
 ;; CSV parser
 ;; Properly handles quoted commas and escaped quotes.
 ;; ---------------------------------------------------------------------------
-(defun DGPS-ParseCSV (s / i n ch next inquote cur fields)
+(defun DGPSSP-ParseCSV (s / i n ch next inquote cur fields)
   (setq i 1 n (strlen s) inquote nil cur "" fields '())
   (while (<= i n)
     (setq ch (substr s i 1))
@@ -528,7 +528,7 @@
 ;; Extract only the time part when possible. For this CSV, the date portion
 ;; is constant/irrelevant; time is what controls survey order.
 ;; ---------------------------------------------------------------------------
-(defun DGPS-TimeKey (s / timeStr pos h m sec ms parts p2 p3)
+(defun DGPSSP-TimeKey (s / timeStr pos h m sec ms parts p2 p3)
   (setq timeStr (DGPS-Trim s))
   (setq pos (vl-string-search " " timeStr))
   (if pos
@@ -601,7 +601,7 @@
 ;; ---------------------------------------------------------------------------
 ;; Error handler
 ;; ---------------------------------------------------------------------------
-(defun DGPS-Error (msg)
+(defun DGPSSP-Error (msg)
   (if (and dgps-*fh* (not (vl-catch-all-error-p
                             (vl-catch-all-apply 'close (list dgps-*fh*)))))
     nil
@@ -676,7 +676,7 @@
     (progn (VIDDGPSTOSP-Error "CSV file is empty.") (exit))
   )
   (setq headerLine (DGPS-StripBOM headerLine))
-  (setq headers (DGPS-ParseCSV headerLine))
+  (setq headers (DGPSSP-ParseCSV headerLine))
 
   (setq idxP (DGPS-HeaderIndex headers "Point Name"))
   (setq idxC (DGPS-HeaderIndex headers "Code"))
@@ -701,7 +701,7 @@
     (if (not (DGPS-BlankP line))
       (progn
         (setq dataRows (1+ dataRows))
-        (setq fields (DGPS-ParseCSV line))
+        (setq fields (DGPSSP-ParseCSV line))
         (setq pname (DGPS-GetField fields idxP))
         (setq code  (DGPS-GetField fields idxC))
         (setq north (DGPS-GetField fields idxN))

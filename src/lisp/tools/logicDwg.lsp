@@ -304,9 +304,16 @@
 
 ;; Settings button: runs VIDDIMSETTINGS (vidDimSettings.lsp).
 ;; Loads the file first if the command is not loaded yet.
-(defun LogicDWG:Settings ()
+(defun LogicDWG:Settings (/ f)
   (if (not (boundp 'c:VIDDIMSETTINGS))
-    (load "vidDimSettings" nil)
+    (if (setq f (findfile "vidDimSettings.lsp"))
+      (load f nil)
+      (if (boundp 'LogicDWG:ToolsDir)
+        (if (findfile (strcat LogicDWG:ToolsDir "\\vidDimSettings.lsp"))
+          (load (strcat LogicDWG:ToolsDir "\\vidDimSettings.lsp") nil)
+        )
+      )
+    )
   )
   (LogicDWG:RunCmd "VIDDIMSETTINGS")
   (princ)
