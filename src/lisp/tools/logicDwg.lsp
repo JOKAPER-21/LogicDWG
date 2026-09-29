@@ -36,9 +36,10 @@
       ("zoff"  "Off"          ZONE "OFF")
     )
     ("Generate from CSV"
-      ("sp"    "Survey Point" CMD  "VIDDGPSTOSP")
-      ("track" "Rail Track"   CMD  "VIDDGPSTOLINE")
-      ("ohe"   "Ohe"          CMD  "VIDDGPSTOOHE")
+      ("sp"        "Survey Point"    CMD "VIDDGPSTOSP")
+      ("track"     "Rail Track"      CMD "VIDDGPSTOLINE")
+      ("chainage"  "Chainage Runner" CMD "VIDCHAINAGERUNNER")
+      ("ohe"       "Ohe"             CMD "VIDDGPSTOOHE")
     )
   )
 )
