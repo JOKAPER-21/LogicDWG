@@ -1,70 +1,100 @@
 # LogicDWG
 
-A small AutoCAD Civil 3D LISP toolset for DGPS survey CSV import, packaged
-behind one launcher dialog.
+AutoLISP toolkit for **AutoCAD Civil 3D 2026** that turns DGPS survey CSV files into drawing geometry, sets the map zone, and adds running chainage along a track. Everything is opened from one dialog (`VIDLOGICDWG`) or run directly as a command.
 
-## Folder structure
+Release: 1.1.3
+
+---
+
+## Contents
+
+| Command | File | What it does |
+|---|---|---|
+| `VIDLOGICDWG` (`LOGICDWG`) | `tools/logicDwg.lsp` | Dialog with Map Zone buttons and the CSV tools |
+| `VIDMAPZONE` | `tools/vidMapZone.lsp` | Command-line map zone: Z43 / Z44 / Off |
+| `VIDDGPSTOSP` | `tools/vidDgpsToSp.lsp` | DGPS CSV to survey points with labels |
+| `VIDDGPSTOLINE` | `tools/vidDgpsToLine.lsp` | DGPS CSV to polylines or 3D polylines, one layer per code |
+| `VIDDGPSTOOHE` | `tools/vidDgpsToOhe.lsp` | DGPS CSV to OHE rectangles and stacked text, aligned to the track |
+| `VIDCHAINAGERUNNER` | `tools/vidChainageRunner.lsp` | Running chainage marks along a selected polyline |
+
+## Folder layout
 
 ```
-LogicDWG/
-├── README.md
-├── loader.lsp                              <- load this one file to get everything
-└── src/
-    └── lisp/
-        ├── logicdwg/
-        │   └── logicdwg_v03.lsp            <- VIDLOGICDWG launcher dialog
-        ├── sm/
-        │   └── sm.lsp                      <- SM  (Zone / GeoMap: 43 / 44 / Off)
-        ├── vdgpstosp/
-        │   └── vdgpstosp_v01.lsp           <- VIDDGPSTOSP  (DGPS CSV -> survey points)
-        └── dgps2pline/
-            └── DGPS2PLINE_v12.LSP          <- DGPS2PLINE (DGPS CSV -> survey points + polyline)
+Support\vid\
+  vidLoader.lsp          <- load this one
+  tools\
+    logicDwg.lsp
+    logicDwg.dcl         (optional, see Notes)
+    vidChainageRunner.lsp
+    vidDgpsToLine.lsp
+    vidDgpsToOhe.lsp
+    vidDgpsToSp.lsp
+    vidMapZone.lsp
 ```
 
-## Install / Load
+`vidLoader.lsp` must sit directly above the `tools` folder.
 
-1. Copy the whole `LogicDWG` folder anywhere on disk (a synced git folder,
-   e.g. `D:\git\LogicDWG`, works fine - the loader finds its own location).
-2. In AutoCAD Civil 3D: `APPLOAD` -> browse to `LogicDWG\loader.lsp` -> Load.
-   This loads all four tools in the correct order.
-3. Type `VIDLOGICDWG` to open the launcher dialog.
+## Installation
 
-To load automatically every session, add `loader.lsp` to your Startup Suite
-in `APPLOAD`, or `(load "D:/git/LogicDWG/loader.lsp")` in your `acaddoc.lsp`.
+1. Copy the `vid` folder to:
+   `C:\Users\<you>\AppData\Roaming\Autodesk\C3D 2026\enu\Support\`
+2. In Civil 3D, load the loader:
+   ```
+   (load "C:/Users/<you>/AppData/Roaming/Autodesk/C3D 2026/enu/Support/vid/vidLoader.lsp")
+   ```
+3. The console lists each file as `[OK]`, `[MISSING]` or `[ERROR]`, then prints the available commands.
 
-## The launcher (`VIDLOGICDWG`)
+### Load automatically at startup
 
-A single dialog titled **Logic DWG** with:
+Use one of these:
 
-| Section                  | Control(s)                       | Runs          |
-|---------------------------|-----------------------------------|---------------|
-| Zone                      | `[43]` `[44]` `[Off]`             | MAPCSASSIGN / GEOMAP / ZOOM (same actions as `SM`) |
-| DGPS to Survey Point      | `[Generate Points]`               | `VIDDGPSTOSP`   |
-| Rail Tracks               | `[Generate Track]`                | `DGPS2PLINE`  |
+- **APPLOAD > Startup Suite > Contents > Add** and select `vidLoader.lsp`, or
+- add the `vid` folder to **OPTIONS > Files > Support File Search Path** and add
+  `(load "vidLoader.lsp")` to `acaddoc.lsp`.
 
-`VIDDGPSTOSP` and `DGPS2PLINE` are invoked as direct LISP function calls
-(`(c:VIDDGPSTOSP)` / `(c:DGPS2PLINE)`) rather than through AutoCAD's command
-lookup, which avoids an "Unknown command" quirk that can occur when a
-custom command is dispatched by name from inside another already-running
-command. The Zone buttons issue the same native `MAPCSASSIGN` / `GEOMAP` /
-`ZOOM` commands `SM` itself uses, directly - `sm.lsp` is unmodified and
-still works exactly as before when run on its own.
+## Usage
 
-## Commands (can also be run directly, without the dialog)
+### Map zone
+`VIDLOGICDWG`, then click **43**, **44** or **Off**, or type `VIDMAPZONE`.
+Assigns `UTM84-43N` or `UTM84-44N`, turns on GeoMap (Hybrid) and zooms to extents. **Off** turns GeoMap off.
 
-- `SM` - assign UTM Zone 43N / 44N coordinate system and turn on GeoMap
-  (Hybrid, zoom-extents), or turn GeoMap off.
-- `VIDDGPSTOSP` - import a DGPS survey CSV and create survey-point graphics
-  (POINT + Point Name / Code / Elevation MTEXT) for every valid row.
-- `DGPS2PLINE` - same CSV import, plus groups records by Code and connects
-  each group into a 2D polyline or 3D polyline (user's choice) in Local
-  Time order.
+### DGPS CSV tools
+All three read a DGPS export CSV and detect columns by header name (a UTF-8 BOM is handled).
 
-## Versions in this package
+| Tool | Required headers | Optional |
+|---|---|---|
+| `VIDDGPSTOSP`, `VIDDGPSTOLINE` | `Point Name`, `Code`, `Northing`, `Easting`, `Elevation` | `Local Time` |
+| `VIDDGPSTOOHE` | `Code`, `Northing`, `Easting` | Header spelling is flexible (case, spaces, `_`, `-` ignored) |
 
-- `logicdwg_v03.lsp` - fixes VIDDGPSTOSP/DGPS2PLINE failing to launch from
-  the dialog ("Unknown command") by calling their functions directly
-  instead of through AutoCAD's command dispatcher; Zone buttons now call
-  MAPCSASSIGN/GEOMAP/ZOOM directly instead of re-dispatching to `SM`.
-- `vdgpstosp_v01.lsp`, `DGPS2PLINE_v12.LSP`, `sm.lsp` - included as supplied,
-  unmodified.
+**VIDDGPSTOSP** places a point plus MTEXT labels (point name, code, elevation) at each row. A dialog asks for the layer mode:
+- **Custom**: everything on one layer (default `1-SURVEY`)
+- **CSV Code**: one `sp_<Code>` layer per code
+
+**VIDDGPSTOLINE** asks for `Polyline` or `3Dpolyline` and draws one line per code on layer `pl_<Code>` or `3dpl_<Code>`.
+- Points are ordered by `Local Time`, then nudged into forward order using the nearest point within a look-ahead window (default 8).
+- Change the window with `(setq DGPS-ForwardWindow 12)`.
+- Codes with a single point are skipped.
+
+**VIDDGPSTOOHE** reads rows whose code starts with `OH`, `OM`, `OHE` or `PORTAL`. For each one it finds the nearest polyline on layer `1-track`, draws a 0.3 m square rotated to the track direction, and adds text (height 1.5). Output goes to layer `1-OHE-CSV`. Choose `Auto` (all track polylines) or `Select`.
+
+### Chainage runner
+`VIDCHAINAGERUNNER`: select the polyline in the direction of increasing chainage, choose Forward or Backward, then enter start KM, start meter and the increment (default 100). Marks are drawn on layer `1-CHAINAGE` at a 1.5 offset from the line.
+
+## Troubleshooting
+
+| Message | Cause and fix |
+|---|---|
+| `could not find the LogicDWG folder` | `tools\logicDwg.lsp` is not next to the loader. Check the folder layout, or add `vid` to the Support File Search Path. |
+| `[MISSING] <file>` | The file is not in `vid\tools`. |
+| `[ERROR] <file> - malformed list on input` | Smart quotes or non-ASCII characters got into the file. Re-save as plain ASCII or UTF-8 without pasted formatting. |
+| `Command ... is not loaded` in the dialog | Run `vidLoader.lsp` first. |
+| `Required headers missing` | The CSV header row does not contain the required column names above. |
+| `No track polylines found on layer 1-track` | Put the track polylines on layer `1-track`, or use `Select` mode. |
+| `Unknown command "MAPCSASSIGN"` | Map and GeoMap commands need the Civil 3D / Map 3D environment. |
+
+## Notes for maintainers
+
+- **Editing the dialog:** edit `LogicDWG:Layout` at the top of `logicDwg.lsp`. By default the dialog is generated into `%TEMP%` at runtime, so no DCL file is needed. `logicDwg.dcl` is only used if `LogicDWG:UseDclFile` is set to `T`.
+- **Adding a tool:** add its file to the `files` list in `vidLoader.lsp`, then add a `CMD` line in `LogicDWG:Layout`.
+- **Zone codes:** edit `LogicDWG:ZoneCS` in `logicDwg.lsp`.
+- **Encoding:** keep all `.lsp` files plain ASCII. Avoid emoji and smart quotes.
