@@ -1,6 +1,6 @@
 ;;; ============================================================================
 ;;; LogicDWG
-;;; Release: 1.1.2 | Civil 3D 2026
+;;; Release: 1.1.3 | Civil 3D 2026
 ;;; Version: 01
 ;;; ============================================================================
 
@@ -45,6 +45,7 @@
   (setq files
     '(
       "logicDwg.lsp"
+      "vidChainageRunner.lsp"
       "vidDgpsToLine.lsp"
       "vidDgpsToOhe.lsp"
       "vidDgpsToSp.lsp"
@@ -90,7 +91,7 @@
   (if (= missing 0)
     (progn
       (princ "\n\nLogicDWG is ready.")
-      (princ "\nCommands: VIDLOGICDWG, VIDDGPSTOLINE, VIDDGPSTOSP, VIDMAPZONE")
+      (princ "\nCommands: VIDLOGICDWG, VIDCHAINAGERUNNER, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDMAPZONE")
     )
     (princ "\n\nWARNING: One or more LogicDWG files are missing.")
   )
