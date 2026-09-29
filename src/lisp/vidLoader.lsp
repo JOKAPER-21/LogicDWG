@@ -49,6 +49,7 @@
       "vidDgpsToLine.lsp"
       "vidDgpsToOhe.lsp"
       "vidDgpsToSp.lsp"
+      "vidDimSettings.lsp"
       "vidMapZone.lsp"
     )
   )
@@ -91,7 +92,7 @@
   (if (= missing 0)
     (progn
       (princ "\n\nLogicDWG is ready.")
-      (princ "\nCommands: VIDLOGICDWG, VIDCHAINAGERUNNER, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDMAPZONE")
+      (princ "\nCommands: VIDLOGICDWG, VIDCHAINAGERUNNER, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDDIMSETTINGS, VIDMAPZONE")
     )
     (princ "\n\nWARNING: One or more LogicDWG files are missing.")
   )

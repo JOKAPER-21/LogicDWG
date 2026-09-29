@@ -5,6 +5,7 @@
 ;;; ============================================================================
 ;;;
 ;;; Commands: LOGICDWG, VIDLOGICDWG
+;;; Settings button: runs VIDDIMSETTINGS (vidDimSettings.lsp)
 ;;;
 ;;; HOW TO CHANGE THINGS - everything you normally edit is in the two
 ;;; SETTINGS blocks below (no need to touch the code underneath):
@@ -29,6 +30,8 @@
 ;; Dialog layout.  ("Box label"  (key "Button label" TYPE "argument") ...)
 ;;   TYPE ZONE = Map Zone button   (argument = key in LogicDWG:ZoneCS, or "OFF")
 ;;   TYPE CMD  = run a command     (argument = command name, without "c:")
+;; Optional 5th item = caption shown to the left of the button (one line per
+;; button, used by vertical boxes).
 (setq LogicDWG:Layout
   '(("Map Zone"
       ("z43"   "43"           ZONE "43")
@@ -36,11 +39,20 @@
       ("zoff"  "Off"          ZONE "OFF")
     )
     ("Generate from CSV"
-      ("sp"        "Survey Point"    CMD "VIDDGPSTOSP")
-      ("track"     "Rail Track"      CMD "VIDDGPSTOLINE")
-      ("chainage"  "Chainage Runner" CMD "VIDCHAINAGERUNNER")
-      ("ohe"       "Ohe"             CMD "VIDDGPSTOOHE")
+      ("sp"    "Generate"     CMD  "VIDDGPSTOSP"        "Survey points")
+      ("track" "Generate"     CMD  "VIDDGPSTOLINE"      "Rail track")
+      ("chain" "Generate"     CMD  "VIDCHAINAGERUNNER"  "Chainage Runner")
+      ("ohe"   "Generate"     CMD  "VIDDGPSTOOHE"       "Ohe")
     )
+  )
+)
+
+;; Button direction inside each box.  ("Box label" . "row")    = horizontal
+;;                                   ("Box label" . "column") = vertical
+;; A box that is not listed here is horizontal.
+(setq LogicDWG:BoxDir
+  '(("Map Zone"          . "row")
+    ("Generate from CSV" . "column")
   )
 )
 
@@ -79,21 +91,39 @@
   )
 )
 
+;; "row" or "column" for a box label (default "row").
+(defun LogicDWG:BoxDirOf (label / d)
+  (if (setq d (cdr (assoc label LogicDWG:BoxDir))) d "row")
+)
+
 ;; DCL text built from LogicDWG:Layout (same output as logicDwg.dcl).
-(defun LogicDWG:DclLines (/ lines)
+(defun LogicDWG:DclLines (/ lines btn)
   (setq lines (list "logicDwg : dialog {" "  label = \"Logic DWG\";"))
   (foreach box LogicDWG:Layout
     (setq lines
       (append lines
-        (list "  : boxed_row {" (strcat "    label = \"" (car box) "\";"))
+        (list
+          (strcat "  : boxed_" (LogicDWG:BoxDirOf (car box)) " {")
+          (strcat "    label = \"" (car box) "\";")
+        )
       )
     )
     (foreach b (cdr box)
+      (setq btn
+        (strcat "    : button { key = \"" (nth 0 b) "\"; label = \"" (nth 1 b)
+                "\"; width = 14; fixed_width = true; }")
+      )
       (setq lines
         (append lines
-          (list
-            (strcat "    : button { key = \"" (nth 0 b) "\"; label = \"" (nth 1 b)
-                    "\"; width = 14; fixed_width = true; }")
+          (if (nth 4 b)
+            ;; caption on the left, button on the right
+            (list
+              "    : row {"
+              (strcat "      : text { label = \"" (nth 4 b) "\"; width = 18; fixed_width = true; }")
+              (strcat "  " btn)
+              "    }"
+            )
+            (list btn)
           )
         )
       )
@@ -104,8 +134,10 @@
     (list
       "  spacer_1;"
       "  : row {"
-      "    alignment = centered;"
-      "    : button { key = \"close\"; label = \"Close\"; width = 12; fixed_width = true; is_cancel = true; }"
+      "    : spacer { width = 1; }"
+      "    : button { key = \"settings\"; label = \"Settings\"; width = 12; fixed_width = true; }"
+      "    : button { key = \"close\"; label = \"Cancel\"; width = 12; fixed_width = true; is_cancel = true; }"
+      "    : spacer { width = 1; }"
       "  }"
       "}"
     )
@@ -163,6 +195,7 @@
             )
           )
           (action_tile "close" "(done_dialog 0)")
+          (action_tile "settings" "(done_dialog 999)")
           (setq opened T)
           (setq code (start_dialog))
         )
@@ -204,9 +237,10 @@
     )
   )
 
-  (if (and res (> (cdr res) 0))
-    (nth (1- (cdr res)) buttons)
-    nil
+  (cond
+    ((and res (= (cdr res) 999)) (list "settings" "Settings" 'SETTINGS nil))
+    ((and res (> (cdr res) 0)) (nth (1- (cdr res)) buttons))
+    (T nil)
   )
 )
 
@@ -268,6 +302,17 @@
 )
 
 
+;; Settings button: runs VIDDIMSETTINGS (vidDimSettings.lsp).
+;; Loads the file first if the command is not loaded yet.
+(defun LogicDWG:Settings ()
+  (if (not (boundp 'c:VIDDIMSETTINGS))
+    (load "vidDimSettings" nil)
+  )
+  (LogicDWG:RunCmd "VIDDIMSETTINGS")
+  (princ)
+)
+
+
 ;;; ============================================================================
 ;;; COMMANDS
 ;;; ============================================================================
@@ -295,6 +340,8 @@
         (cond
           ;; Zone buttons keep the dialog open
           ((eq kind 'ZONE) (LogicDWG:Zone arg))
+          ;; Settings keeps the dialog open
+          ((eq kind 'SETTINGS) (LogicDWG:Settings))
           ;; Tool buttons close the dialog, then run the command
           ((eq kind 'CMD)
            (setq again nil)
