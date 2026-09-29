@@ -8,11 +8,13 @@
 ;; Tool files, in load order.
 (setq LogicDWG:Files
   '("logicDwg.lsp"
+    "vidCadMergeLayers.lsp"
     "vidChainageRunner.lsp"
     "vidDgpsToLine.lsp"
     "vidDgpsToOhe.lsp"
     "vidDgpsToSp.lsp"
     "vidDimSettings.lsp"
+    "vidMapZone.lsp"
   )
 )
 
@@ -128,7 +130,7 @@
   (setq loaded 0 missing 0)
 
   (princ "\n============================================================")
-  (princ "\n LogicDWG 1.1.3")
+  (princ "\n LogicDWG 1.1.4")
   (princ "\n============================================================")
 
   (if (null LogicDWG:ToolsDir)
@@ -150,7 +152,7 @@
   (if (= loaded (length LogicDWG:Files))
     (progn
       (princ "\n\nLogicDWG is ready. Type VIDLOGICDWG to open.")
-      (princ "\nCommands: VIDCHAINAGERUNNER, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDDIMSETTINGS")
+      (princ "\nCommands: VIDCHAINAGERUNNER, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDDIMSETTINGS, VIDCADMERGELAYERS")
     )
     (princ "\n\nWARNING: LogicDWG did not load completely - see messages above.")
   )

@@ -26,11 +26,14 @@ logicDwg : dialog {
       : button { key = "ohe"; label = "Generate"; width = 14; fixed_width = true; }
     }
   }
+  : boxed_row {
+    label = "CAD Tools";
+    : button { key = "cadMerge"; label = "Cad Merge Layer"; width = 14; fixed_width = true; }
+    : button { key = "settings"; label = "Settings"; width = 12; fixed_width = true; }
+  }
   spacer_1;
   : row {
-    : spacer { width = 1; }
-    : button { key = "settings"; label = "Settings"; width = 12; fixed_width = true; }
+    alignment = centered;
     : button { key = "close"; label = "Cancel"; width = 12; fixed_width = true; is_cancel = true; }
-    : spacer { width = 1; }
   }
 }

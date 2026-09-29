@@ -1,7 +1,7 @@
 ;;; ============================================================================
 ;;; LogicDWG.lsp
-;;; Release: 1.1.2 | Civil 3D 2026
-;;; Version: 05
+;;; Release: 1.1.4 | Civil 3D 2026
+;;; Version: 06
 ;;; ============================================================================
 ;;;
 ;;; Commands: LOGICDWG, VIDLOGICDWG
@@ -44,6 +44,9 @@
       ("chain" "Generate"     CMD  "VIDCHAINAGERUNNER"  "Chainage Runner")
       ("ohe"   "Generate"     CMD  "VIDDGPSTOOHE"       "Ohe")
     )
+    ("CAD Tools"
+      ("cadMerge" "Cad Merge Layer" CMD "VIDCADMERGELAYERS")
+    )
   )
 )
 
@@ -53,6 +56,7 @@
 (setq LogicDWG:BoxDir
   '(("Map Zone"          . "row")
     ("Generate from CSV" . "column")
+    ("CAD Tools"         . "row")
   )
 )
 
@@ -128,16 +132,24 @@
         )
       )
     )
+    ;; Settings belongs inside the CAD Tools box.
+    (if (= (car box) "CAD Tools")
+      (setq lines
+        (append lines
+          (list
+            "    : button { key = \"settings\"; label = \"Settings\"; width = 12; fixed_width = true; }"
+          )
+        )
+      )
+    )
     (setq lines (append lines (list "  }")))
   )
   (append lines
     (list
       "  spacer_1;"
       "  : row {"
-      "    : spacer { width = 1; }"
-      "    : button { key = \"settings\"; label = \"Settings\"; width = 12; fixed_width = true; }"
+      "    alignment = centered;"
       "    : button { key = \"close\"; label = \"Cancel\"; width = 12; fixed_width = true; is_cancel = true; }"
-      "    : spacer { width = 1; }"
       "  }"
       "}"
     )
