@@ -1,39 +1,37 @@
-// logicDwg.dcl - matches LogicDWG:Layout in logicDwg.lsp
+// logicDwg.dcl - Logic DWG dialog.
+// Every "key" here must match a button line in LogicDWG:Buttons (logicDwg.lsp).
+
+btn : button { width = 14; fixed_width = true; }
+cap : text   { width = 18; fixed_width = true; }
+
 logicDwg : dialog {
   label = "Logic DWG";
+
   : boxed_row {
     label = "Map Zone";
-    : button { key = "z43"; label = "43"; width = 14; fixed_width = true; }
-    : button { key = "z44"; label = "44"; width = 14; fixed_width = true; }
-    : button { key = "zoff"; label = "Off"; width = 14; fixed_width = true; }
+    : btn { key = "z43";  label = "43"; }
+    : btn { key = "z44";  label = "44"; }
+    : btn { key = "zoff"; label = "Off"; }
   }
+
   : boxed_column {
     label = "Generate from CSV";
-    : row {
-      : text { label = "Survey points"; width = 18; fixed_width = true; }
-      : button { key = "sp"; label = "Generate"; width = 14; fixed_width = true; }
-    }
-    : row {
-      : text { label = "Rail track"; width = 18; fixed_width = true; }
-      : button { key = "track"; label = "Generate"; width = 14; fixed_width = true; }
-    }
-    : row {
-      : text { label = "Chainage Runner"; width = 18; fixed_width = true; }
-      : button { key = "chain"; label = "Generate"; width = 14; fixed_width = true; }
-    }
-    : row {
-      : text { label = "Ohe"; width = 18; fixed_width = true; }
-      : button { key = "ohe"; label = "Generate"; width = 14; fixed_width = true; }
-    }
+    : row { : cap { label = "Survey points"; }   : btn { key = "sp";    label = "Generate"; } }
+    : row { : cap { label = "Rail track"; }      : btn { key = "track"; label = "Generate"; } }
+    : row { : cap { label = "Chainage Runner"; } : btn { key = "chainRev"; label = "Reverse"; } : btn { key = "chain"; label = "Generate"; } }
+    : row { : cap { label = "Ohe"; }             : btn { key = "ohe";   label = "Generate"; } }
   }
+
   : boxed_row {
-    label = "CAD Tools";
-    : button { key = "cadMerge"; label = "Cad Merge Layer"; width = 14; fixed_width = true; }
-    : button { key = "settings"; label = "Settings"; width = 12; fixed_width = true; }
+    label = "Settings";
+    : btn { key = "cadMerge"; label = "Cad Merge Layer"; }
+    : btn { key = "settings"; label = "Dim settings"; }
   }
+
   spacer_1;
   : row {
     alignment = centered;
-    : button { key = "close"; label = "Cancel"; width = 12; fixed_width = true; is_cancel = true; }
+    fixed_width = true;
+    : button { key = "cancel"; label = "Cancel"; width = 12; fixed_width = true; is_cancel = true; }
   }
 }

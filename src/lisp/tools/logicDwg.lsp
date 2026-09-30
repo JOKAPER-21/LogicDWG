@@ -1,382 +1,167 @@
 ;;; ============================================================================
-;;; LogicDWG.lsp
-;;; Release: 1.1.4 | Civil 3D 2026
-;;; Version: 06
-;;; ============================================================================
-;;;
+;;; LogicDWG.lsp   |   Release 1.1.4   |   Civil 3D 2026   |   Version 11
 ;;; Commands: LOGICDWG, VIDLOGICDWG
-;;; Settings button: runs VIDDIMSETTINGS (vidDimSettings.lsp)
 ;;;
-;;; HOW TO CHANGE THINGS - everything you normally edit is in the two
-;;; SETTINGS blocks below (no need to touch the code underneath):
-;;;
-;;;   LogicDWG:Layout   boxes, buttons, and what each button does
-;;;   LogicDWG:ZoneCS   coordinate-system code used by each Map Zone button
-;;;
-;;; To add a button:
-;;;   1. add one line to LogicDWG:Layout
-;;;   2. add the same key / label line to logicDwg.dcl
-;;;      (if logicDwg.dcl is not found, the dialog is built from
-;;;       LogicDWG:Layout automatically)
+;;; The dialog is drawn in logicDwg.dcl (same folder as this file).
+;;; To add a button:  1) add the button in logicDwg.dcl
+;;;                   2) add ONE line for its key in LogicDWG:Buttons below
 ;;; ============================================================================
 
 (vl-load-com)
 
-
-;;; ============================================================================
-;;; SETTINGS  (edit here)
-;;; ============================================================================
-
-;; Dialog layout.  ("Box label"  (key "Button label" TYPE "argument") ...)
-;;   TYPE ZONE = Map Zone button   (argument = key in LogicDWG:ZoneCS, or "OFF")
-;;   TYPE CMD  = run a command     (argument = command name, without "c:")
-;; Optional 5th item = caption shown to the left of the button (one line per
-;; button, used by vertical boxes).
-(setq LogicDWG:Layout
-  '(("Map Zone"
-      ("z43"   "43"           ZONE "43")
-      ("z44"   "44"           ZONE "44")
-      ("zoff"  "Off"          ZONE "OFF")
-    )
-    ("Generate from CSV"
-      ("sp"    "Generate"     CMD  "VIDDGPSTOSP"        "Survey points")
-      ("track" "Generate"     CMD  "VIDDGPSTOLINE"      "Rail track")
-      ("chain" "Generate"     CMD  "VIDCHAINAGERUNNER"  "Chainage Runner")
-      ("ohe"   "Generate"     CMD  "VIDDGPSTOOHE"       "Ohe")
-    )
-    ("CAD Tools"
-      ("cadMerge" "Cad Merge Layer" CMD "VIDCADMERGELAYERS")
-    )
+;; One line per button:  (key  TYPE  argument  [lsp file to load first])
+;;   ZONE = set Map Zone      argument = coordinate system, nil = GeoMap Off
+;;   CMD  = run command       argument = command name (no "c:"), dialog closes
+;;   CAD  = AutoCAD command   argument = built-in command name (e.g. "REVERSE"), dialog closes
+;;   SET  = run command       same as CMD, but the dialog opens again after
+(setq LogicDWG:Buttons
+  '(("z43"      ZONE "UTM84-43N")
+    ("z44"      ZONE "UTM84-44N")
+    ("zoff"     ZONE nil)
+    ("sp"       CMD  "VIDDGPSTOSP")
+    ("track"    CMD  "VIDDGPSTOLINE")
+    ("chainRev" CAD  "REVERSE")
+    ("chain"    CMD  "VIDCHAINAGERUNNER")
+    ("ohe"      CMD  "VIDDGPSTOOHE")
+    ("cadMerge" CMD  "VIDCADMERGELAYERS")
+    ("settings" SET  "VIDDIMSETTINGS" "vidDimSettings.lsp")
   )
 )
 
-;; Button direction inside each box.  ("Box label" . "row")    = horizontal
-;;                                   ("Box label" . "column") = vertical
-;; A box that is not listed here is horizontal.
-(setq LogicDWG:BoxDir
-  '(("Map Zone"          . "row")
-    ("Generate from CSV" . "column")
-    ("CAD Tools"         . "row")
-  )
-)
 
-;; Coordinate system assigned by each Map Zone button.
-(setq LogicDWG:ZoneCS
-  '(("43" . "UTM84-43N")
-    ("44" . "UTM84-44N")
-  )
-)
+;; Tools folder (set by vidLoader.lsp). Keep it if already set.
+(if (not (boundp 'LogicDWG:ToolsDir)) (setq LogicDWG:ToolsDir nil))
 
-;; Where the dialog comes from.
-;;   nil = built from LogicDWG:Layout above (default: no file needed)
-;;   T   = use logicDwg.dcl (falls back to the built-in dialog if the file
-;;         cannot be used, and prints which file it tried)
-(setq LogicDWG:UseDclFile nil)
-
-
-;;; ============================================================================
-;;; DIALOG FILE (logicDwg.dcl, or generated from LogicDWG:Layout)
-;;; ============================================================================
-
-(defun LogicDWG:TryDir (baseFile subPath / p)
-  (if (setq p (findfile baseFile))
-    (findfile (strcat (vl-filename-directory p) subPath))
-    nil
-  )
-)
-
-(defun LogicDWG:FindDcl ( / p)
+;; Find logicDwg.dcl. NOTE: AutoLISP "or" / "and" return only T or nil, never a
+;; value, so "cond" is used wherever a path has to be returned.
+(defun LogicDWG:FindDcl ( / f)
   (cond
-    ((setq p (LogicDWG:TryDir "logicDwg.lsp" "\\logicDwg.dcl")) p)
-    ((setq p (LogicDWG:TryDir "vidLoader.lsp" "\\tools\\logicDwg.dcl")) p)
-    ((setq p (LogicDWG:TryDir "vidLoader.lsp" "\\logicDwg.dcl")) p)
-    ((setq p (findfile "logicDwg.dcl")) p)
+    ((and LogicDWG:ToolsDir
+          (setq f (findfile (strcat LogicDWG:ToolsDir "\\logicDwg.dcl"))))
+     f)
+    ((setq f (findfile "logicDwg.dcl")) f)
+    ((and (setq f (findfile "logicDwg.lsp"))
+          (setq f (findfile (strcat (vl-filename-directory f) "\\logicDwg.dcl"))))
+     f)
     (T nil)
   )
 )
 
-;; "row" or "column" for a box label (default "row").
-(defun LogicDWG:BoxDirOf (label / d)
-  (if (setq d (cdr (assoc label LogicDWG:BoxDir))) d "row")
-)
-
-;; DCL text built from LogicDWG:Layout (same output as logicDwg.dcl).
-(defun LogicDWG:DclLines (/ lines btn)
-  (setq lines (list "logicDwg : dialog {" "  label = \"Logic DWG\";"))
-  (foreach box LogicDWG:Layout
-    (setq lines
-      (append lines
-        (list
-          (strcat "  : boxed_" (LogicDWG:BoxDirOf (car box)) " {")
-          (strcat "    label = \"" (car box) "\";")
-        )
-      )
-    )
-    (foreach b (cdr box)
-      (setq btn
-        (strcat "    : button { key = \"" (nth 0 b) "\"; label = \"" (nth 1 b)
-                "\"; width = 14; fixed_width = true; }")
-      )
-      (setq lines
-        (append lines
-          (if (nth 4 b)
-            ;; caption on the left, button on the right
-            (list
-              "    : row {"
-              (strcat "      : text { label = \"" (nth 4 b) "\"; width = 18; fixed_width = true; }")
-              (strcat "  " btn)
-              "    }"
-            )
-            (list btn)
-          )
-        )
-      )
-    )
-    ;; Settings belongs inside the CAD Tools box.
-    (if (= (car box) "CAD Tools")
-      (setq lines
-        (append lines
-          (list
-            "    : button { key = \"settings\"; label = \"Settings\"; width = 12; fixed_width = true; }"
-          )
-        )
-      )
-    )
-    (setq lines (append lines (list "  }")))
-  )
-  (append lines
-    (list
-      "  spacer_1;"
-      "  : row {"
-      "    alignment = centered;"
-      "    : button { key = \"close\"; label = \"Cancel\"; width = 12; fixed_width = true; is_cancel = true; }"
-      "  }"
-      "}"
-    )
-  )
-)
-
-(defun LogicDWG:WriteTempDcl (/ dir path f)
-  (setq dir
-    (cond
-      ((getenv "TEMP"))
-      ((getenv "TMP"))
-      (T (getvar "DWGPREFIX"))
-    )
-  )
-  (setq path (strcat dir "\\logicDwg_" (itoa (getvar "MILLISECS")) ".dcl"))
-  (setq f (open path "w"))
-  (if f
+;; Show the dialog. Returns the clicked button line, or nil if cancelled.
+(defun LogicDWG:Show (/ dcl id n code b)
+  (if (not (setq dcl (LogicDWG:FindDcl)))
+    (alert "logicDwg.dcl not found.\nKeep it in the same folder as logicDwg.lsp.")
     (progn
-      (foreach ln (LogicDWG:DclLines) (write-line ln f))
-      (close f)
-      path
-    )
-    nil
-  )
-)
-
-
-;;; ============================================================================
-;;; DIALOG
-;;; ============================================================================
-
-;; All buttons as one flat list: (key label type arg) ...
-(defun LogicDWG:Buttons ()
-  (apply 'append (mapcar 'cdr LogicDWG:Layout))
-)
-
-;; Try to open the dialog from one DCL file.
-;; Returns (opened . code): opened = T when the dialog was really displayed,
-;; code = number of the clicked button (0 = closed).
-(defun LogicDWG:TryShow (dclFile buttons / dclId code n opened)
-  (setq opened nil
-        code 0)
-  (setq dclId (load_dialog dclFile))
-  (if (and dclId (>= dclId 1))
-    (progn
-      (if (new_dialog "logicDwg" dclId)
+      (setq id (load_dialog dcl))
+      (if (new_dialog "logicDwg" id)
         (progn
-          ;; every button returns its position in the list (1, 2, 3 ...)
           (setq n 0)
-          (foreach b buttons
+          (foreach b LogicDWG:Buttons
             (setq n (1+ n))
-            (vl-catch-all-apply
-              'action_tile
-              (list (car b) (strcat "(done_dialog " (itoa n) ")"))
-            )
+            (action_tile (car b) (strcat "(done_dialog " (itoa n) ")"))
           )
-          (action_tile "close" "(done_dialog 0)")
-          (action_tile "settings" "(done_dialog 999)")
-          (setq opened T)
+          (action_tile "cancel" "(done_dialog 0)")
           (setq code (start_dialog))
         )
+        (alert "logicDwg.dcl has an error - the dialog could not open.")
       )
-      (unload_dialog dclId)
+      (unload_dialog id)
     )
   )
-  (cons opened (if (numberp code) code 0))
+  (if (and code (> code 0)) (nth (1- code) LogicDWG:Buttons))
 )
 
-;; Show the dialog once.
-;; Returns the clicked button (key label type arg), or nil if closed.
-;; The dialog is built from LogicDWG:Layout unless LogicDWG:UseDclFile is T.
-;; If logicDwg.dcl is then missing or has any error, the built-in dialog
-;; is used instead, so the dialog always opens.
-(defun LogicDWG:Show (/ buttons dclFile tempFile res)
-  (setq buttons (LogicDWG:Buttons))
-  (setq dclFile (if LogicDWG:UseDclFile (LogicDWG:FindDcl) nil))
-
-  (if dclFile
-    (setq res (LogicDWG:TryShow dclFile buttons))
-  )
-
-  (if (or (null res) (not (car res)))
-    (progn
-      (if dclFile
-        (princ (strcat "\nLogicDWG: could not use " dclFile " - using built-in dialog."))
-      )
-      (setq tempFile (LogicDWG:WriteTempDcl))
-      (if tempFile
-        (progn
-          (setq res (LogicDWG:TryShow tempFile buttons))
-          (vl-file-delete tempFile)
-        )
-      )
-      (if (or (null res) (not (car res)))
-        (alert "LogicDWG: the dialog could not be opened.")
-      )
-    )
-  )
-
-  (cond
-    ((and res (= (cdr res) 999)) (list "settings" "Settings" 'SETTINGS nil))
-    ((and res (> (cdr res) 0)) (nth (1- (cdr res)) buttons))
-    (T nil)
-  )
-)
-
-
-;;; ============================================================================
-;;; ACTIONS
-;;; ============================================================================
-
-;; Map Zone: assign coordinate system + GeoMap, or turn GeoMap off.
-(defun LogicDWG:ZoneApply (mode / cs)
-  (if (= mode "OFF")
-    (command "._GEOMAP" "_Off")
-    (progn
-      (setq cs (cdr (assoc mode LogicDWG:ZoneCS)))
-      (if (null cs) (error (strcat "No coordinate system set for zone " mode)))
-      (command "._MAPCSASSIGN" cs)
-      (command "._GEOMAP" "_Hybrid")
-      (command "._ZOOM" "_E")
-    )
-  )
-  T
-)
-
-(defun LogicDWG:Zone (mode / oldEcho res)
-  (setq oldEcho (getvar "CMDECHO"))
+;; Map Zone: set coordinate system + GeoMap (cs = nil turns GeoMap off).
+(defun LogicDWG:Zone (cs / echo r)
+  (setq echo (getvar "CMDECHO"))
   (setvar "CMDECHO" 0)
-  (setq res (vl-catch-all-apply 'LogicDWG:ZoneApply (list mode)))
-  ;; If a command was left waiting for input, cancel it.
-  (repeat 3
-    (if (> (getvar "CMDACTIVE") 0) (command))
-  )
-  (setvar "CMDECHO" oldEcho)
-  (if (vl-catch-all-error-p res)
-    (princ (strcat "\nLogicDWG zone error: " (vl-catch-all-error-message res)))
-    (princ
-      (if (= mode "OFF")
-        "\nGeoMap turned Off."
-        (strcat "\nZone " mode " (" (cdr (assoc mode LogicDWG:ZoneCS)) ") set.")
-      )
+  ;; "command" cannot be passed to vl-catch-all-apply, so wrap it in a lambda.
+  (setq r
+    (vl-catch-all-apply
+      '(lambda (cs)
+         (if cs
+           (progn
+             (command "._MAPCSASSIGN" cs)
+             (command "._GEOMAP" "_Hybrid")
+             (command "._ZOOM" "_E")
+           )
+           (command "._GEOMAP" "_Off")
+         )
+       )
+      (list cs)
     )
   )
-  (princ)
+  (repeat 3 (if (> (getvar "CMDACTIVE") 0) (command)))
+  (setvar "CMDECHO" echo)
+  (princ
+    (cond
+      ((vl-catch-all-error-p r) (strcat "\nLogicDWG zone error: " (vl-catch-all-error-message r)))
+      (cs (strcat "\nCoordinate system " cs " set."))
+      (T "\nGeoMap turned Off.")
+    )
+  )
 )
 
-;; Start a tool command by name (called after the dialog has closed).
-(defun LogicDWG:RunCmd (name / sym)
+;; Start a built-in AutoCAD command (the command then asks you for input).
+(defun LogicDWG:Cad (name)
+  (command (strcat "._" name))
+)
+
+;; Run a command by name (loads its lsp file first if it is not loaded yet).
+(defun LogicDWG:Run (name file / sym f)
   (setq sym (read (strcat "c:" name)))
-  (if (and (boundp sym)
-           (member (type (eval sym)) '(USR SUBR EXRXSUBR))
-      )
-    (eval (list sym))
-    (alert
-      (strcat
-        "Command " (strcase name) " is not loaded.\n\n"
-        "Load the LogicDWG tools first (vidLoader.lsp)."
-      )
-    )
-  )
-)
-
-
-;; Settings button: runs VIDDIMSETTINGS (vidDimSettings.lsp).
-;; Loads the file first if the command is not loaded yet.
-(defun LogicDWG:Settings (/ f)
-  (if (not (boundp 'c:VIDDIMSETTINGS))
-    (if (setq f (findfile "vidDimSettings.lsp"))
-      (load f nil)
-      (if (boundp 'LogicDWG:ToolsDir)
-        (if (findfile (strcat LogicDWG:ToolsDir "\\vidDimSettings.lsp"))
-          (load (strcat LogicDWG:ToolsDir "\\vidDimSettings.lsp") nil)
-        )
-      )
-    )
-  )
-  (LogicDWG:RunCmd "VIDDIMSETTINGS")
-  (princ)
-)
-
-
-;;; ============================================================================
-;;; COMMANDS
-;;; ============================================================================
-
-(defun c:LOGICDWG (/ *error* again picked kind arg)
-
-  ;; Quiet handler: ESC / cancel inside a tool is not reported as an error.
-  (defun *error* (msg)
-    (if (and msg
-             (not (member (strcase msg) '("FUNCTION CANCELLED" "QUIT / EXIT ABORT")))
-        )
-      (princ (strcat "\nLogicDWG error: " msg))
-    )
-    (princ)
-  )
-
-  (setq again T)
-  (while again
-    (setq picked (LogicDWG:Show))
-    (if (null picked)
-      (setq again nil)
-      (progn
-        (setq kind (nth 2 picked)
-              arg  (nth 3 picked))
+  (if (and file (not (boundp sym)))
+    (progn
+      (setq f
         (cond
-          ;; Zone buttons keep the dialog open
-          ((eq kind 'ZONE) (LogicDWG:Zone arg))
-          ;; Settings keeps the dialog open
-          ((eq kind 'SETTINGS) (LogicDWG:Settings))
-          ;; Tool buttons close the dialog, then run the command
-          ((eq kind 'CMD)
-           (setq again nil)
-           (LogicDWG:RunCmd arg)
-          )
-          (T (setq again nil))
+          ((findfile file))
+          (LogicDWG:ToolsDir (findfile (strcat LogicDWG:ToolsDir "\\" file)))
         )
       )
+      (if f (load f))
     )
+  )
+  (if (boundp sym)
+    (eval (list sym))
+    (alert (strcat "Command " (strcase name) " is not loaded.\nLoad the tools first (vidLoader.lsp)."))
+  )
+)
+
+;; Run one step. An error is printed with the step name, so you can see
+;; whether the dialog or a tool failed. Cancel / ESC is silent.
+;; (No local *error* here: the tools set their own *error* and would replace it.)
+(defun LogicDWG:Try (step fn args / r)
+  (setq r (vl-catch-all-apply fn args))
+  (cond
+    ((not (vl-catch-all-error-p r)) r)
+    (T
+     (setq r (vl-catch-all-error-message r))
+     (if (not (wcmatch (strcase r) "*CANCEL*,*EXIT*"))
+       (princ (strcat "\nLogicDWG [" step "]: " r))
+     )
+     nil
+    )
+  )
+)
+
+(defun c:LOGICDWG (/ again b kind)
+  (setq again T)
+  (while (and again (setq b (LogicDWG:Try "dialog" 'LogicDWG:Show nil)))
+    (setq kind (cadr b))
+    (cond
+      ((eq kind 'ZONE)
+       (LogicDWG:Try (car b) 'LogicDWG:Zone (list (caddr b))))
+      ((eq kind 'CAD)
+       (LogicDWG:Try (caddr b) 'LogicDWG:Cad (list (caddr b))))
+      (T
+       (LogicDWG:Try (caddr b) 'LogicDWG:Run (list (caddr b) (cadddr b))))
+    )
+    (if (member kind '(CMD CAD)) (setq again nil))
   )
   (princ)
 )
 
-(defun c:VIDLOGICDWG ()
-  (c:LOGICDWG)
-)
+(defun c:VIDLOGICDWG () (c:LOGICDWG))
 
 (princ "\n[OK] LogicDWG loaded. Type VIDLOGICDWG to open.")
 (princ)
