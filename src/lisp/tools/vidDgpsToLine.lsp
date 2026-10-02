@@ -1,7 +1,21 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Line
-;;; Release: 1.1.2 | Civil 3D 2026
-;;; Version: 02
+;;; Release: 1.2.0 | Civil 3D 2026
+;;; Version: 03
+;;; ============================================================================
+;;;
+;;; WORKFLOW:
+;;;   1. User opens LogicDWG dialog, clicks Rail Track [Generate].
+;;;   2. User selects a CSV file (getfiled).
+;;;   3. CSV is parsed; unique Codes are extracted.
+;;;   4. Layer-selection dialog appears:
+;;;        - [Polyline] / [3D Polyline] toggle
+;;;        - Scrollable list of grouped Code names (R1, R2, OHE, …)
+;;;        - [Select Layers] button
+;;;        - Then a second dialog: choose Default layers or Custom layer name,
+;;;          and confirm.
+;;;   5. Polylines / 3D polylines are created on the chosen layer.
+;;;
 ;;; ============================================================================
 
 (vl-load-com)
@@ -9,18 +23,43 @@
 ;; ---------------------------------------------------------------------------
 ;; Globals used by error handler
 ;; ---------------------------------------------------------------------------
-(setq dgps-*fh* nil)
+(setq dgps-*fh*        nil)
 (setq dgps-*old-error* nil)
-(setq dgps-*old-clayer* nil)
-(setq dgps-*old-cmdecho* nil)
-(setq dgps-*old-osmode* nil)
+(setq dgps-*old-clayer*   nil)
+(setq dgps-*old-cmdecho*  nil)
+(setq dgps-*old-osmode*   nil)
 
-;; Forward re-ordering look-ahead: how many of the next (time-ordered)
-;; unvisited points are considered when choosing the next vertex.
-;; Larger = repairs points surveyed much later; smaller = stays closer to
-;; the raw time order. Can be changed at the command line, e.g.
-;;   (setq DGPS-ForwardWindow 12)
+;; Forward re-ordering look-ahead window
 (if (null DGPS-ForwardWindow) (setq DGPS-ForwardWindow 8))
+
+;; ---------------------------------------------------------------------------
+;; Default layer list (shown in the layer-options dialog)
+;; ---------------------------------------------------------------------------
+(setq DGPS-DefaultLayers
+  '("1-BANK CUTTING"
+    "1-BOUNDARY"
+    "1-BRIDGES"
+    "1-BUILDINGS"
+    "1-C-WALL R-WALL"
+    "1-CABLE"
+    "1-DRAINAGE ARRANGEMENT"
+    "1-ECW"
+    "1-FENCE"
+    "1-LAYOUT"
+    "1-LC"
+    "1-LWR"
+    "1-OHE"
+    "1-PF SHELTER"
+    "1-PLATFORM"
+    "1-ROAD & TROLLEY PATH"
+    "1-SURVEY"
+    "1-TEXT"
+    "1-TOE OF EMBANKMENT"
+    "1-TR"
+    "1-TRACK"
+    "1-WATERWAY"
+  )
+)
 
 ;; ---------------------------------------------------------------------------
 ;; Basic string helpers
@@ -46,7 +85,6 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Numeric validation
-;; Accepts integer / decimal / signed decimal / scientific notation.
 ;; ---------------------------------------------------------------------------
 (defun DGPS-NumericP (s / t1 n i ch code seenDot seenExp ok)
   (setq t1 (DGPS-Trim s))
@@ -98,7 +136,7 @@
 ;; ---------------------------------------------------------------------------
 (defun DGPS-SanitizeLayerName (s / src i ch out)
   (setq src (DGPS-Trim s)
-        i 1
+        i   1
         out "")
   (while (<= i (strlen src))
     (setq ch (substr src i 1))
@@ -161,9 +199,7 @@
       (foreach p pts
         (setq data
           (append data
-            (list
-              (cons 10 (list (car p) (cadr p)))
-            )
+            (list (cons 10 (list (car p) (cadr p))))
           )
         )
       )
@@ -272,16 +308,12 @@
   count
 )
 
-;; Reads one physical line. Binary reader: does NOT treat byte 0x1A
-;; (Ctrl-Z) as end-of-file, unlike text-mode read-line.
+;; Reads one physical line (binary mode; safe against Ctrl-Z / 0x1A).
 (defun DGPS-ReadPhysicalLine (fh / b s gotLine)
-  (setq s ""
-        gotLine nil)
+  (setq s "" gotLine nil)
   (while (and (not gotLine) (setq b (read-char fh)))
     (cond
-      ((= b 10)
-       (setq gotLine T)
-      )
+      ((= b 10)  (setq gotLine T))
       ((= b 13)
        (setq b (read-char fh))
        (if (and b (/= b 10))
@@ -289,34 +321,30 @@
        )
        (setq gotLine T)
       )
-      (T
-       (setq s (strcat s (chr b)))
-      )
+      (T (setq s (strcat s (chr b))))
     )
   )
   (if (or gotLine (> (strlen s) 0)) s nil)
 )
 
-;; Reads one logical CSV record. Supports quoted multiline fields.
+;; Reads one logical CSV record (supports quoted multiline fields).
 (defun DGPS-ReadRecord (fh / s next)
   (setq s (DGPS-ReadPhysicalLine fh))
   (if s
-    (progn
-      (while (= (rem (DGPS-QuoteCount s) 2) 1)
-        (setq next (DGPS-ReadPhysicalLine fh))
-        (if next
-          (setq s (strcat s "\n" next))
-          (setq next nil)
-        )
-        (if (null next) (setq s nil))
+    (while (= (rem (DGPS-QuoteCount s) 2) 1)
+      (setq next (DGPS-ReadPhysicalLine fh))
+      (if next
+        (setq s (strcat s "\n" next))
+        (setq s nil)
       )
+      (if (null next) (setq s nil))
     )
   )
   s
 )
 
 ;; ---------------------------------------------------------------------------
-;; Open CSV in binary mode (0x1A safe).
+;; Open CSV in binary mode.
 ;; ---------------------------------------------------------------------------
 (defun DGPS-OpenCSV (file / fh)
   (setq fh (open file "rb"))
@@ -355,7 +383,7 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Record accessors
-;; record = pname code north east elev time row sortkey
+;; record = (pname code north east elev time row sortkey)
 ;; ---------------------------------------------------------------------------
 (defun DGPS-R-PName (r) (nth 0 r))
 (defun DGPS-R-Code  (r) (nth 1 r))
@@ -367,18 +395,16 @@
 (defun DGPS-R-Key   (r) (nth 7 r))
 
 ;; ---------------------------------------------------------------------------
-;; Time sort key (time part only; falls back to CSV row number).
+;; Time sort key
 ;; ---------------------------------------------------------------------------
 (defun DGPS-TimeKey (s / timeStr pos h m sec ms p2 p3)
   (setq timeStr (DGPS-Trim s))
   (setq pos (vl-string-search " " timeStr))
-  (if pos
-    (setq timeStr (substr timeStr (+ pos 2)))
-  )
+  (if pos (setq timeStr (substr timeStr (+ pos 2))))
   (if (>= (strlen timeStr) 8)
     (progn
-      (setq h (substr timeStr 1 2)
-            m (substr timeStr 4 2)
+      (setq h   (substr timeStr 1 2)
+            m   (substr timeStr 4 2)
             sec (substr timeStr 7 2))
       (if (and (DGPS-NumericP h) (DGPS-NumericP m) (DGPS-NumericP sec))
         (progn
@@ -422,7 +448,7 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; Group records by Code (master list is not sorted or modified).
+;; Group records by Code.
 ;; Result: ((code rec1 rec2 ...) ...)
 ;; ---------------------------------------------------------------------------
 (defun DGPS-GroupByCode (records / groups code cell)
@@ -439,18 +465,10 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; Forward ordering (no backward / back-and-forth vertices)
-;;
-;; Input : records already sorted by Local Time.
-;; Method: start at the earliest point. At each step look only at the next
-;;         DGPS-ForwardWindow unvisited points (in time order) and move to
-;;         the one NEAREST in Easting/Northing. Ties keep the earlier time.
-;;         Example: times give 1,3,2,4,5 -> from 1 the nearest of {3,2,4,..}
-;;         is 2, then 3, then 4 ... => 1,2,3,4,5 (forward).
-;; No record is ever dropped or duplicated.
+;; Forward ordering
 ;; ---------------------------------------------------------------------------
 (defun DGPS-Dist2D (a b / dx dy)
-  (setq dx (- (atof (DGPS-R-East a)) (atof (DGPS-R-East b)))
+  (setq dx (- (atof (DGPS-R-East  a)) (atof (DGPS-R-East  b)))
         dy (- (atof (DGPS-R-North a)) (atof (DGPS-R-North b))))
   (sqrt (+ (* dx dx) (* dy dy)))
 )
@@ -464,7 +482,6 @@
             remaining (cdr recs)
             result (list cur))
       (while remaining
-        ;; candidates: first "win" unvisited points in time order
         (setq cand '() k 0)
         (foreach c remaining
           (if (< k win)
@@ -488,7 +505,6 @@
   )
 )
 
-;; Number of positions where the forward order differs from the time order.
 (defun DGPS-CountMoved (a b / n)
   (setq n 0)
   (while (and a b)
@@ -510,9 +526,9 @@
       (setq dgps-*fh* nil)
     )
   )
-  (if dgps-*old-clayer* (setvar "CLAYER" dgps-*old-clayer*))
+  (if dgps-*old-clayer*  (setvar "CLAYER"  dgps-*old-clayer*))
   (if dgps-*old-cmdecho* (setvar "CMDECHO" dgps-*old-cmdecho*))
-  (if dgps-*old-osmode* (setvar "OSMODE" dgps-*old-osmode*))
+  (if dgps-*old-osmode*  (setvar "OSMODE"  dgps-*old-osmode*))
   (setq *error* dgps-*old-error*)
   (if (and msg
            (/= msg "Function cancelled")
@@ -523,75 +539,446 @@
   (princ)
 )
 
-;; ---------------------------------------------------------------------------
+;; ===========================================================================
+;; DIALOG 1 – Layer Selection
+;;
+;; Shows:
+;;   • [Polyline] / [3D Polyline] toggle buttons  (radio-button feel)
+;;   • Scrollable list of Code groups from the CSV
+;;   • [Select Layers] button
+;;
+;; Returns a list:  (outType selectedCodes)
+;;   outType       = "Polyline" | "3Dpolyline"
+;;   selectedCodes = list of code strings the user highlighted, or nil = all
+;;
+;; Returns nil when the user cancels.
+;; ===========================================================================
+(defun DGPS-LayerSelectDialog (codenames / dcl_id dlgName result
+                                outTypeChoice selectedList
+                                allKeys)
+  ;;
+  ;; Write a temporary DCL file so we do not need a permanent .dcl on disk.
+  ;;
+  (setq dlgName (vl-filename-mktemp "dgpsLine" (getvar "TEMPPREFIX") ".dcl"))
+
+  ;; Build DCL text
+  (setq dcl_text
+    (strcat
+      "dgps_layer_sel : dialog {\n"
+      "  label = \"Rail Track - Select Layer\";\n"
+      "\n"
+      "  : row {\n"
+      "    label = \"Select layer\";\n"
+      "    alignment = left;\n"
+      "    : radio_button { key = \"rb_poly\";   label = \"Polyline\";    value = \"1\"; }\n"
+      "    : radio_button { key = \"rb_3dpoly\"; label = \"3D Polyline\"; value = \"0\"; }\n"
+      "  }\n"
+      "\n"
+      "  : list_box {\n"
+      "    key             = \"lst_codes\";\n"
+      "    height          = 20;\n"
+      "    width           = 48;\n"
+      "    fixed_width_font = false;\n"
+      "    multiple_select  = true;\n"
+      "    allow_accept     = false;\n"
+      "  }\n"
+      "\n"
+      "  spacer_1;\n"
+      "  : row {\n"
+      "    alignment = centered;\n"
+      "    : button  { key = \"btn_select\"; label = \"Select Layers\"; width = 16; fixed_width = true; is_default = true; }\n"
+      "    : button  { key = \"cancel\";     label = \"Cancel\";        width = 10; fixed_width = true; is_cancel  = true; }\n"
+      "  }\n"
+      "}\n"
+    )
+  )
+
+  ;; Write DCL file
+  (setq f (open dlgName "w"))
+  (write-line dcl_text f)
+  (close f)
+
+  ;; Load DCL
+  (setq dcl_id (load_dialog dlgName))
+  (setq result nil)
+
+  (if (and dcl_id (new_dialog "dgps_layer_sel" dcl_id))
+    (progn
+      ;; Default: Polyline selected
+      (setq outTypeChoice "Polyline")
+      (set_tile "rb_poly"   "1")
+      (set_tile "rb_3dpoly" "0")
+
+      ;; Populate list – sorted ascending
+      (setq sortedCodes (vl-sort codenames '(lambda (a b) (< (strcase a) (strcase b)))))
+      (start_list "lst_codes" 3)
+      (foreach c sortedCodes (add_list c))
+      (end_list)
+
+      ;; Radio button callbacks
+      (action_tile "rb_poly"
+        "(setq outTypeChoice \"Polyline\")
+         (set_tile \"rb_poly\"   \"1\")
+         (set_tile \"rb_3dpoly\" \"0\")"
+      )
+      (action_tile "rb_3dpoly"
+        "(setq outTypeChoice \"3Dpolyline\")
+         (set_tile \"rb_poly\"   \"0\")
+         (set_tile \"rb_3dpoly\" \"1\")"
+      )
+
+      ;; Select Layers button
+      (action_tile "btn_select"
+        (strcat
+          "(setq selIdxStr (get_tile \"lst_codes\"))"
+          "(done_dialog 1)"
+        )
+      )
+
+      ;; Cancel
+      (action_tile "cancel" "(done_dialog 0)")
+
+      ;; Run dialog
+      (setq dlgRet (start_dialog))
+
+      (if (= dlgRet 1)
+        (progn
+          ;; Parse selected indices (space-separated string from list_box)
+          (setq selectedList '())
+          (if (and selIdxStr (/= (DGPS-Trim selIdxStr) ""))
+            (progn
+              (setq tkns (read (strcat "(" selIdxStr ")")))
+              (foreach idx tkns
+                (setq nm (nth idx sortedCodes))
+                (if nm (setq selectedList (cons nm selectedList)))
+              )
+              (setq selectedList (reverse selectedList))
+            )
+          )
+          (setq result (list outTypeChoice selectedList))
+        )
+        (setq result nil)  ; cancelled
+      )
+    )
+    (progn
+      (princ "\nVIDDGPSTOLINE: could not open layer-selection dialog.")
+      (setq result nil)
+    )
+  )
+
+  (unload_dialog dcl_id)
+  (vl-catch-all-apply 'vl-file-delete (list dlgName))
+  result
+)
+
+;; ===========================================================================
+;; DIALOG 2 – Layer Options
+;;
+;; Called after the user clicks [Select Layers].
+;; Shows:
+;;   • radio: "Default layers"  -> scrollable list of DGPS-DefaultLayers
+;;   • radio: "Custom layer for <codes>"
+;;   • text edit for custom name
+;;   • [OK] / [Cancel]
+;;
+;; Returns chosen layer name string, or nil if cancelled.
+;; ===========================================================================
+(defun DGPS-LayerOptionsDialog (selectedCodes / dcl_id dlgName result
+                                 modeChoice customName defaultChoice
+                                 codeLabel dcl_text f selIdxStr dlgRet idx nm)
+
+  (setq dlgName (vl-filename-mktemp "dgpsOpt" (getvar "TEMPPREFIX") ".dcl"))
+
+  ;; Build label for codes in use
+  (if (and selectedCodes (> (length selectedCodes) 0))
+    (progn
+      (setq codeLabel "")
+      (foreach c selectedCodes
+        (setq codeLabel (strcat codeLabel (if (= codeLabel "") "" ", ") c))
+      )
+      (if (> (strlen codeLabel) 40)
+        (setq codeLabel (strcat (substr codeLabel 1 37) "..."))
+      )
+    )
+    (setq codeLabel "all codes")
+  )
+
+  (setq dcl_text
+    (strcat
+      "dgps_layer_opt : dialog {\n"
+      "  label = \"Layer Options\";\n"
+      "\n"
+      "  : radio_button { key = \"rb_default\"; label = \"Default layers\";  value = \"1\"; }\n"
+      "\n"
+      "  : list_box {\n"
+      "    key             = \"lst_default\";\n"
+      "    height          = 8;\n"
+      "    width           = 48;\n"
+      "    fixed_width_font = false;\n"
+      "    multiple_select  = false;\n"
+      "    allow_accept     = false;\n"
+      "  }\n"
+      "\n"
+      "  : radio_button { key = \"rb_custom\"; label = \"Custom layer for ("
+      codeLabel
+      ")\"; value = \"0\"; }\n"
+      "\n"
+      "  : edit_box {\n"
+      "    key   = \"edt_custom\";\n"
+      "    label = \"Custom layer name\";\n"
+      "    width = 40;\n"
+      "    edit_width = 36;\n"
+      "    is_enabled = false;\n"
+      "  }\n"
+      "\n"
+      "  spacer_1;\n"
+      "  : row {\n"
+      "    alignment = centered;\n"
+      "    : button { key = \"accept\"; label = \"OK\";     width = 10; fixed_width = true; is_default = true; }\n"
+      "    : button { key = \"cancel\"; label = \"Cancel\"; width = 10; fixed_width = true; is_cancel  = true; }\n"
+      "  }\n"
+      "}\n"
+    )
+  )
+
+  ;; Write DCL
+  (setq f (open dlgName "w"))
+  (write-line dcl_text f)
+  (close f)
+
+  (setq dcl_id (load_dialog dlgName))
+  (setq result nil)
+
+  (if (and dcl_id (new_dialog "dgps_layer_opt" dcl_id))
+    (progn
+      (setq modeChoice "default")
+      (setq defaultChoice nil)
+      (setq customName "")
+
+      ;; Radio defaults
+      (set_tile "rb_default" "1")
+      (set_tile "rb_custom"  "0")
+
+      ;; Populate default layer list
+      (start_list "lst_default" 3)
+      (foreach lyr DGPS-DefaultLayers (add_list lyr))
+      (end_list)
+
+      ;; Pre-select first item
+      (set_tile "lst_default" "0")
+      (setq defaultChoice (nth 0 DGPS-DefaultLayers))
+
+      ;; Radio callbacks
+      (action_tile "rb_default"
+        (strcat
+          "(setq modeChoice \"default\")"
+          "(set_tile \"rb_default\" \"1\")"
+          "(set_tile \"rb_custom\"  \"0\")"
+          "(mode_tile \"lst_default\" 0)"
+          "(mode_tile \"edt_custom\"  1)"
+        )
+      )
+      (action_tile "rb_custom"
+        (strcat
+          "(setq modeChoice \"custom\")"
+          "(set_tile \"rb_default\" \"0\")"
+          "(set_tile \"rb_custom\"  \"1\")"
+          "(mode_tile \"lst_default\" 1)"
+          "(mode_tile \"edt_custom\"  0)"
+        )
+      )
+
+      ;; List selection callback
+      (action_tile "lst_default"
+        (strcat
+          "(setq selIdxStr (get_tile \"lst_default\"))"
+          "(if (and selIdxStr (/= (vl-string-trim \" \" selIdxStr) \"\"))"
+          "  (setq defaultChoice (nth (atoi selIdxStr) DGPS-DefaultLayers))"
+          ")"
+        )
+      )
+
+      ;; Custom name edit callback
+      (action_tile "edt_custom"
+        "(setq customName (get_tile \"edt_custom\"))"
+      )
+
+      ;; OK
+      (action_tile "accept"
+        (strcat
+          "(setq customName (get_tile \"edt_custom\"))"
+          "(setq selIdxStr  (get_tile \"lst_default\"))"
+          "(if (and selIdxStr (/= (vl-string-trim \" \" selIdxStr) \"\"))"
+          "  (setq defaultChoice (nth (atoi selIdxStr) DGPS-DefaultLayers))"
+          ")"
+          "(done_dialog 1)"
+        )
+      )
+      (action_tile "cancel" "(done_dialog 0)")
+
+      (setq dlgRet (start_dialog))
+
+      (if (= dlgRet 1)
+        (progn
+          (cond
+            ((= modeChoice "custom")
+             (setq customName (DGPS-Trim customName))
+             (if (= customName "")
+               (progn
+                 (alert "Custom layer name cannot be blank. Using default.")
+                 (setq result defaultChoice)
+               )
+               (setq result customName)
+             )
+            )
+            (T  ; "default"
+             (if defaultChoice
+               (setq result defaultChoice)
+               (setq result (nth 0 DGPS-DefaultLayers))
+             )
+            )
+          )
+        )
+        (setq result nil)
+      )
+    )
+    (progn
+      (princ "\nVIDDGPSTOLINE: could not open layer-options dialog.")
+      (setq result nil)
+    )
+  )
+
+  (unload_dialog dcl_id)
+  (vl-catch-all-apply 'vl-file-delete (list dlgName))
+  result
+)
+
+;; ===========================================================================
+;; Build geometry for one group of records
+;; ===========================================================================
+(defun DGPS-BuildGeometry (codeRecs code outType targetLayer
+                           / sortedRecs orderedRecs moved
+                             pts x y z result)
+  (if (< (length codeRecs) 2)
+    (progn
+      (princ (strcat "\nGeometry: " code " | Points: 1 | SKIPPED (single point)"))
+      (list nil 0 1 0)  ; (entity moved singleCt failures)
+    )
+    (progn
+      ;; Ensure target layer exists
+      (DGPS-EnsureLayer targetLayer 3)
+
+      ;; Sort by time then forward-order
+      (setq sortedRecs  (vl-sort codeRecs 'DGPS-TimeLess))
+      (setq orderedRecs (DGPS-OrderForward sortedRecs DGPS-ForwardWindow))
+      (setq moved (DGPS-CountMoved sortedRecs orderedRecs))
+
+      (if (> moved 0)
+        (princ
+          (strcat "\nRe-ordered forward: " code " | "
+                  (itoa moved) " position(s) changed"))
+      )
+
+      ;; Collect points
+      (setq pts '())
+      (foreach rec orderedRecs
+        (setq x (atof (DGPS-R-East  rec))
+              y (atof (DGPS-R-North rec))
+              z (atof (DGPS-R-Elev  rec)))
+        (setq pts
+          (cons
+            (if (= outType "3Dpolyline")
+              (list x y z)
+              (list x y)
+            )
+            pts
+          )
+        )
+      )
+      (setq pts (reverse pts))
+
+      ;; Create entity
+      (setq result
+        (if (= outType "3Dpolyline")
+          (DGPS-Make3DPolyline pts targetLayer)
+          (DGPS-Make2DPolyline pts targetLayer)
+        )
+      )
+
+      (if result
+        (progn
+          (princ
+            (strcat "\nGeometry: " code
+                    " | Points: " (itoa (length sortedRecs))
+                    " | Layer: "  targetLayer
+                    " | "         outType " | CREATED"))
+          (list result moved 0 0)
+        )
+        (progn
+          (princ
+            (strcat "\nGeometry: " code
+                    " | Points: " (itoa (length sortedRecs))
+                    " | Layer: "  targetLayer
+                    " | "         outType " | FAILED"))
+          (list nil moved 0 1)
+        )
+      )
+    )
+  )
+)
+
+;; ===========================================================================
 ;; Main command
-;; ---------------------------------------------------------------------------
+;; ===========================================================================
 (defun c:VIDDGPSTOLINE
-  (/ outType csvFile openResult enc fh
+  (/ csvFile openResult enc fh
      headerLine headers
      idxP idxC idxN idxE idxZ idxT
      line fields rowNo dataRows validRows skippedRows
-     allRev allRecords rec pname code north east elev localTime key
-     groups g codeRecs sortedRecs orderedRecs moved totalMoved pts x y z
-     plLayer geomCount singleCount plLayers geomFailures
-     result i sampleCount)
+     allRev allRecords
+     rec pname code north east elev localTime key
+     groups codenames
+     dlgResult outType selectedCodes targetLayer
+     g codeRecs geomResult
+     geomCount singleCount geomFailures totalMoved
+     layersCreated i sampleCount)
 
   (setq dgps-*old-error* *error*)
   (setq *error* DGPS-Error)
 
-  (setq dgps-*old-clayer* (getvar "CLAYER"))
+  (setq dgps-*old-clayer*  (getvar "CLAYER"))
   (setq dgps-*old-cmdecho* (getvar "CMDECHO"))
-  (setq dgps-*old-osmode* (getvar "OSMODE"))
+  (setq dgps-*old-osmode*  (getvar "OSMODE"))
 
   (setvar "CMDECHO" 0)
-  (setvar "OSMODE" 0)
+  (setvar "OSMODE"  0)
 
   ;; -------------------------------------------------------------------------
-  ;; Output type
-  ;; -------------------------------------------------------------------------
-  (initget "Polyline 3Dpolyline")
-  (setq outType
-    (getkword "\nSelect output type [Polyline/3Dpolyline] <Polyline>: ")
-  )
-  (if (null outType) (setq outType "Polyline"))
-
-  ;; -------------------------------------------------------------------------
-  ;; CSV selection
+  ;; 1. Select CSV file
   ;; -------------------------------------------------------------------------
   (setq csvFile (getfiled "Select DGPS CSV File" "" "csv" 4))
   (if (null csvFile)
-    (progn
-      (DGPS-Error "No CSV file selected.")
-      (exit)
-    )
+    (progn (DGPS-Error "No CSV file selected.") (exit))
   )
 
   ;; -------------------------------------------------------------------------
-  ;; Open CSV
+  ;; 2. Open and read CSV
   ;; -------------------------------------------------------------------------
   (setq openResult (DGPS-OpenCSV csvFile))
-  (setq fh (car openResult))
+  (setq fh  (car  openResult))
   (setq enc (cadr openResult))
   (if (null fh)
-    (progn
-      (DGPS-Error "Could not open CSV in binary mode.")
-      (exit)
-    )
+    (progn (DGPS-Error "Could not open CSV in binary mode.") (exit))
   )
   (setq dgps-*fh* fh)
 
-  ;; -------------------------------------------------------------------------
   ;; Header
-  ;; -------------------------------------------------------------------------
   (setq headerLine (DGPS-ReadRecord fh))
   (if (null headerLine)
-    (progn
-      (DGPS-Error "CSV file is empty.")
-      (exit)
-    )
+    (progn (DGPS-Error "CSV file is empty.") (exit))
   )
   (setq headerLine (DGPS-StripBOM headerLine))
-  (setq headers (DGPS-ParseCSV headerLine))
+  (setq headers    (DGPS-ParseCSV headerLine))
 
   (setq idxP (DGPS-HeaderIndex headers "Point Name"))
   (setq idxC (DGPS-HeaderIndex headers "Code"))
@@ -603,40 +990,38 @@
   (if (or (null idxP) (null idxC) (null idxN) (null idxE) (null idxZ))
     (progn
       (DGPS-Error
-        "Required headers missing. Required: Point Name, Code, Northing, Easting, Elevation.")
+        "Required headers missing. Need: Point Name, Code, Northing, Easting, Elevation.")
       (exit)
     )
   )
 
-  ;; -------------------------------------------------------------------------
-  ;; Read EVERY row until EOF
-  ;; -------------------------------------------------------------------------
-  (setq rowNo 1
-        dataRows 0
-        validRows 0
+  ;; Read all rows
+  (setq rowNo      1
+        dataRows   0
+        validRows  0
         skippedRows 0
-        allRev '())
+        allRev     '())
 
   (while (setq line (DGPS-ReadRecord fh))
     (setq rowNo (1+ rowNo))
     (if (not (DGPS-BlankP line))
       (progn
         (setq dataRows (1+ dataRows))
-        (setq fields (DGPS-ParseCSV line))
-        (setq pname (DGPS-GetField fields idxP))
-        (setq code  (DGPS-GetField fields idxC))
-        (setq north (DGPS-GetField fields idxN))
-        (setq east  (DGPS-GetField fields idxE))
-        (setq elev  (DGPS-GetField fields idxZ))
+        (setq fields    (DGPS-ParseCSV line))
+        (setq pname     (DGPS-GetField fields idxP))
+        (setq code      (DGPS-GetField fields idxC))
+        (setq north     (DGPS-GetField fields idxN))
+        (setq east      (DGPS-GetField fields idxE))
+        (setq elev      (DGPS-GetField fields idxZ))
         (setq localTime (if (null idxT) "" (DGPS-GetField fields idxT)))
 
         (if (and (/= pname "")
-                 (/= code "")
+                 (/= code  "")
                  (DGPS-NumericP north)
                  (DGPS-NumericP east)
                  (DGPS-NumericP elev))
           (progn
-            (setq key (DGPS-TimeKey localTime))
+            (setq key    (DGPS-TimeKey localTime))
             (setq allRev
               (cons
                 (list pname code north east elev localTime rowNo key)
@@ -654,29 +1039,71 @@
   (close fh)
   (setq dgps-*fh* nil)
   (setq allRecords (reverse allRev))
-  (setq groups (DGPS-GroupByCode allRecords))
+
+  (if (= validRows 0)
+    (progn (DGPS-Error "No valid records found in CSV.") (exit))
+  )
+
+  ;; Group and extract code names
+  (setq groups    (DGPS-GroupByCode allRecords))
+  (setq codenames '())
+  (foreach g groups
+    (setq codenames (append codenames (list (car g))))
+  )
 
   ;; -------------------------------------------------------------------------
-  ;; Report input
+  ;; 3. Dialog 1: Layer selection
+  ;; -------------------------------------------------------------------------
+  (setq dlgResult (DGPS-LayerSelectDialog codenames))
+  (if (null dlgResult)
+    (progn (DGPS-Error "Cancelled by user.") (exit))
+  )
+
+  (setq outType       (nth 0 dlgResult))
+  (setq selectedCodes (nth 1 dlgResult))
+
+  ;; -------------------------------------------------------------------------
+  ;; 4. Dialog 2: Layer options
+  ;; -------------------------------------------------------------------------
+  (setq targetLayer (DGPS-LayerOptionsDialog selectedCodes))
+  (if (null targetLayer)
+    (progn (DGPS-Error "Cancelled by user.") (exit))
+  )
+
+  ;; Sanitize user-supplied name just in case
+  (setq targetLayer (DGPS-SanitizeLayerName targetLayer))
+
+  ;; -------------------------------------------------------------------------
+  ;; 5. Report input summary
   ;; -------------------------------------------------------------------------
   (princ "\n========================================")
   (princ "\nVIDDGPSTOLINE CSV IMPORT")
   (princ "\n========================================")
-  (princ (strcat "\nFile: " csvFile))
-  (princ (strcat "\nEncoding: " enc))
-  (princ (strcat "\nOutput type: " outType))
-  (princ (strcat "\nData rows read: " (itoa dataRows)))
-  (princ (strcat "\nValid records: " (itoa validRows)))
-  (princ (strcat "\nSkipped rows: " (itoa skippedRows)))
+  (princ (strcat "\nFile:         " csvFile))
+  (princ (strcat "\nEncoding:     " enc))
+  (princ (strcat "\nOutput type:  " outType))
+  (princ (strcat "\nTarget layer: " targetLayer))
+  (princ (strcat "\nData rows:    " (itoa dataRows)))
+  (princ (strcat "\nValid:        " (itoa validRows)))
+  (princ (strcat "\nSkipped:      " (itoa skippedRows)))
   (princ (strcat "\nUnique Codes: " (itoa (length groups))))
-  (princ "\n----------------------------------------")
-  (foreach g groups
-    (princ (strcat "\n" (car g) " -> " (itoa (length (cdr g)))))
+
+  (if (and selectedCodes (> (length selectedCodes) 0))
+    (progn
+      (princ "\nFiltered to codes:")
+      (foreach c selectedCodes (princ (strcat "\n  " c)))
+    )
+    (princ "\nProcessing ALL codes.")
   )
 
+  (princ "\n----------------------------------------")
+  (foreach g groups
+    (princ (strcat "\n  " (car g) " -> " (itoa (length (cdr g))) " pts"))
+  )
+
+  ;; Sample records
   (princ "\n\nFIRST FIVE RECORDS")
-  (setq sampleCount (min 5 (length allRecords))
-        i 0)
+  (setq sampleCount (min 5 (length allRecords)) i 0)
   (while (< i sampleCount)
     (setq rec (nth i allRecords))
     (princ
@@ -684,137 +1111,84 @@
         "\n" (itoa (1+ i))
         ": " (DGPS-R-PName rec)
         " | " (DGPS-R-Code rec)
-        " | E=" (DGPS-R-East rec)
+        " | E=" (DGPS-R-East  rec)
         " | N=" (DGPS-R-North rec)
-        " | Z=" (DGPS-R-Elev rec)
-        " | T=" (DGPS-R-Time rec)
+        " | Z=" (DGPS-R-Elev  rec)
+        " | T=" (DGPS-R-Time  rec)
       )
     )
     (setq i (1+ i))
   )
 
   ;; -------------------------------------------------------------------------
-  ;; Geometry: one pass over every Code group (no points, no text)
+  ;; 6. Build geometry
   ;; -------------------------------------------------------------------------
-  (setq geomCount 0 singleCount 0 geomFailures 0 totalMoved 0 plLayers '())
+  (setq geomCount    0
+        singleCount  0
+        geomFailures 0
+        totalMoved   0
+        layersCreated '())
+
+  ;; Ensure target layer exists once
+  (DGPS-EnsureLayer targetLayer 3)
 
   (foreach g groups
-    (setq codeRecs (cdr g))
-    (setq code (car g))
+    (setq code     (car  g))
+    (setq codeRecs (cdr  g))
 
-    (if (< (length codeRecs) 2)
+    ;; Filter: skip codes not in the user's selection (if a selection was made)
+    (if (or (null selectedCodes)
+            (= (length selectedCodes) 0)
+            (member code selectedCodes))
       (progn
-        (setq singleCount (1+ singleCount))
-        (princ
-          (strcat "\nGeometry: " code " | Points: 1 | SKIPPED (single point)")
+        (setq geomResult
+          (DGPS-BuildGeometry codeRecs code outType targetLayer)
+        )
+        (setq totalMoved   (+ totalMoved   (nth 1 geomResult)))
+        (setq singleCount  (+ singleCount  (nth 2 geomResult)))
+        (setq geomFailures (+ geomFailures (nth 3 geomResult)))
+        (if (nth 0 geomResult)
+          (setq geomCount (1+ geomCount))
+        )
+        (if (null (member targetLayer layersCreated))
+          (setq layersCreated (cons targetLayer layersCreated))
         )
       )
-      (progn
-        ;; Layer prefix depends on the selected output type:
-        ;;   Polyline   -> pl_<Code>
-        ;;   3Dpolyline -> 3dpl_<Code>
-        (setq plLayer
-          (strcat
-            (if (= outType "3Dpolyline") "3dpl_" "pl_")
-            (DGPS-SanitizeLayerName code)
-          )
-        )
-        (if (not (tblsearch "LAYER" plLayer))
-          (DGPS-EnsureLayer plLayer 3)
-        )
-        (if (null (member plLayer plLayers))
-          (setq plLayers (cons plLayer plLayers))
-        )
-
-        ;; 1) Local Time order (then CSV row number)
-        (setq sortedRecs (vl-sort codeRecs 'DGPS-TimeLess))
-        ;; 2) Forward order using Easting/Northing (no back-and-forth)
-        (setq orderedRecs (DGPS-OrderForward sortedRecs DGPS-ForwardWindow))
-        (setq moved (DGPS-CountMoved sortedRecs orderedRecs))
-        (setq totalMoved (+ totalMoved moved))
-        (if (> moved 0)
-          (princ
-            (strcat "\nRe-ordered forward: " code " | "
-                    (itoa moved) " position(s) changed")
-          )
-        )
-        (setq pts '())
-
-        (foreach rec orderedRecs
-          (setq x (atof (DGPS-R-East rec)))
-          (setq y (atof (DGPS-R-North rec)))
-          (setq z (atof (DGPS-R-Elev rec)))
-          (setq pts
-            (cons
-              (if (= outType "3Dpolyline")
-                (list x y z)
-                (list x y)
-              )
-              pts
-            )
-          )
-        )
-        (setq pts (reverse pts))
-
-        (setq result
-          (if (= outType "3Dpolyline")
-            (DGPS-Make3DPolyline pts plLayer)
-            (DGPS-Make2DPolyline pts plLayer)
-          )
-        )
-
-        (if result
-          (progn
-            (setq geomCount (1+ geomCount))
-            (princ
-              (strcat "\nGeometry: " code
-                      " | Points: " (itoa (length sortedRecs))
-                      " | " outType " | CREATED")
-            )
-          )
-          (progn
-            (setq geomFailures (1+ geomFailures))
-            (princ
-              (strcat "\nGeometry: " code
-                      " | Points: " (itoa (length sortedRecs))
-                      " | " outType " | FAILED")
-            )
-          )
-        )
-      )
+      ;; Skipped (not in filter)
+      (princ (strcat "\nSkipped (not selected): " code))
     )
   )
 
   ;; -------------------------------------------------------------------------
-  ;; Final report
+  ;; 7. Final report
   ;; -------------------------------------------------------------------------
   (princ "\n\n========================================")
   (princ "\nVIDDGPSTOLINE COMPLETE")
   (princ "\n========================================")
-  (princ (strcat "\nRows read:              " (itoa dataRows)))
-  (princ (strcat "\nValid records:          " (itoa validRows)))
-  (princ (strcat "\nSkipped rows:           " (itoa skippedRows)))
-  (princ (strcat "\nUnique Codes:           " (itoa (length groups))))
-  (princ (strcat "\nGeometry layers:        " (itoa (length plLayers))))
-  (princ (strcat "\nGeometry created:       " (itoa geomCount)))
-  (princ (strcat "\nGeometry failures:      " (itoa geomFailures)))
-  (princ (strcat "\nSingle-point Codes:     " (itoa singleCount)))
-  (princ (strcat "\nPoints re-ordered:      " (itoa totalMoved)))
+  (princ (strcat "\nOutput type:      " outType))
+  (princ (strcat "\nTarget layer:     " targetLayer))
+  (princ (strcat "\nRows read:        " (itoa dataRows)))
+  (princ (strcat "\nValid records:    " (itoa validRows)))
+  (princ (strcat "\nSkipped rows:     " (itoa skippedRows)))
+  (princ (strcat "\nUnique Codes:     " (itoa (length groups))))
+  (princ (strcat "\nGeometry created: " (itoa geomCount)))
+  (princ (strcat "\nGeometry failed:  " (itoa geomFailures)))
+  (princ (strcat "\nSingle-point:     " (itoa singleCount)))
+  (princ (strcat "\nPoints re-ordered:" (itoa totalMoved)))
 
   (if (> geomFailures 0)
     (princ "\nWARNING: One or more geometry entities failed to create.")
   )
-
   (princ "\n========================================")
 
   ;; Restore AutoCAD state
-  (setvar "CLAYER" dgps-*old-clayer*)
+  (setvar "CLAYER"  dgps-*old-clayer*)
   (setvar "CMDECHO" dgps-*old-cmdecho*)
-  (setvar "OSMODE" dgps-*old-osmode*)
+  (setvar "OSMODE"  dgps-*old-osmode*)
   (setq *error* dgps-*old-error*)
   (princ "\nVIDDGPSTOLINE finished successfully.")
   (princ)
 )
 
-(princ "\nVIDDGPSTOLINE_v15 loaded. Type VIDDGPSTOLINE to run.")
+(princ "\nVIDDGPSTOLINE_v16 loaded. Type VIDDGPSTOLINE to run.")
 (princ)
