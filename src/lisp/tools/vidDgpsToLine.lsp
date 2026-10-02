@@ -712,7 +712,7 @@
       "\n"
       "  : list_box {\n"
       "    key             = \"lst_default\";\n"
-      "    height          = 8;\n"
+      "    height          = 20;\n"
       "    width           = 48;\n"
       "    fixed_width_font = false;\n"
       "    multiple_select  = false;\n"
