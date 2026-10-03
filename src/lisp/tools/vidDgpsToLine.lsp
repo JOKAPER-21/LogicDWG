@@ -1,7 +1,20 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Line
-;;; Release: 1.2.0 | Civil 3D 2026
-;;; Version: 03
+;;; Release: 1.4.0 | Civil 3D 2026
+;;; Version: 05
+;;; ============================================================================
+;;;
+;;; CHANGE LOG v1.4.0 (Version 05)
+;;;   - Removed Local Time ordering entirely.
+;;;   - Points within each Code are now chained by nearest-neighbour:
+;;;       Start from the first point in CSV row order.
+;;;       Repeatedly pick the closest unvisited point in the same Code.
+;;;       This eliminates zig-zag artefacts caused by GPS survey order.
+;;;   - Longest-edge removal preserved: after nearest-neighbour chaining,
+;;;       a temporary closed loop is still evaluated to remove the largest
+;;;       gap edge and produce a clean open polyline.
+;;;   - DGPS-TimeKey / DGPS-TimeLess / DGPS-OrderForward / DGPS-CountMoved
+;;;       kept as dead code for compatibility; not invoked.
 ;;; ============================================================================
 ;;;
 ;;; WORKFLOW:
@@ -854,75 +867,228 @@
 )
 
 ;; ===========================================================================
-;; Build geometry for one group of records
+;; DGPS-Dist2DPt  –  2-D distance between two raw (x y ...) point lists
 ;; ===========================================================================
-(defun DGPS-BuildGeometry (codeRecs code outType targetLayer
-                           / sortedRecs orderedRecs moved
-                             pts x y z result)
-  (if (< (length codeRecs) 2)
+(defun DGPS-Dist2DPt (a b / dx dy)
+  (setq dx (- (car a) (car b))
+        dy (- (cadr a) (cadr b)))
+  (sqrt (+ (* dx dx) (* dy dy)))
+)
+
+;; ===========================================================================
+;; DGPS-FormatDist  –  format a real as a string with 2 decimal places
+;; ===========================================================================
+(defun DGPS-FormatDist (d)
+  ;; AutoLISP rtos: unit 2 = decimal, precision 2
+  (rtos d 2 2)
+)
+
+;; ===========================================================================
+;; Build geometry for one group of records
+;;
+;; Algorithm (spec §4-§9):
+;;   1. Sort records by Local Time (row as tie-breaker).
+;;   2. Build temporary closed loop:  P0→P1→…→Pn-1→P0
+;;   3. Compute 2-D plan length of every edge.
+;;   4. Find the edge with the greatest length.
+;;   5. Remove that edge → open polyline starting from the vertex *after*
+;;      the removed edge and traversing around to the vertex *before* it.
+;;   6. Create LWPOLYLINE or 3D POLYLINE on targetLayer.
+;;
+;; Edge cases (spec §10):
+;;   0 points → skip, report.
+;;   1 point  → skip (no polyline).
+;;   2 points → direct open line, no edge-removal step.
+;;
+;; Returns: (entity 0 singleCt failures)
+;;   entity    = AutoCAD entity name, or nil
+;;   0         = placeholder (was "moved" in v03, unused in v04)
+;;   singleCt  = 1 if skipped because < 2 valid pts, else 0
+;;   failures  = 1 if entmakex failed, else 0
+;; ===========================================================================
+;; ---------------------------------------------------------------------------
+;; DGPS-NNChain
+;;   Nearest-neighbour greedy chain over a list of records.
+;;   Starts from the first record in the list (CSV row order).
+;;   At each step picks the closest unvisited record by 2-D plan distance.
+;;   Returns the re-ordered list of records.
+;; ---------------------------------------------------------------------------
+(defun DGPS-NNChain (recs / remaining result cur best bestD d cx cy bx by rx ry)
+  (if (or (null recs) (null (cdr recs)))
+    recs
     (progn
-      (princ (strcat "\nGeometry: " code " | Points: 1 | SKIPPED (single point)"))
-      (list nil 0 1 0)  ; (entity moved singleCt failures)
-    )
-    (progn
-      ;; Ensure target layer exists
-      (DGPS-EnsureLayer targetLayer 3)
-
-      ;; Sort by time then forward-order
-      (setq sortedRecs  (vl-sort codeRecs 'DGPS-TimeLess))
-      (setq orderedRecs (DGPS-OrderForward sortedRecs DGPS-ForwardWindow))
-      (setq moved (DGPS-CountMoved sortedRecs orderedRecs))
-
-      (if (> moved 0)
-        (princ
-          (strcat "\nRe-ordered forward: " code " | "
-                  (itoa moved) " position(s) changed"))
-      )
-
-      ;; Collect points
-      (setq pts '())
-      (foreach rec orderedRecs
-        (setq x (atof (DGPS-R-East  rec))
-              y (atof (DGPS-R-North rec))
-              z (atof (DGPS-R-Elev  rec)))
-        (setq pts
-          (cons
-            (if (= outType "3Dpolyline")
-              (list x y z)
-              (list x y)
-            )
-            pts
+      (setq cur       (car recs)
+            remaining (cdr recs)
+            result    (list cur))
+      (while remaining
+        (setq cx     (atof (DGPS-R-East  cur))
+              cy     (atof (DGPS-R-North cur))
+              best   nil
+              bestD  nil)
+        (foreach r remaining
+          (setq rx (atof (DGPS-R-East  r))
+                ry (atof (DGPS-R-North r))
+                d  (+ (* (- rx cx) (- rx cx))
+                       (* (- ry cy) (- ry cy))))  ; squared dist, no sqrt needed
+          (if (or (null bestD) (< d bestD))
+            (setq best r  bestD d)
           )
         )
+        (setq result    (append result (list best))
+              remaining (vl-remove best remaining)
+              cur       best)
       )
-      (setq pts (reverse pts))
+      result
+    )
+  )
+)
 
-      ;; Create entity
-      (setq result
-        (if (= outType "3Dpolyline")
-          (DGPS-Make3DPolyline pts targetLayer)
-          (DGPS-Make2DPolyline pts targetLayer)
-        )
-      )
+;; ===========================================================================
+;; Build geometry for one group of records
+;;
+;; Algorithm:
+;;   1. Take records in CSV row order (no time sort).
+;;   2. Chain them by nearest-neighbour (greedy, no zig-zag).
+;;   3. Build a temporary closed loop and find the longest edge (the gap).
+;;   4. Remove that edge → final OPEN polyline.
+;;
+;; Edge cases:
+;;   0 points → skip
+;;   1 point  → skip
+;;   2 points → direct open line (no loop/removal needed)
+;;
+;; Returns: (entity 0 singleCt failures)
+;; ===========================================================================
+(defun DGPS-BuildGeometry (codeRecs code outType targetLayer
+                           / chainedRecs nPts i rec x y z
+                             allPts3D allPts2D
+                             loopPts loopLen
+                             maxLen maxIdx edgeLen
+                             fromPt toPt startIdx
+                             orderedPts finalPts
+                             fromName toName result)
 
-      (if result
-        (progn
-          (princ
-            (strcat "\nGeometry: " code
-                    " | Points: " (itoa (length sortedRecs))
-                    " | Layer: "  targetLayer
-                    " | "         outType " | CREATED"))
-          (list result moved 0 0)
-        )
-        (progn
-          (princ
-            (strcat "\nGeometry: " code
-                    " | Points: " (itoa (length sortedRecs))
-                    " | Layer: "  targetLayer
-                    " | "         outType " | FAILED"))
-          (list nil moved 0 1)
-        )
-      )
+  (setq nPts (length codeRecs))
+
+  (cond
+
+    ;; ── 0 points ────────────────────────────────────────────────────────────
+    ((= nPts 0)
+     (princ (strcat "\n" code))
+     (princ         "\n  Points           : 0")
+     (princ         "\n  Result            : SKIPPED (no valid points)")
+     (list nil 0 1 0)
+    )
+
+    ;; ── 1 point ─────────────────────────────────────────────────────────────
+    ((= nPts 1)
+     (princ (strcat "\n" code))
+     (princ         "\n  Points           : 1")
+     (princ         "\n  Result            : SKIPPED (single point, no polyline)")
+     (list nil 0 1 0)
+    )
+
+    ;; ── 2+ points ───────────────────────────────────────────────────────────
+    (T
+     (DGPS-EnsureLayer targetLayer 3)
+
+     ;; Step 1: nearest-neighbour chain (eliminates zig-zag)
+     (setq chainedRecs (DGPS-NNChain codeRecs))
+     (setq nPts (length chainedRecs))
+
+     ;; Step 2: build coordinate arrays from chained order
+     (setq allPts3D '()
+           allPts2D '())
+     (foreach rec chainedRecs
+       (setq x (atof (DGPS-R-East  rec))
+             y (atof (DGPS-R-North rec))
+             z (atof (DGPS-R-Elev  rec)))
+       (setq allPts3D (append allPts3D (list (list x y z))))
+       (setq allPts2D (append allPts2D (list (list x y))))
+     )
+
+     (if (= nPts 2)
+
+       ;; ── 2 points: direct open line ──────────────────────────────────────
+       (progn
+         (setq finalPts (if (= outType "3Dpolyline") allPts3D allPts2D))
+         (setq result
+           (if (= outType "3Dpolyline")
+             (DGPS-Make3DPolyline finalPts targetLayer)
+             (DGPS-Make2DPolyline finalPts targetLayer)
+           )
+         )
+         (princ (strcat "\n" code))
+         (princ         "\n  Points           : 2")
+         (princ         "\n  Order            : NEAREST-NEIGHBOUR")
+         (princ         "\n  Longest Edge     : N/A (2-point direct line)")
+         (princ         "\n  Removed Edge     : NONE")
+         (princ (strcat "\n  Layer            : " targetLayer))
+         (princ (strcat "\n  Type             : " outType))
+         (princ (strcat "\n  Result            : "
+                        (if result "OPEN POLYLINE" "FAILED")))
+         (list result 0 0 (if result 0 1))
+       )
+
+       ;; ── 3+ points: temporary closed loop → remove longest edge ──────────
+       ;; The chained points form a clean spatial sequence.
+       ;; Close the loop (Pn-1 → P0), find the longest gap, then open it.
+       (progn
+         (setq loopPts allPts2D
+               loopLen nPts
+               maxLen  -1.0
+               maxIdx   0
+               i        0)
+
+         (while (< i loopLen)
+           (setq fromPt  (nth i loopPts)
+                 toPt    (nth (rem (1+ i) loopLen) loopPts)
+                 edgeLen (DGPS-Dist2DPt fromPt toPt))
+           (if (> edgeLen maxLen)
+             (setq maxLen edgeLen  maxIdx i)
+           )
+           (setq i (1+ i))
+         )
+
+         ;; Open the loop: start from the vertex after the longest edge
+         (setq startIdx (rem (1+ maxIdx) nPts))
+         (setq orderedPts '()
+               i           0)
+         (while (< i nPts)
+           (setq orderedPts
+             (append orderedPts
+               (list (nth (rem (+ startIdx i) nPts)
+                          (if (= outType "3Dpolyline") allPts3D allPts2D)))
+             )
+           )
+           (setq i (1+ i))
+         )
+
+         ;; Point names for report
+         (setq fromName (DGPS-R-PName (nth maxIdx chainedRecs)))
+         (setq toName   (DGPS-R-PName (nth (rem (1+ maxIdx) nPts) chainedRecs)))
+
+         ;; Create entity
+         (setq result
+           (if (= outType "3Dpolyline")
+             (DGPS-Make3DPolyline orderedPts targetLayer)
+             (DGPS-Make2DPolyline orderedPts targetLayer)
+           )
+         )
+
+         (princ (strcat "\n" code))
+         (princ (strcat "\n  Points           : " (itoa nPts)))
+         (princ         "\n  Order            : NEAREST-NEIGHBOUR")
+         (princ (strcat "\n  Longest Edge     : " (DGPS-FormatDist maxLen)))
+         (princ (strcat "\n  Removed Edge     : " fromName " -> " toName))
+         (princ (strcat "\n  Layer            : " targetLayer))
+         (princ (strcat "\n  Type             : " outType))
+         (princ (strcat "\n  Result            : "
+                        (if result "OPEN POLYLINE" "FAILED")))
+
+         (list result 0 0 (if result 0 1))
+       )
+     )
     )
   )
 )
@@ -1174,7 +1340,7 @@
   (princ (strcat "\nGeometry created: " (itoa geomCount)))
   (princ (strcat "\nGeometry failed:  " (itoa geomFailures)))
   (princ (strcat "\nSingle-point:     " (itoa singleCount)))
-  (princ (strcat "\nPoints re-ordered:" (itoa totalMoved)))
+  (princ (strcat "\nAlgorithm:        Nearest-neighbour + longest-edge removal (v05)"))
 
   (if (> geomFailures 0)
     (princ "\nWARNING: One or more geometry entities failed to create.")
@@ -1190,5 +1356,5 @@
   (princ)
 )
 
-(princ "\nVIDDGPSTOLINE_v16 loaded. Type VIDDGPSTOLINE to run.")
+(princ "\nVIDDGPSTOLINE_v18 loaded. Type VIDDGPSTOLINE to run.")
 (princ)
