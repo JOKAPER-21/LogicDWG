@@ -1,7 +1,16 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Line
-;;; Release: 1.5.5 | Civil 3D 2026
-;;; Version: 11
+;;; Release: 1.5.7 | Civil 3D 2026
+;;; Version: 13
+;;;   v13: the temporary HP spline is erased after all track lines are created
+;;;        (set DGPS-HPKeep to T to keep it).
+;;;   v12: HP (hectometre post) rows are detected automatically after the CSV is
+;;;        read - no layer selection needed.  Accepted names (PName or Code):
+;;;            HP 71/600   HP 71-600   HP 71_600   HP 71 600   HP71/600
+;;;        All HP points are sorted ascending (km*1000 + m), joined with a
+;;;        smooth spline-style curve (polyline / 3D polyline, per the dialog
+;;;        radio) on layer "HP".  The curve tangent is then used to give every
+;;;        newly created track polyline the SAME direction as the HP chainage.
 ;;;   v11: "Local Time" OFF now joins NEAREST points from both ends of the
 ;;;        chain (no CSV-order dependence) - fixes zig-zag like 1..132 then 133..486.
 ;;; ============================================================================
@@ -62,6 +71,13 @@
 
 ;; Forward re-ordering look-ahead window
 (if (null DGPS-ForwardWindow) (setq DGPS-ForwardWindow 8))
+
+;; HP (hectometre post) settings
+(if (null DGPS-HPLayer) (setq DGPS-HPLayer "HP"))   ; layer for the HP curve
+(if (null DGPS-HPSegs)  (setq DGPS-HPSegs  10))     ; spline samples per HP span
+(if (null DGPS-HPKeep)  (setq DGPS-HPKeep  nil))    ; T = keep HP spline after run
+(setq DGPS-HPSamples nil)                           ; (x y z tx ty) of HP curve
+(setq DGPS-LastFlipped nil)
 
 ;; Dialog options (remembered between runs)
 (if (null DGPS-UseAngle) (setq DGPS-UseAngle T))      ; angle filter on
@@ -1004,6 +1020,243 @@
   )
 )
 
+;; ===========================================================================
+;; HP (hectometre post) support
+;; ===========================================================================
+
+(defun DGPS-DigitP (c / a)
+  (setq a (ascii c))
+  (and (>= a 48) (<= a 57))
+)
+
+;; ---------------------------------------------------------------------------
+;; DGPS-ParseHP
+;;   Returns chainage in metres (km*1000 + m, as a real) when the text looks
+;;   like an HP name, otherwise nil.
+;;     HP 71/600  HP 71-600  HP 71_600  HP 71 600  HP71/600   (any case)
+;; ---------------------------------------------------------------------------
+(defun DGPS-ParseHP (s / u n i km m sepSeen)
+  (if (and s (= (type s) 'STR))
+    (progn
+      (setq u (strcase (vl-string-trim " \t" s))
+            n (strlen u))
+      (if (and (>= n 4) (= (substr u 1 2) "HP"))
+        (progn
+          (setq i 3 km "" m "" sepSeen nil)
+          (while (and (<= i n) (= (substr u i 1) " ")) (setq i (1+ i)))
+          (while (and (<= i n) (DGPS-DigitP (substr u i 1)))
+            (setq km (strcat km (substr u i 1)) i (1+ i)))
+          (while (and (<= i n)
+                      (vl-string-position (ascii (substr u i 1)) "/-_ \\"))
+            (setq sepSeen T i (1+ i)))
+          (while (and (<= i n) (DGPS-DigitP (substr u i 1)))
+            (setq m (strcat m (substr u i 1)) i (1+ i)))
+          (while (and (<= i n) (= (substr u i 1) " ")) (setq i (1+ i)))
+          (if (and (> i n) (/= km "") (/= m "") sepSeen)
+            (+ (* (atoi km) 1000.0) (atoi m))
+            nil
+          )
+        )
+        nil
+      )
+    )
+    nil
+  )
+)
+
+;; ---------------------------------------------------------------------------
+;; DGPS-HPBuildSamples
+;;   Smooth curve through the HP points (cubic Hermite, tangent at each HP =
+;;   average of the two neighbouring chord directions).  Returns a list of
+;;   (x y z tx ty): sample position + unit tangent (in ascending HP order).
+;;   pts = list of (x y z), at least 2, no coincident neighbours.
+;; ---------------------------------------------------------------------------
+(defun DGPS-HPBuildSamples (pts segs / n i j u dirs a b dx dy d h tt tt2 tt3
+                                      p0 p1 d0 d1 m0x m0y m1x m1y
+                                      h00 h10 h01 h11 g00 g10 g01 g11
+                                      x y z tx ty out)
+  (setq n (length pts))
+  ;; unit chord vectors  (ux uy len)
+  (setq u '() i 0)
+  (while (< i (1- n))
+    (setq a (nth i pts) b (nth (1+ i) pts)
+          dx (- (car b) (car a)) dy (- (cadr b) (cadr a))
+          d  (sqrt (+ (* dx dx) (* dy dy))))
+    (setq u (append u (list (list (/ dx d) (/ dy d) d))))
+    (setq i (1+ i))
+  )
+  ;; direction at every HP
+  (setq dirs '() i 0)
+  (while (< i n)
+    (cond
+      ((= i 0)       (setq dx (car (nth 0 u))       dy (cadr (nth 0 u))))
+      ((= i (1- n))  (setq dx (car (nth (- n 2) u)) dy (cadr (nth (- n 2) u))))
+      (T
+       (setq dx (+ (car  (nth (1- i) u)) (car  (nth i u)))
+             dy (+ (cadr (nth (1- i) u)) (cadr (nth i u))))
+       (setq d (sqrt (+ (* dx dx) (* dy dy))))
+       (if (< d 1e-9)
+         (setq dx (car (nth i u)) dy (cadr (nth i u)))
+         (setq dx (/ dx d) dy (/ dy d))
+       )
+      )
+    )
+    (setq dirs (append dirs (list (list dx dy))))
+    (setq i (1+ i))
+  )
+  ;; sample every span
+  (setq out '() i 0)
+  (while (< i (1- n))
+    (setq p0 (nth i pts) p1 (nth (1+ i) pts)
+          h  (caddr (nth i u))
+          d0 (nth i dirs) d1 (nth (1+ i) dirs)
+          m0x (* h (car d0)) m0y (* h (cadr d0))
+          m1x (* h (car d1)) m1y (* h (cadr d1)))
+    (setq j 0)
+    (while (< j segs)
+      (setq tt  (/ (float j) segs)
+            tt2 (* tt tt)
+            tt3 (* tt2 tt))
+      (setq h00 (+ (- (* 2.0 tt3) (* 3.0 tt2)) 1.0)
+            h10 (+ (- tt3 (* 2.0 tt2)) tt)
+            h01 (+ (* -2.0 tt3) (* 3.0 tt2))
+            h11 (- tt3 tt2)
+            g00 (- (* 6.0 tt2) (* 6.0 tt))
+            g10 (+ (- (* 3.0 tt2) (* 4.0 tt)) 1.0)
+            g01 (+ (* -6.0 tt2) (* 6.0 tt))
+            g11 (- (* 3.0 tt2) (* 2.0 tt)))
+      (setq x  (+ (* h00 (car p0))  (* h10 m0x) (* h01 (car p1))  (* h11 m1x))
+            y  (+ (* h00 (cadr p0)) (* h10 m0y) (* h01 (cadr p1)) (* h11 m1y))
+            z  (+ (caddr p0) (* tt (- (caddr p1) (caddr p0))))
+            tx (+ (* g00 (car p0))  (* g10 m0x) (* g01 (car p1))  (* g11 m1x))
+            ty (+ (* g00 (cadr p0)) (* g10 m0y) (* g01 (cadr p1)) (* g11 m1y)))
+      (setq d (sqrt (+ (* tx tx) (* ty ty))))
+      (if (< d 1e-12)
+        (setq tx (car d0) ty (cadr d0))
+        (setq tx (/ tx d) ty (/ ty d))
+      )
+      (setq out (cons (list x y z tx ty) out))
+      (setq j (1+ j))
+    )
+    (setq i (1+ i))
+  )
+  ;; last HP
+  (setq p1 (nth (1- n) pts) d1 (nth (1- n) dirs))
+  (setq out (cons (list (car p1) (cadr p1) (caddr p1) (car d1) (cadr d1)) out))
+  (reverse out)
+)
+
+;; Unit tangent of the HP curve nearest to (x,y)  ->  (tx ty)  or nil
+(defun DGPS-HPTangentAt (x y / best bestD d s)
+  (setq best nil bestD nil)
+  (foreach s DGPS-HPSamples
+    (setq d (+ (* (- (car s) x) (- (car s) x))
+               (* (- (cadr s) y) (- (cadr s) y))))
+    (if (or (null bestD) (< d bestD))
+      (setq best s bestD d)
+    )
+  )
+  (if best (list (nth 3 best) (nth 4 best)) nil)
+)
+
+;; ---------------------------------------------------------------------------
+;; DGPS-OrientAlongHP
+;;   Returns pts in the direction of increasing HP chainage: each segment is
+;;   compared with the HP-curve tangent nearest to it; if the polyline runs
+;;   against it overall, the vertex list is reversed.
+;;   No HP curve -> pts returned unchanged.
+;; ---------------------------------------------------------------------------
+(defun DGPS-OrientAlongHP (pts / n stride i p q mx my tg sum)
+  (setq DGPS-LastFlipped nil)
+  (if (and DGPS-HPSamples pts (>= (length pts) 2))
+    (progn
+      (setq n      (length pts)
+            stride (max 1 (/ n 60))
+            sum    0.0
+            i      0)
+      (while (< (1+ i) n)
+        (setq p  (nth i pts)
+              q  (nth (1+ i) pts)
+              mx (/ (+ (car p)  (car q))  2.0)
+              my (/ (+ (cadr p) (cadr q)) 2.0)
+              tg (DGPS-HPTangentAt mx my))
+        (if tg
+          (setq sum (+ sum (* (- (car q)  (car p))  (car tg))
+                           (* (- (cadr q) (cadr p)) (cadr tg))))
+        )
+        (setq i (+ i stride))
+      )
+      (if (< sum 0.0)
+        (progn (setq DGPS-LastFlipped T) (reverse pts))
+        pts
+      )
+    )
+    pts
+  )
+)
+
+;; ---------------------------------------------------------------------------
+;; DGPS-BuildHP
+;;   hpItems = list of (chainage rec).  Sorts ascending, builds the HP curve
+;;   as a polyline / 3D polyline on DGPS-HPLayer and stores the samples for
+;;   DGPS-OrientAlongHP.  Returns the entity or nil.
+;; ---------------------------------------------------------------------------
+(defun DGPS-BuildHP (hpItems outType / sorted pts prev x y z rec it
+                                      samples ptsOut result firstN lastN)
+  (setq sorted
+    (vl-sort hpItems
+      '(lambda (a b)
+         (if (/= (car a) (car b))
+           (< (car a) (car b))
+           (< (DGPS-R-Row (cadr a)) (DGPS-R-Row (cadr b)))))))
+
+  (setq pts '() prev nil)
+  (foreach it sorted
+    (setq rec (cadr it)
+          x (atof (DGPS-R-East  rec))
+          y (atof (DGPS-R-North rec))
+          z (atof (DGPS-R-Elev  rec)))
+    (if (or (null prev)
+            (> (distance (list x y 0.0) (list (car prev) (cadr prev) 0.0)) 1e-6))
+      (progn
+        (setq pts (cons (list x y z) pts))
+        (setq prev (list x y z))
+      )
+    )
+  )
+  (setq pts (reverse pts))
+
+  (princ "\nHP (hectometre posts)")
+  (princ (strcat "\n  HP points        : " (itoa (length sorted))))
+  (setq firstN (DGPS-R-PName (cadr (car sorted)))
+        lastN  (DGPS-R-PName (cadr (last sorted))))
+  (princ (strcat "\n  Chainage order   : " firstN " ... " lastN))
+
+  (if (< (length pts) 2)
+    (progn
+      (princ "\n  Result            : SKIPPED (need at least 2 HP points)")
+      nil
+    )
+    (progn
+      (DGPS-EnsureLayer DGPS-HPLayer 6)
+      (setq samples (DGPS-HPBuildSamples pts DGPS-HPSegs))
+      (setq DGPS-HPSamples samples)
+      (setq ptsOut
+        (if (= outType "3Dpolyline")
+          (mapcar '(lambda (s) (list (car s) (cadr s) (caddr s))) samples)
+          (mapcar '(lambda (s) (list (car s) (cadr s))) samples)))
+      (setq result
+        (if (= outType "3Dpolyline")
+          (DGPS-Make3DPolyline ptsOut DGPS-HPLayer)
+          (DGPS-Make2DPolyline ptsOut DGPS-HPLayer)))
+      (princ (strcat "\n  Layer            : " DGPS-HPLayer))
+      (princ (strcat "\n  Type             : " outType " (spline through HP)"))
+      (princ (strcat "\n  Result            : " (if result "CREATED" "FAILED")))
+      result
+    )
+  )
+)
+
 ;; ---------------------------------------------------------------------------
 ;; DGPS-Bearing2D
 ;;   Returns the bearing in degrees (0–360) from point A to point B.
@@ -1229,6 +1482,7 @@
        ;; ── 2 points: direct open line, skip loop removal + angle filter ───
        (progn
          (setq finalPts (if (= outType "3Dpolyline") allPts3D allPts2D))
+         (setq finalPts (DGPS-OrientAlongHP finalPts))
          (setq result
            (if (= outType "3Dpolyline")
              (DGPS-Make3DPolyline finalPts targetLayer)
@@ -1244,6 +1498,10 @@
          (princ         "\n  Final Points     : 2")
          (princ (strcat "\n  Layer            : " targetLayer))
          (princ (strcat "\n  Type             : " outType))
+         (princ (strcat "\n  Direction        : "
+                        (if DGPS-HPSamples
+                          (if DGPS-LastFlipped "REVERSED to follow HP" "already along HP")
+                          "N/A (no HP rows)")))
          (princ (strcat "\n  Result            : "
                         (if result "OPEN POLYLINE" "FAILED")))
          (list result 0 0 (if result 0 1))
@@ -1349,6 +1607,7 @@
 
          ;; ── Step 4: Create open polyline ─────────────────────────────────
          (setq finalPts (if (= outType "3Dpolyline") openPts3D openPts2D))
+         (setq finalPts (DGPS-OrientAlongHP finalPts))
          (setq result
            (if (= outType "3Dpolyline")
              (DGPS-Make3DPolyline finalPts targetLayer)
@@ -1374,6 +1633,10 @@
                         (itoa (length finalPts))))
          (princ (strcat "\n  Layer            : " targetLayer))
          (princ (strcat "\n  Type             : " outType))
+         (princ (strcat "\n  Direction        : "
+                        (if DGPS-HPSamples
+                          (if DGPS-LastFlipped "REVERSED to follow HP" "already along HP")
+                          "N/A (no HP rows)")))
          (princ (strcat "\n  Result            : "
                         (if result "OPEN POLYLINE" "FAILED")))
 
@@ -1398,7 +1661,8 @@
      dlgResult outType selectedCodes targetLayer
      g codeRecs geomResult
      geomCount singleCount geomFailures totalMoved
-     layersCreated i sampleCount)
+     layersCreated i sampleCount
+     hpRecs otherRecs hpCh hpGeom)
 
   (setq dgps-*old-error* *error*)
   (setq *error* DGPS-Error)
@@ -1413,7 +1677,12 @@
   ;; -------------------------------------------------------------------------
   ;; 1. Select CSV file
   ;; -------------------------------------------------------------------------
-  (setq csvFile (getfiled "Select DGPS CSV File" "" "csv" 4))
+  (setq csvFile
+    (if (boundp 'LogicDWG:RequireCsv)
+      (LogicDWG:RequireCsv)                              ; main CSV
+      (getfiled "Select DGPS CSV File" "" "csv" 4)       ; fallback
+    )
+  )
   (if (null csvFile)
     (progn (DGPS-Error "No CSV file selected.") (exit))
   )
@@ -1502,7 +1771,25 @@
   )
 
   ;; Group and extract code names
-  (setq groups    (DGPS-GroupByCode allRecords))
+  ;; HP rows (HP 71/600, HP 71-600, HP 71_600, HP 71 600) are picked out
+  ;; automatically - they never appear in the layer list.
+  (setq hpRecs '() otherRecs '())
+  (foreach rec allRecords
+    (setq hpCh
+      (cond
+        ((DGPS-ParseHP (DGPS-R-PName rec)))
+        ((DGPS-ParseHP (DGPS-R-Code  rec)))
+        (T nil)
+      )
+    )
+    (if hpCh
+      (setq hpRecs (cons (list hpCh rec) hpRecs))
+      (setq otherRecs (cons rec otherRecs))
+    )
+  )
+  (setq hpRecs    (reverse hpRecs)
+        otherRecs (reverse otherRecs))
+  (setq groups    (DGPS-GroupByCode otherRecs))
   (setq codenames '())
   (foreach g groups
     (setq codenames (append codenames (list (car g))))
@@ -1591,6 +1878,13 @@
   ;; Ensure target layer exists once
   (DGPS-EnsureLayer targetLayer 3)
 
+  ;; HP curve first, so its tangent can orient the track polylines
+  (setq DGPS-HPSamples nil)
+  (setq hpGeom nil)
+  (if hpRecs
+    (setq hpGeom (DGPS-BuildHP hpRecs outType))
+  )
+
   (foreach g groups
     (setq code     (car  g))
     (setq codeRecs (cdr  g))
@@ -1618,6 +1912,15 @@
     )
   )
 
+  ;; Remove the temporary HP spline now that every line is built
+  (if (and hpGeom (not DGPS-HPKeep) (entget hpGeom))
+    (progn
+      (entdel hpGeom)
+      (princ "\nHP spline removed (it was only used for direction).")
+    )
+  )
+  (setq DGPS-HPSamples nil)
+
   ;; -------------------------------------------------------------------------
   ;; 7. Final report
   ;; -------------------------------------------------------------------------
@@ -1633,6 +1936,8 @@
   (princ (strcat "\nGeometry created: " (itoa geomCount)))
   (princ (strcat "\nGeometry failed:  " (itoa geomFailures)))
   (princ (strcat "\nSingle-point:     " (itoa singleCount)))
+  (princ (strcat "\nHP rows:          " (itoa (length hpRecs))
+                 (if hpGeom (if DGPS-HPKeep "  (HP curve kept)" "  (HP curve used, then removed)") "")))
   (princ (strcat "\nAlgorithm:        "
                  (if DGPS-UseTime
                    "Local Time order"
@@ -1653,5 +1958,5 @@
   (princ)
 )
 
-(princ "\nVIDDGPSTOLINE_v24 loaded. Type VIDDGPSTOLINE to run.")
+(princ "\nVIDDGPSTOLINE_v25 loaded. Type VIDDGPSTOLINE to run.")
 (princ)
