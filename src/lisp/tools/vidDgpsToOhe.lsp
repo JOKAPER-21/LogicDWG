@@ -1,7 +1,10 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Ohe
-;;; Release: 1.1.2 | Civil 3D 2026
-;;; Version: 02
+;;; Release: 1.1.4 | Civil 3D 2026
+;;; Version: 04
+;;;   v04: rectangle V3/V4 always point AWAY from the nearest track
+;;;        (LHS point -> box on the left, RHS point -> box on the right).
+;;;        Nearest track is chosen by 2D distance among all track polylines.
 ;;; ============================================================================
 
 (vl-load-com)
@@ -315,7 +318,7 @@
     (if (not (vl-catch-all-error-p r))
       (progn
         (setq cp r)
-        (setq d (distance p cp))
+        (setq d (distance (list (car p) (cadr p) 0.0) (list (car cp) (cadr cp) 0.0)))
         (if (or (null bestd) (< d bestd))
           (progn
             (setq best e)
@@ -360,7 +363,7 @@
         0.0)
 )
 
-(defun DGO-MakeRectangle (p tangent / half side v1 v2 v3 v4)
+(defun DGO-MakeRectangle (p tangent sideSign / half side v1 v2 v3 v4)
   ;; DGPS point = midpoint V1-V2
   ;;
   ;; V1 ---- V2
@@ -369,10 +372,11 @@
   ;; V4 ---- V3
   ;;
   ;; V1->V2 follows track direction.
-  ;; V2->V3 is perpendicular.
+  ;; V2->V3 is perpendicular and points AWAY from the track
+  ;; (sideSign = +1 -> left of track direction, -1 -> right).
 
   (setq half (/ *DGO-RECT-SIZE* 2.0))
-  (setq side (DGO-Rot90 tangent))
+  (setq side (DGO-VecScale (DGO-Rot90 tangent) sideSign))
 
   (setq v1 (DGO-VecSub p (DGO-VecScale tangent half)))
   (setq v2 (DGO-VecAdd p (DGO-VecScale tangent half)))
@@ -421,7 +425,7 @@
       (cons 10 pt)
       (cons 40 *DGO-TEXT-HEIGHT*)
       (cons 41 0.0)
-      (cons 71 5) ; Middle Center
+      (cons 71 4) ; Middle Left
       (cons 50 rotation)
       (cons 1 txt)
       (cons 7 (getvar "TEXTSTYLE"))
@@ -441,7 +445,12 @@
         headerFound nil
         badCount 0)
 
-  (setq path (getfiled "Select DGPS CSV file" "" "csv" 0))
+  (setq path
+    (if (boundp 'LogicDWG:RequireCsv)
+      (LogicDWG:RequireCsv)                          ; main CSV (new logicDwg.lsp)
+      (getfiled "Select DGPS CSV file" "" "csv" 0)   ; fallback (old logicDwg.lsp)
+    )
+  )
 
   (if (null path)
     nil
@@ -561,7 +570,7 @@
 (defun c:vidDgpsToOhe (/ *error* oldcmdecho oldosmode rows tracks
                        mode ss i e item p best cp tangent rect
                        v1 v2 v3 v4 textpt ident textstr ent1 ent2
-                       madeRect madeText failCount tooFar)
+                       madeRect madeText failCount tooFar sideSign)
 
   (vl-load-com)
 
@@ -684,7 +693,17 @@
                   (setq tangent (list 1.0 0.0 0.0))
                 )
 
-                (setq rect (DGO-MakeRectangle p tangent))
+                ;; Which side of the track is the point on?
+                ;; cross(tangent, cp->p) > 0 = LHS (left), < 0 = RHS (right).
+                ;; Box always extends away from the track.
+                (setq sideSign
+                  (if (< (- (* (car tangent)  (- (cadr p) (cadr cp)))
+                            (* (cadr tangent) (- (car p)  (car cp))))
+                         -1e-9)
+                    -1.0
+                    1.0))
+
+                (setq rect (DGO-MakeRectangle p tangent sideSign))
 
                 (setq v1 (nth 0 rect))
                 (setq v2 (nth 1 rect))
@@ -720,7 +739,12 @@
                 ;; Keep text readable.
                 (if (and (> trackAng (/ pi 2.0))
                          (< trackAng (* 1.5 pi)))
-                  (setq trackAng (+ trackAng pi))
+                  (progn
+                    (setq trackAng (+ trackAng pi))
+                    ;; Text now runs the opposite way, so anchor it on the
+                    ;; V1-V4 edge (keeps it outside the rectangle).
+                    (setq textpt (DGO-Mid v1 v4))
+                  )
                 )
 
                 (setq ent2
