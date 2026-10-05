@@ -1,7 +1,9 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Line
-;;; Release: 1.5.4 | Civil 3D 2026
-;;; Version: 10
+;;; Release: 1.5.5 | Civil 3D 2026
+;;; Version: 11
+;;;   v11: "Local Time" OFF now joins NEAREST points from both ends of the
+;;;        chain (no CSV-order dependence) - fixes zig-zag like 1..132 then 133..486.
 ;;; ============================================================================
 ;;;
 ;;; CHANGE LOG v1.5.4 (Version 10)
@@ -941,38 +943,63 @@
 ;;   failures  = 1 if entmakex failed, else 0
 ;; ===========================================================================
 ;; ---------------------------------------------------------------------------
-;; DGPS-NNChain
-;;   Nearest-neighbour greedy chain over a list of records.
-;;   Starts from the first record in CSV row order.
-;;   At each step picks the closest unvisited record by 2-D plan distance.
-;;   Returns the re-ordered list of records.
+;; DGPS-NNChain   (v11: nearest-point chain, grows from BOTH ends)
+;;   Old version walked from the first CSV row only, so a line numbered
+;;   132..1 (start in the middle) 133..486 was joined 1->132 then jumped
+;;   132->133 (zig-zag).
+;;   New: start at the first record, then repeatedly attach the unvisited
+;;   point that is nearest (2-D plan distance) to EITHER end of the chain,
+;;   at that end.  Row / ascending order is never used for connecting.
+;;   Result runs 132 ... 3 2 1 133 ... 486.  Direction is normalised so the
+;;   lower CSV row number is at the start of the polyline.
 ;; ---------------------------------------------------------------------------
-(defun DGPS-NNChain (recs / remaining result cur best bestD d cx cy rx ry)
+(defun DGPS-NNChain (recs / items start remaining headEnd tailEnd
+                            headStack tailStack best bestD bestSide
+                            it dh dt dx dy chain)
   (if (or (null recs) (null (cdr recs)))
     recs
     (progn
-      (setq cur       (car recs)
-            remaining (cdr recs)
-            result    (list cur))
+      ;; items = (x y rec)
+      (setq items
+        (mapcar
+          '(lambda (r) (list (atof (DGPS-R-East r)) (atof (DGPS-R-North r)) r))
+          recs))
+      (setq start     (car items)
+            remaining (cdr items)
+            headEnd   start
+            tailEnd   start
+            headStack '()
+            tailStack '())
       (while remaining
-        (setq cx    (atof (DGPS-R-East  cur))
-              cy    (atof (DGPS-R-North cur))
-              best  nil
-              bestD nil)
-        (foreach r remaining
-          (setq rx (atof (DGPS-R-East  r))
-                ry (atof (DGPS-R-North r))
-                d  (+ (* (- rx cx) (- rx cx))
-                       (* (- ry cy) (- ry cy))))   ; squared – no sqrt needed
-          (if (or (null bestD) (< d bestD))
-            (setq best r  bestD d)
-          )
+        (setq best nil bestD nil bestSide nil)
+        (foreach it remaining
+          ;; squared distance to head end / tail end
+          (setq dx (- (car it) (car headEnd))
+                dy (- (cadr it) (cadr headEnd))
+                dh (+ (* dx dx) (* dy dy)))
+          (setq dx (- (car it) (car tailEnd))
+                dy (- (cadr it) (cadr tailEnd))
+                dt (+ (* dx dx) (* dy dy)))
+          (if (or (null bestD) (< dh bestD))
+            (setq best it bestD dh bestSide 'HEAD))
+          (if (< dt bestD)
+            (setq best it bestD dt bestSide 'TAIL))
         )
-        (setq result    (append result (list best))
-              remaining (vl-remove best remaining)
-              cur       best)
+        (if (eq bestSide 'HEAD)
+          (setq headStack (cons best headStack)
+                headEnd   best)
+          (setq tailStack (cons best tailStack)
+                tailEnd   best)
+        )
+        (setq remaining (vl-remove best remaining))
       )
-      result
+      ;; head end ... start ... tail end
+      (setq chain (append headStack (list start) (reverse tailStack)))
+      ;; stable direction: lower CSV row first
+      (if (> (DGPS-R-Row (caddr (car chain)))
+             (DGPS-R-Row (caddr (last chain))))
+        (setq chain (reverse chain)))
+      (mapcar 'caddr chain)
     )
   )
 )
@@ -1210,7 +1237,7 @@
          )
          (princ (strcat "\n" code))
          (princ         "\n  Points (chained) : 2")
-         (princ (strcat "\n  Order            : " (if DGPS-UseTime "LOCAL TIME" "NEAREST-NEIGHBOUR")))
+         (princ (strcat "\n  Order            : " (if DGPS-UseTime "LOCAL TIME" "NEAREST POINT (both ends)")))
          (princ         "\n  Longest Edge     : N/A (2-point direct line)")
          (princ         "\n  Removed Edge     : NONE")
          (princ         "\n  Angle Filter     : N/A")
@@ -1332,7 +1359,7 @@
          ;; Report
          (princ (strcat "\n" code))
          (princ (strcat "\n  Points (chained) : " (itoa nPts)))
-         (princ (strcat "\n  Order            : " (if DGPS-UseTime "LOCAL TIME" "NEAREST-NEIGHBOUR")))
+         (princ (strcat "\n  Order            : " (if DGPS-UseTime "LOCAL TIME" "NEAREST POINT (both ends)")))
          (princ (strcat "\n  Longest Edge     : "
                         (if DGPS-UseTime "N/A (Local Time order)" (DGPS-FormatDist maxLen))))
          (princ (strcat "\n  Removed Edge     : "
@@ -1514,7 +1541,7 @@
   (princ (strcat "\nOutput type:  " outType))
   (princ (strcat "\nTarget layer: " targetLayer))
   (princ (strcat "\nAngle filter: " (if DGPS-UseAngle "ON" "OFF")))
-  (princ (strcat "\nPoint order:  " (if DGPS-UseTime "Local Time" "Nearest-neighbour")))
+  (princ (strcat "\nPoint order:  " (if DGPS-UseTime "Local Time" "Nearest point")))
   (princ (strcat "\nData rows:    " (itoa dataRows)))
   (princ (strcat "\nValid:        " (itoa validRows)))
   (princ (strcat "\nSkipped:      " (itoa skippedRows)))
@@ -1626,5 +1653,5 @@
   (princ)
 )
 
-(princ "\nVIDDGPSTOLINE_v23 loaded. Type VIDDGPSTOLINE to run.")
+(princ "\nVIDDGPSTOLINE_v24 loaded. Type VIDDGPSTOLINE to run.")
 (princ)
