@@ -1,20 +1,36 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Line
-;;; Release: 1.4.0 | Civil 3D 2026
-;;; Version: 05
+;;; Release: 1.5.4 | Civil 3D 2026
+;;; Version: 10
 ;;; ============================================================================
 ;;;
-;;; CHANGE LOG v1.4.0 (Version 05)
-;;;   - Removed Local Time ordering entirely.
-;;;   - Points within each Code are now chained by nearest-neighbour:
-;;;       Start from the first point in CSV row order.
-;;;       Repeatedly pick the closest unvisited point in the same Code.
-;;;       This eliminates zig-zag artefacts caused by GPS survey order.
-;;;   - Longest-edge removal preserved: after nearest-neighbour chaining,
-;;;       a temporary closed loop is still evaluated to remove the largest
-;;;       gap edge and produce a clean open polyline.
-;;;   - DGPS-TimeKey / DGPS-TimeLess / DGPS-OrderForward / DGPS-CountMoved
-;;;       kept as dead code for compatibility; not invoked.
+;;; CHANGE LOG v1.5.4 (Version 10)
+;;;   - "Rail Track - Select Layer" dialog: two new check boxes
+;;;       [x] Angle filter (+/- 5 deg)  ON  = remove spike vertices (old behaviour)
+;;;                                     OFF = keep every vertex
+;;;       [ ] Use "Local Time" column to order and connect points
+;;;                                     ON  = points sorted by Local Time and
+;;;                                           joined in that order (no
+;;;                                           nearest-neighbour, no edge removal)
+;;;                                     OFF = nearest-neighbour chain (old behaviour)
+;;;   - Both options apply to Polyline and 3D Polyline output.
+;;;   - Last used settings are remembered (DGPS-UseAngle / DGPS-UseTime).
+;;;
+;;; CHANGE LOG v1.5.0 (Version 06)
+;;;   - Added angular-deviation filter (DGPS-AngleFilter) as a post-processing
+;;;     pass after nearest-neighbour chaining and longest-edge removal.
+;;;   - Algorithm:
+;;;       For each interior vertex P(i), compute the bearing change between
+;;;       edge P(i-1)→P(i) and edge P(i)→P(i+1).
+;;;       If the absolute bearing change is > 5°, vertex P(i) is a bad GPS
+;;;       point — remove it.
+;;;       Repeat iteratively until no more vertices are removed in a full pass
+;;;       (stable state).
+;;;       First and last vertices are always preserved.
+;;;   - Report now shows: Points (after NN chain), Filtered (removed by angle),
+;;;       Final Points (used in polyline).
+;;;   - DGPS-Bearing2D helper added.
+;;;   - DGPS-AngleDiff helper added (handles 0°/360° wrap correctly).
 ;;; ============================================================================
 ;;;
 ;;; WORKFLOW:
@@ -44,6 +60,11 @@
 
 ;; Forward re-ordering look-ahead window
 (if (null DGPS-ForwardWindow) (setq DGPS-ForwardWindow 8))
+
+;; Dialog options (remembered between runs)
+(if (null DGPS-UseAngle) (setq DGPS-UseAngle T))      ; angle filter on
+(if (null DGPS-UseTime)  (setq DGPS-UseTime  nil))    ; Local Time ordering off
+(if (null DGPS-AngleThreshold) (setq DGPS-AngleThreshold 5.0))
 
 ;; ---------------------------------------------------------------------------
 ;; Default layer list (shown in the layer-options dialog)
@@ -587,6 +608,13 @@
       "    : radio_button { key = \"rb_3dpoly\"; label = \"3D Polyline\"; value = \"0\"; }\n"
       "  }\n"
       "\n"
+      "  : boxed_column {\n"
+      "    label = \"Options\";\n"
+      (strcat "    : toggle { key = \"tg_angle\"; label = \"Angle filter (+/- "
+              (rtos DGPS-AngleThreshold 2 0) " deg)\"; }\n")
+      "    : toggle { key = \"tg_time\";  label = \"Use Local Time column to order and connect points\"; }\n"
+      "  }\n"
+      "\n"
       "  : list_box {\n"
       "    key             = \"lst_codes\";\n"
       "    height          = 20;\n"
@@ -622,6 +650,10 @@
       (set_tile "rb_poly"   "1")
       (set_tile "rb_3dpoly" "0")
 
+      ;; Option check boxes (last used values)
+      (set_tile "tg_angle" (if DGPS-UseAngle "1" "0"))
+      (set_tile "tg_time"  (if DGPS-UseTime  "1" "0"))
+
       ;; Populate list – sorted ascending
       (setq sortedCodes (vl-sort codenames '(lambda (a b) (< (strcase a) (strcase b)))))
       (start_list "lst_codes" 3)
@@ -644,6 +676,8 @@
       (action_tile "btn_select"
         (strcat
           "(setq selIdxStr (get_tile \"lst_codes\"))"
+          "(setq DGPS-UseAngle (= (get_tile \"tg_angle\") \"1\"))"
+          "(setq DGPS-UseTime  (= (get_tile \"tg_time\")  \"1\"))"
           "(done_dialog 1)"
         )
       )
@@ -909,11 +943,11 @@
 ;; ---------------------------------------------------------------------------
 ;; DGPS-NNChain
 ;;   Nearest-neighbour greedy chain over a list of records.
-;;   Starts from the first record in the list (CSV row order).
+;;   Starts from the first record in CSV row order.
 ;;   At each step picks the closest unvisited record by 2-D plan distance.
 ;;   Returns the re-ordered list of records.
 ;; ---------------------------------------------------------------------------
-(defun DGPS-NNChain (recs / remaining result cur best bestD d cx cy bx by rx ry)
+(defun DGPS-NNChain (recs / remaining result cur best bestD d cx cy rx ry)
   (if (or (null recs) (null (cdr recs)))
     recs
     (progn
@@ -921,15 +955,15 @@
             remaining (cdr recs)
             result    (list cur))
       (while remaining
-        (setq cx     (atof (DGPS-R-East  cur))
-              cy     (atof (DGPS-R-North cur))
-              best   nil
-              bestD  nil)
+        (setq cx    (atof (DGPS-R-East  cur))
+              cy    (atof (DGPS-R-North cur))
+              best  nil
+              bestD nil)
         (foreach r remaining
           (setq rx (atof (DGPS-R-East  r))
                 ry (atof (DGPS-R-North r))
                 d  (+ (* (- rx cx) (- rx cx))
-                       (* (- ry cy) (- ry cy))))  ; squared dist, no sqrt needed
+                       (* (- ry cy) (- ry cy))))   ; squared – no sqrt needed
           (if (or (null bestD) (< d bestD))
             (setq best r  bestD d)
           )
@@ -943,30 +977,179 @@
   )
 )
 
+;; ---------------------------------------------------------------------------
+;; DGPS-Bearing2D
+;;   Returns the bearing in degrees (0–360) from point A to point B.
+;;   A and B are (x y) or (x y z) lists.
+;;   Returns 0.0 when A and B are coincident (avoid atan2 undefined).
+;; ---------------------------------------------------------------------------
+(defun DGPS-Bearing2D (a b / dx dy)
+  (setq dx (- (car  b) (car  a))
+        dy (- (cadr b) (cadr a)))
+  (if (and (= dx 0.0) (= dy 0.0))
+    0.0
+    (progn
+      ;; atan in AutoLISP: (atan y x) = standard atan2
+      (setq ang (* (/ (atan dy dx) (* 4.0 (atan 1.0))) 180.0))
+      ;; Convert maths angle (CCW from East) to bearing (CW from North)
+      (setq ang (- 90.0 ang))
+      ;; Normalise to [0, 360)
+      (while (< ang   0.0) (setq ang (+ ang 360.0)))
+      (while (>= ang 360.0) (setq ang (- ang 360.0)))
+      ang
+    )
+  )
+)
+
+;; ---------------------------------------------------------------------------
+;; DGPS-AngleDiff
+;;   Smallest signed difference between two bearings, in degrees.
+;;   Result is in (-180, +180].
+;;   Handles the 0°/360° wrap correctly.
+;;   Example: DGPS-AngleDiff(350, 5) → +15  (not -345)
+;;            DGPS-AngleDiff(5, 350) → -15
+;; ---------------------------------------------------------------------------
+(defun DGPS-AngleDiff (b1 b2 / d)
+  (setq d (- b2 b1))
+  (while (>  d  180.0) (setq d (- d 360.0)))
+  (while (<= d -180.0) (setq d (+ d 360.0)))
+  d
+)
+
+;; ---------------------------------------------------------------------------
+;; DGPS-AngleFilter
+;;   Post-processing pass on an ordered list of 2-D (x y) or 3-D (x y z) pts.
+;;   Removes interior vertices where the bearing change between the incoming
+;;   and outgoing edge exceeds DGPS-AngleThreshold degrees (default 5°).
+;;   Runs iteratively until no vertices are removed in a complete pass.
+;;   First and last vertices are always preserved.
+;;   Returns: (filteredPts removedCount)
+;; ---------------------------------------------------------------------------
+(if (null DGPS-AngleThreshold) (setq DGPS-AngleThreshold 5.0))
+
+;; ---------------------------------------------------------------------------
+;; DGPS-AngleFilter
+;;
+;; Removes interior spike vertices — GPS points that cause a sharp direction
+;; change — by removing ONE vertex per pass (the worst offender), then
+;; re-evaluating the shortened list. Repeats until stable.
+;;
+;; WHY one-per-pass (fixes the p4/p5/p6 cascade bug):
+;;
+;;   Consider:  p3 -- p4 -- p5(spike) -- p6 -- p7  (track goes straight)
+;;
+;;   If ALL vertices exceeding the threshold are removed in one pass, p4 and
+;;   p6 are also flagged because their bearing to p5 looks sharp. But once
+;;   p5 is removed, p4 and p6 reconnect cleanly and are NOT spikes.
+;;
+;;   Removing only the WORST spike per pass lets the list heal before the
+;;   next evaluation. After p5 is gone, pass 2 sees p4--p6 as a straight
+;;   segment and correctly keeps both.
+;;
+;; Algorithm per pass:
+;;   1. Scan all interior vertices.
+;;   2. For each, compute abs(bearing_change) = |diff(b_in, b_out)|.
+;;   3. Track the vertex with the LARGEST bearing change that exceeds
+;;      DGPS-AngleThreshold.
+;;   4. If found, remove that one vertex and go to the next pass.
+;;   5. If none found, done (stable).
+;;
+;; First and last vertices are always preserved.
+;; Returns: (filteredPts totalRemovedCount)
+;; ---------------------------------------------------------------------------
+(defun DGPS-AngleFilter (pts / done totalRemoved
+                               nPts i prev curr next
+                               b1 b2 diff
+                               worstIdx worstDiff
+                               newPts)
+  (setq totalRemoved 0
+        done         nil)
+
+  (while (not done)
+    (setq nPts (length pts))
+
+    (if (< nPts 3)
+      (setq done T)  ; nothing left to filter
+
+      (progn
+        ;; Find the single worst spike in this pass
+        (setq worstIdx  -1
+              worstDiff DGPS-AngleThreshold  ; must EXCEED threshold to qualify
+              i         1)
+
+        (while (< i (1- nPts))
+          (setq prev (nth (1- i) pts)
+                curr (nth i       pts)
+                next (nth (1+ i)  pts))
+
+          ;; Nil-coord guard
+          (if (and prev curr next
+                   (car prev) (cadr prev)
+                   (car curr) (cadr curr)
+                   (car next) (cadr next))
+            (progn
+              (setq b1   (DGPS-Bearing2D prev curr)
+                    b2   (DGPS-Bearing2D curr next)
+                    diff (abs (DGPS-AngleDiff b1 b2)))
+              ;; Keep track of the worst offender (strictly greater)
+              (if (> diff worstDiff)
+                (setq worstDiff diff  worstIdx i)
+              )
+            )
+          )
+          (setq i (1+ i))
+        )
+
+        (if (= worstIdx -1)
+          ;; No spike found – list is stable
+          (setq done T)
+
+          ;; Remove the single worst vertex and loop again
+          (progn
+            (setq newPts '()
+                  i       0)
+            (while (< i nPts)
+              (if (/= i worstIdx)
+                (setq newPts (append newPts (list (nth i pts))))
+              )
+              (setq i (1+ i))
+            )
+            (setq pts           newPts
+                  totalRemoved  (1+ totalRemoved))
+          )
+        )
+      )
+    )
+  )
+
+  (list pts totalRemoved)
+)
+
 ;; ===========================================================================
 ;; Build geometry for one group of records
 ;;
-;; Algorithm:
-;;   1. Take records in CSV row order (no time sort).
-;;   2. Chain them by nearest-neighbour (greedy, no zig-zag).
-;;   3. Build a temporary closed loop and find the longest edge (the gap).
-;;   4. Remove that edge → final OPEN polyline.
+;; Pipeline:
+;;   1. Nearest-neighbour chain  (spatial ordering, no zig-zag)
+;;   2. Longest-edge removal     (open the loop at the biggest gap)
+;;   3. Angular-deviation filter (iteratively remove bad GPS vertices >5°)
+;;   4. Create open polyline
 ;;
 ;; Edge cases:
 ;;   0 points → skip
 ;;   1 point  → skip
-;;   2 points → direct open line (no loop/removal needed)
+;;   2 points → direct open line (no loop removal or angle filter)
 ;;
 ;; Returns: (entity 0 singleCt failures)
 ;; ===========================================================================
 (defun DGPS-BuildGeometry (codeRecs code outType targetLayer
-                           / chainedRecs nPts i rec x y z
+                           / chainedRecs nPts i x y z
                              allPts3D allPts2D
                              loopPts loopLen
                              maxLen maxIdx edgeLen
                              fromPt toPt startIdx
-                             orderedPts finalPts
-                             fromName toName result)
+                             openPts3D openPts2D
+                             filterResult filteredPts removedCt
+                             finalPts fromName toName result)
 
   (setq nPts (length codeRecs))
 
@@ -992,11 +1175,18 @@
     (T
      (DGPS-EnsureLayer targetLayer 3)
 
-     ;; Step 1: nearest-neighbour chain (eliminates zig-zag)
-     (setq chainedRecs (DGPS-NNChain codeRecs))
+     ;; ── Step 1: Nearest-neighbour chain ─────────────────────────────────
+     ;; Local Time ON  -> sort by Local Time (row = tie-breaker), join in order
+     ;; Local Time OFF -> nearest-neighbour chain
+     (setq chainedRecs
+       (if DGPS-UseTime
+         (vl-sort codeRecs '(lambda (a b) (DGPS-TimeLess a b)))
+         (DGPS-NNChain codeRecs)
+       )
+     )
      (setq nPts (length chainedRecs))
 
-     ;; Step 2: build coordinate arrays from chained order
+     ;; Build coordinate arrays in chained order
      (setq allPts3D '()
            allPts2D '())
      (foreach rec chainedRecs
@@ -1009,7 +1199,7 @@
 
      (if (= nPts 2)
 
-       ;; ── 2 points: direct open line ──────────────────────────────────────
+       ;; ── 2 points: direct open line, skip loop removal + angle filter ───
        (progn
          (setq finalPts (if (= outType "3Dpolyline") allPts3D allPts2D))
          (setq result
@@ -1019,10 +1209,12 @@
            )
          )
          (princ (strcat "\n" code))
-         (princ         "\n  Points           : 2")
-         (princ         "\n  Order            : NEAREST-NEIGHBOUR")
+         (princ         "\n  Points (chained) : 2")
+         (princ (strcat "\n  Order            : " (if DGPS-UseTime "LOCAL TIME" "NEAREST-NEIGHBOUR")))
          (princ         "\n  Longest Edge     : N/A (2-point direct line)")
          (princ         "\n  Removed Edge     : NONE")
+         (princ         "\n  Angle Filter     : N/A")
+         (princ         "\n  Final Points     : 2")
          (princ (strcat "\n  Layer            : " targetLayer))
          (princ (strcat "\n  Type             : " outType))
          (princ (strcat "\n  Result            : "
@@ -1030,10 +1222,18 @@
          (list result 0 0 (if result 0 1))
        )
 
-       ;; ── 3+ points: temporary closed loop → remove longest edge ──────────
-       ;; The chained points form a clean spatial sequence.
-       ;; Close the loop (Pn-1 → P0), find the longest gap, then open it.
+       ;; ── 3+ points ──────────────────────────────────────────────────────
        (progn
+
+         ;; ── Step 2: Longest-edge removal (open the loop) ─────────────────
+         (if DGPS-UseTime
+           ;; Local Time order: open polyline in time order, nothing removed
+           (setq openPts3D allPts3D
+                 openPts2D allPts2D
+                 maxLen    0.0
+                 fromName  "NONE"
+                 toName    "NONE")
+         (progn
          (setq loopPts allPts2D
                loopLen nPts
                maxLen  -1.0
@@ -1050,37 +1250,101 @@
            (setq i (1+ i))
          )
 
-         ;; Open the loop: start from the vertex after the longest edge
+         ;; Re-order starting from vertex after the longest edge
          (setq startIdx (rem (1+ maxIdx) nPts))
-         (setq orderedPts '()
-               i           0)
+         (setq openPts3D '()
+               openPts2D '()
+               i          0)
          (while (< i nPts)
-           (setq orderedPts
-             (append orderedPts
-               (list (nth (rem (+ startIdx i) nPts)
-                          (if (= outType "3Dpolyline") allPts3D allPts2D)))
+           (setq openPts3D
+             (append openPts3D
+               (list (nth (rem (+ startIdx i) nPts) allPts3D)))
+           )
+           (setq openPts2D
+             (append openPts2D
+               (list (nth (rem (+ startIdx i) nPts) allPts2D)))
+           )
+           (setq i (1+ i))
+         )
+
+         ;; Names of the removed edge endpoints (for report)
+         (setq fromName
+           (DGPS-R-PName (nth maxIdx chainedRecs)))
+         (setq toName
+           (DGPS-R-PName (nth (rem (1+ maxIdx) nPts) chainedRecs)))
+         ))
+
+         ;; ── Step 3: Angular-deviation filter (iterative, >5° → remove) ──
+         ;;
+         ;; Run the filter on paired (2D . 3D) cons cells so both lists
+         ;; stay perfectly in sync — no coordinate matching required.
+         ;;
+         ;; Build a paired list: each element is (pt2D . pt3D)
+         (setq pairedPts '()
+               i          0)
+         (while (< i nPts)
+           (setq pairedPts
+             (append pairedPts
+               (list (cons (nth i openPts2D) (nth i openPts3D)))
              )
            )
            (setq i (1+ i))
          )
 
-         ;; Point names for report
-         (setq fromName (DGPS-R-PName (nth maxIdx chainedRecs)))
-         (setq toName   (DGPS-R-PName (nth (rem (1+ maxIdx) nPts) chainedRecs)))
+         ;; Extract just the 2D half for the angle filter
+         (setq only2D (mapcar 'car pairedPts))
 
-         ;; Create entity
-         (setq result
-           (if (= outType "3Dpolyline")
-             (DGPS-Make3DPolyline orderedPts targetLayer)
-             (DGPS-Make2DPolyline orderedPts targetLayer)
+         (setq filterResult
+           (if DGPS-UseAngle
+             (DGPS-AngleFilter only2D)
+             (list only2D 0)))
+         (setq filteredPts  (car  filterResult)
+               removedCt    (cadr filterResult))
+
+         ;; Rebuild paired list keeping only survivors (walk in parallel)
+         (if (> removedCt 0)
+           (progn
+             (setq survivedPairs '()
+                   filterQueue   filteredPts)
+             (foreach pair pairedPts
+               (if (and filterQueue
+                        (equal (car pair) (car filterQueue) 1e-9))
+                 (progn
+                   (setq survivedPairs (append survivedPairs (list pair)))
+                   (setq filterQueue   (cdr filterQueue))
+                 )
+               )
+             )
+             (setq openPts2D (mapcar 'car survivedPairs))
+             (setq openPts3D (mapcar 'cdr survivedPairs))
            )
          )
 
+         ;; ── Step 4: Create open polyline ─────────────────────────────────
+         (setq finalPts (if (= outType "3Dpolyline") openPts3D openPts2D))
+         (setq result
+           (if (= outType "3Dpolyline")
+             (DGPS-Make3DPolyline finalPts targetLayer)
+             (DGPS-Make2DPolyline finalPts targetLayer)
+           )
+         )
+
+         ;; Report
          (princ (strcat "\n" code))
-         (princ (strcat "\n  Points           : " (itoa nPts)))
-         (princ         "\n  Order            : NEAREST-NEIGHBOUR")
-         (princ (strcat "\n  Longest Edge     : " (DGPS-FormatDist maxLen)))
-         (princ (strcat "\n  Removed Edge     : " fromName " -> " toName))
+         (princ (strcat "\n  Points (chained) : " (itoa nPts)))
+         (princ (strcat "\n  Order            : " (if DGPS-UseTime "LOCAL TIME" "NEAREST-NEIGHBOUR")))
+         (princ (strcat "\n  Longest Edge     : "
+                        (if DGPS-UseTime "N/A (Local Time order)" (DGPS-FormatDist maxLen))))
+         (princ (strcat "\n  Removed Edge     : "
+                        (if DGPS-UseTime "NONE" (strcat fromName " -> " toName))))
+         (princ
+           (if DGPS-UseAngle
+             (strcat "\n  Angle Filter     : " (itoa removedCt)
+                     " vertex(es) removed  (threshold "
+                     (rtos DGPS-AngleThreshold 2 1) (chr 176) ")")
+             "\n  Angle Filter     : OFF"))
+         (princ (strcat "\n  Final Points     : "
+                        (itoa (length finalPts))))
          (princ (strcat "\n  Layer            : " targetLayer))
          (princ (strcat "\n  Type             : " outType))
          (princ (strcat "\n  Result            : "
@@ -1249,6 +1513,8 @@
   (princ (strcat "\nEncoding:     " enc))
   (princ (strcat "\nOutput type:  " outType))
   (princ (strcat "\nTarget layer: " targetLayer))
+  (princ (strcat "\nAngle filter: " (if DGPS-UseAngle "ON" "OFF")))
+  (princ (strcat "\nPoint order:  " (if DGPS-UseTime "Local Time" "Nearest-neighbour")))
   (princ (strcat "\nData rows:    " (itoa dataRows)))
   (princ (strcat "\nValid:        " (itoa validRows)))
   (princ (strcat "\nSkipped:      " (itoa skippedRows)))
@@ -1340,7 +1606,11 @@
   (princ (strcat "\nGeometry created: " (itoa geomCount)))
   (princ (strcat "\nGeometry failed:  " (itoa geomFailures)))
   (princ (strcat "\nSingle-point:     " (itoa singleCount)))
-  (princ (strcat "\nAlgorithm:        Nearest-neighbour + longest-edge removal (v05)"))
+  (princ (strcat "\nAlgorithm:        "
+                 (if DGPS-UseTime
+                   "Local Time order"
+                   "NN-chain + longest-edge removal")
+                 (if DGPS-UseAngle " + angle filter" "")))
 
   (if (> geomFailures 0)
     (princ "\nWARNING: One or more geometry entities failed to create.")
@@ -1356,5 +1626,5 @@
   (princ)
 )
 
-(princ "\nVIDDGPSTOLINE_v18 loaded. Type VIDDGPSTOLINE to run.")
+(princ "\nVIDDGPSTOLINE_v23 loaded. Type VIDDGPSTOLINE to run.")
 (princ)
