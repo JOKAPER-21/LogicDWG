@@ -1,5 +1,5 @@
 ;;; ============================================================================
-;;; LogicDWG.lsp   |   Release 1.1.4   |   Civil 3D 2026   |   Version 11
+;;; LogicDWG.lsp   |   Release 1.1.6   |   AutoCAD / Civil 3D 2026   |   Version 13
 ;;; Commands: LOGICDWG, VIDLOGICDWG
 ;;;
 ;;; The dialog is drawn in logicDwg.dcl (same folder as this file).
@@ -19,6 +19,7 @@
     ("z44"      ZONE "UTM84-44N")
     ("zoff"     ZONE nil)
     ("sp"       CMD  "VIDDGPSTOSP")
+    ("trackEx"  CMD  "VIDLINETOEXPORTLEVEL" "vidDgpsToExportLevel.lsp")
     ("track"    CMD  "VIDDGPSTOLINE")
     ("chainRev" CAD  "REVERSE")
     ("chain"    CMD  "VIDCHAINAGERUNNER")
@@ -26,6 +27,7 @@
     ("building" CMD  "VIDDGPSTOBOX")
     ("cadMerge" CMD  "VIDCADMERGELAYERS")
     ("settings" SET  "VIDDIMSETTINGS" "vidDimSettings.lsp")
+    ("dimMToFt" CMD  "VIDDIMMTOFT" "vidDimMToFt.lsp")
   )
 )
 
@@ -73,7 +75,16 @@
 )
 
 ;; Map Zone: set coordinate system + GeoMap (cs = nil turns GeoMap off).
-(defun LogicDWG:Zone (cs / echo r)
+;; Map Zone needs Civil 3D / AutoCAD Map 3D (MAPCSASSIGN). In plain AutoCAD it
+;; is skipped with a message instead of sending unknown commands.
+(defun LogicDWG:Zone (cs)
+  (if (and cs (not (getcname "MAPCSASSIGN")))
+    (alert "Map Zone needs Civil 3D / AutoCAD Map 3D (command MAPCSASSIGN).\nIt is not available in this AutoCAD.")
+    (LogicDWG:ZoneRun cs)
+  )
+)
+
+(defun LogicDWG:ZoneRun (cs / echo r)
   (setq echo (getvar "CMDECHO"))
   (setvar "CMDECHO" 0)
   ;; "command" cannot be passed to vl-catch-all-apply, so wrap it in a lambda.

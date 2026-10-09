@@ -11,9 +11,11 @@
     "vidCadMergeLayers.lsp"
     "vidChainageRunner.lsp"
     "vidDgpsToBox.lsp"
+    "vidDgpsToExportLevel.lsp"
     "vidDgpsToLine.lsp"
     "vidDgpsToOhe.lsp"
     "vidDgpsToSp.lsp"
+    "vidDimMToFt.lsp"
     "vidDimSettings.lsp"
     "vidMapZone.lsp"
   )
@@ -153,7 +155,7 @@
   (if (= loaded (length LogicDWG:Files))
     (progn
       (princ "\n\nLogicDWG is ready. Type VIDLOGICDWG to open.")
-      (princ "\nCommands: VIDCHAINAGERUNNER, VIDDGPSTOBOX, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDDIMSETTINGS, VIDCADMERGELAYERS")
+      (princ "\nCommands: VIDCHAINAGERUNNER, VIDDGPSTOBOX, VIDLINETOEXPORTLEVEL, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDDIMSETTINGS, VIDDIMMTOFT, VIDCADMERGELAYERS")
     )
     (princ "\n\nWARNING: LogicDWG did not load completely - see messages above.")
   )

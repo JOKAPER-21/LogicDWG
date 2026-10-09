@@ -4,10 +4,11 @@
 ;;; Version: 14
 ;;;   v14: * Angle filter now has its own whole-number box (+/- deg, default 5).
 ;;;        * Codes R, R1, R2, R3 ... R<n> are selected automatically in the list.
-;;;        * Layer Options: new radio [From CSV] -> layer "1-Track_<Code>" is
+;;;        * Layer Options: new radio [From CSV] -> layer "1-TRACK_<Code>" is
 ;;;          created for every Code.  [Default layers] and Custom are unchanged.
 ;;;   v13: the temporary HP spline is erased after all track lines are created
-;;;        (set DGPS-HPKeep to T to keep it).
+;;;        (set DGPS-HPKeep to T to keep it).  v14b: the HP curve AND the HP layer are
+;;;        now removed in both polyline and 3D polyline mode.
 ;;;   v12: HP (hectometre post) rows are detected automatically after the CSV is
 ;;;        read - no layer selection needed.  Accepted names (PName or Code):
 ;;;            HP 71/600   HP 71-600   HP 71_600   HP 71 600   HP71/600
@@ -87,7 +88,7 @@
 (if (null DGPS-UseAngle) (setq DGPS-UseAngle T))      ; angle filter on
 (if (null DGPS-UseTime)  (setq DGPS-UseTime  nil))    ; Local Time ordering off
 (if (null DGPS-AngleThreshold) (setq DGPS-AngleThreshold 5.0))
-(setq DGPS-LayerFromCsv nil)                          ; T = layer "1-Track_<Code>"
+(setq DGPS-LayerFromCsv nil)                          ; T = layer "1-TRACK_<Code>"
 
 ;; ---------------------------------------------------------------------------
 ;; Default layer list (shown in the layer-options dialog)
@@ -671,7 +672,6 @@
       "    : row {\n"
       "      : toggle   { key = \"tg_angle\"; label = \"Angle filter  +/-\"; }\n"
       "      : edit_box { key = \"edt_angle\"; label = \"\"; edit_width = 5; width = 8; fixed_width = true; }\n"
-      "      : text     { label = \"deg\"; width = 5; fixed_width = true; }\n"
       "    }\n"
       "    : toggle { key = \"tg_time\";  label = \"Use Local Time column to order and connect points\"; }\n"
       "  }\n"
@@ -836,7 +836,7 @@
       "\n"
       "  : row {\n"
       "    : radio_button { key = \"rb_default\"; label = \"Default layers\";  value = \"1\"; }\n"
-      "    : radio_button { key = \"rb_csv\";     label = \"From CSV (prefix 1-Track_)\"; value = \"0\"; }\n"
+      "    : radio_button { key = \"rb_csv\";     label = \"From CSV\"; value = \"0\"; }\n"
       "  }\n"
       "\n"
       "  : list_box {\n"
@@ -967,7 +967,7 @@
           (cond
             ((= modeChoice "csv")
              (setq DGPS-LayerFromCsv T)
-             (setq result "1-Track_")
+             (setq result "1-TRACK_")
             )
             ((= modeChoice "custom")
              (setq customName (DGPS-Trim customName))
@@ -1276,6 +1276,85 @@
     )
     pts
   )
+)
+
+;; ---------------------------------------------------------------------------
+;; DGPS-RemoveHP
+;;   Deletes the HP curve (polyline OR 3D polyline) and then the HP layer.
+;;   Every HP object is first moved to layer 0, then erased - an old-style 3D
+;;   polyline keeps its erased VERTEX / SEQEND records on the layer, which
+;;   otherwise makes the layer "in use" and impossible to delete.
+;; ---------------------------------------------------------------------------
+(defun DGPS-MoveToZeroAndErase (en / e ed t0 done)
+  (if (and en (entget en))
+    (progn
+      (if (= (cdr (assoc 0 (entget en))) "POLYLINE")
+        (progn
+          (setq e (entnext en) done nil)
+          (while (and e (not done))
+            (setq ed (entget e) t0 (cdr (assoc 0 ed)))
+            (if (assoc 8 ed) (entmod (subst (cons 8 "0") (assoc 8 ed) ed)))
+            (if (= t0 "SEQEND") (setq done T) (setq e (entnext e)))
+          )
+        )
+      )
+      (setq ed (entget en))
+      (if (assoc 8 ed) (entmod (subst (cons 8 "0") (assoc 8 ed) ed)))
+      (entdel en)
+      T
+    )
+  )
+)
+
+(defun DGPS-RemoveHP (geom / lay lays obj ss i en n delErr)
+  (setq lay DGPS-HPLayer n 0)
+  ;; unlock + thaw so nothing is skipped; never leave it as the current layer
+  (setq lays (vla-get-Layers (vla-get-ActiveDocument (vlax-get-acad-object))))
+  (setq obj  (vl-catch-all-apply 'vla-Item (list lays lay)))
+  (if (not (vl-catch-all-error-p obj))
+    (progn
+      (vl-catch-all-apply 'vla-put-Lock   (list obj :vlax-false))
+      (vl-catch-all-apply 'vla-put-Freeze (list obj :vlax-false))
+    )
+  )
+  (if (= (strcase (getvar "CLAYER")) (strcase lay)) (setvar "CLAYER" "0"))
+
+  ;; the HP curve made by this run
+  (if (DGPS-MoveToZeroAndErase geom) (setq n (1+ n)))
+
+  ;; anything else still on the HP layer (leftover HP curves)
+  (setq ss (ssget "_X" (list (cons 8 lay))))
+  (if ss
+    (progn
+      (setq i 0)
+      (while (< i (sslength ss))
+        (if (DGPS-MoveToZeroAndErase (ssname ss i)) (setq n (1+ n)))
+        (setq i (1+ i))
+      )
+    )
+  )
+  (princ (strcat "\nHP curve removed (" (itoa n) " object(s))."))
+
+  ;; delete the layer
+  (if (tblsearch "LAYER" lay)
+    (progn
+      (setq obj (vl-catch-all-apply 'vla-Item (list lays lay)))
+      (setq delErr
+        (if (vl-catch-all-error-p obj)
+          T
+          (vl-catch-all-error-p (vl-catch-all-apply 'vla-Delete (list obj)))))
+      (if (and delErr (tblsearch "LAYER" lay))
+        (vl-catch-all-apply
+          '(lambda () (command "_.-PURGE" "_LA" lay "_N")))
+      )
+      (while (> (getvar "CMDACTIVE") 0) (command ""))
+      (if (tblsearch "LAYER" lay)
+        (princ (strcat "\nLayer " lay " could not be deleted (still in use)."))
+        (princ (strcat "\nLayer " lay " removed."))
+      )
+    )
+  )
+  T
 )
 
 ;; ---------------------------------------------------------------------------
@@ -1910,7 +1989,7 @@
   (princ (strcat "\nEncoding:     " enc))
   (princ (strcat "\nOutput type:  " outType))
   (princ (strcat "\nTarget layer: "
-                 (if DGPS-LayerFromCsv "1-Track_<Code> (from CSV)" targetLayer)))
+                 (if DGPS-LayerFromCsv "1-TRACK_<Code> (from CSV)" targetLayer)))
   (princ (strcat "\nAngle filter: " (if DGPS-UseAngle
                                         (strcat "ON (+/- " (rtos DGPS-AngleThreshold 2 0) " deg)")
                                         "OFF")))
@@ -1982,7 +2061,7 @@
       (progn
         (setq codeLayer
           (if DGPS-LayerFromCsv
-            (DGPS-SanitizeLayerName (strcat "1-Track_" code))
+            (DGPS-SanitizeLayerName (strcat "1-TRACK_" code))
             targetLayer
           )
         )
@@ -2005,12 +2084,9 @@
     )
   )
 
-  ;; Remove the temporary HP spline now that every line is built
-  (if (and hpGeom (not DGPS-HPKeep) (entget hpGeom))
-    (progn
-      (entdel hpGeom)
-      (princ "\nHP spline removed (it was only used for direction).")
-    )
+  ;; Remove the temporary HP spline and the HP layer (2D and 3D polyline mode)
+  (if (and hpRecs (not DGPS-HPKeep))
+    (DGPS-RemoveHP hpGeom)
   )
   (setq DGPS-HPSamples nil)
 
@@ -2022,7 +2098,7 @@
   (princ "\n========================================")
   (princ (strcat "\nOutput type:      " outType))
   (princ (strcat "\nTarget layer:     "
-                 (if DGPS-LayerFromCsv "1-Track_<Code> (from CSV)" targetLayer)))
+                 (if DGPS-LayerFromCsv "1-TRACK_<Code> (from CSV)" targetLayer)))
   (princ (strcat "\nRows read:        " (itoa dataRows)))
   (princ (strcat "\nValid records:    " (itoa validRows)))
   (princ (strcat "\nSkipped rows:     " (itoa skippedRows)))

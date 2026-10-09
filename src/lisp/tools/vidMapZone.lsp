@@ -5,6 +5,10 @@
     (setq zone "Z43")
   )
   (cond
+    ;; Plain AutoCAD has no MAPCSASSIGN (Civil 3D / Map 3D only)
+    ((and (/= zone "Off") (not (getcname "MAPCSASSIGN")))
+     (alert "Map Zone needs Civil 3D / AutoCAD Map 3D (command MAPCSASSIGN).")
+    )
     ;; If user selects Off -> switch off GeoMap
     ((= zone "Off")
      (command "._GEOMAP" "_Off")

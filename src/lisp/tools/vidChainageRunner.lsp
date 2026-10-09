@@ -65,13 +65,15 @@
 )
 
 ;; Dialog.  Returns T = Ok, nil = Cancel.
-(defun VCR-Dialog (/ dlgName f dcl_id ret)
+(defun VCR-Dialog (nSel lastPrompt / dlgName f dcl_id ret)
   (setq dlgName (vl-filename-mktemp "vcrUi" (getvar "TEMPPREFIX") ".dcl"))
   (setq f (open dlgName "w"))
   (write-line
     (strcat
       "vcr_ui : dialog {\n"
       "  label = \"Chainage Runner\";\n"
+      "  : text { key = \"lbl_last\"; label = \"\"; width = 48; }\n"
+      "  : text { key = \"lbl_sel\";  label = \"\"; width = 48; }\n"
       "  : boxed_radio_row {\n"
       "    label = \"Direction\";\n"
       "    : radio_button { key = \"rb_fwd\"; label = \"Forward\";  value = \"1\"; }\n"
@@ -96,6 +98,9 @@
   (setq ret nil)
   (if (and dcl_id (new_dialog "vcr_ui" dcl_id))
     (progn
+      ;; keep the last AutoCAD prompt line (e.g. "Select objects: 3 found") visible
+      (set_tile "lbl_last" lastPrompt)
+      (set_tile "lbl_sel"  (strcat (itoa nSel) " polyline(s) selected"))
       (set_tile "rb_fwd" (if (= VCR-Dir "Backward") "0" "1"))
       (set_tile "rb_bwd" (if (= VCR-Dir "Backward") "1" "0"))
       (set_tile "edt_km"  (itoa VCR-Km))
@@ -197,7 +202,7 @@
 ;; ---------------------------------------------------------------------------
 ;; Command
 ;; ---------------------------------------------------------------------------
-(defun c:VIDCHAINAGERUNNER (/ ss i ent n marks total)
+(defun c:VIDCHAINAGERUNNER (/ ss i ent n marks total lastPrompt)
   (vl-load-com)
   (setq VCR-OldError *error*)
   (setq *error* VCR-Error)
@@ -206,11 +211,15 @@
 
   (princ "\nSelect polyline(s) (chainage runs in the increasing-chainage direction of each): ")
   (setq ss (ssget '((0 . "LWPOLYLINE,POLYLINE"))))
+  ;; last command-line prompt, shown again inside the dialog
+  (setq lastPrompt (vl-string-trim " \n" (getvar "LASTPROMPT")))
+  (if (> (strlen lastPrompt) 60) (setq lastPrompt (substr lastPrompt 1 60)))
+  (if ss (princ (strcat "\n" (itoa (sslength ss)) " polyline(s) selected.")))
 
   (cond
     ((null ss)
      (princ "\nSelect at least one valid polyline."))
-    ((not (VCR-Dialog))
+    ((not (VCR-Dialog (sslength ss) lastPrompt))
      (princ "\nVIDCHAINAGERUNNER cancelled."))
     (T
      (setvar "CMDECHO" 0)

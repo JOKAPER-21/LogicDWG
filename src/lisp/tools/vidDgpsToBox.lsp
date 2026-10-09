@@ -46,6 +46,9 @@
 (setq VDB-TrackLayer  "1-TRACK")   ; layer whose tangent sets the text rotation
 (setq VDB-TextHeight  0.5)         ; text height in drawing units
 (setq VDB-TrackSS     nil)
+(setq VDB-CsvPrefix   "1-TRACK_")  ; [From CSV] layer = prefix + Code
+(setq VDB-FromCsv     nil)
+(setq VDB-TextFlip180 T)           ; T = turn the label 180 deg from the track tangent
 
 ;; Groups selected automatically in dialog 1 when a Code contains one of these.
 ;;   "word"  = the Code contains the entry as a whole word  (Motor Room -> ROOM)
@@ -399,6 +402,8 @@
   (setq ang (VDB-TrackAngle (list cx cy cz)))
   (if (null ang) (setq ang fallbackAng))
   (setq ang (VDB-ReadableAngle ang))
+  (if VDB-TextFlip180 (setq ang (+ ang pi)))
+  (while (>= ang (* 2.0 pi)) (setq ang (- ang (* 2.0 pi))))
   (setq e
     (entmakex
       (list
@@ -613,7 +618,10 @@
     (strcat
       "vdb_opt : dialog {\n"
       "  label = \"Dgps To Box - Layer Options\";\n"
-      "  : radio_button { key = \"rb_default\"; label = \"Default layers\"; value = \"1\"; }\n"
+      "  : row {\n"
+      "    : radio_button { key = \"rb_default\"; label = \"Default layers\"; value = \"1\"; }\n"
+      "    : radio_button { key = \"rb_csv\"; label = \"From CSV\"; value = \"0\"; }\n"
+      "  }\n"
       "  : list_box {\n"
       "    key = \"lst_default\"; height = 16; width = 48;\n"
       "    fixed_width_font = false; multiple_select = false; allow_accept = false;\n"
@@ -635,7 +643,9 @@
   (if (and (> dcl_id 0) (new_dialog "vdb_opt" dcl_id))
     (progn
       (setq VDB-mode "default" VDB-defIdx "0" VDB-custom "")
+      (setq VDB-FromCsv nil)
       (set_tile "rb_default" "1")
+      (set_tile "rb_csv" "0")
       (set_tile "rb_custom" "0")
       (start_list "lst_default" 3)
       (foreach l VDB-DefaultLayers (add_list l))
@@ -644,11 +654,15 @@
 
       (action_tile "rb_default"
         (strcat "(setq VDB-mode \"default\")"
-                "(set_tile \"rb_default\" \"1\") (set_tile \"rb_custom\" \"0\")"
+                "(set_tile \"rb_default\" \"1\") (set_tile \"rb_csv\" \"0\") (set_tile \"rb_custom\" \"0\")"
                 "(mode_tile \"lst_default\" 0) (mode_tile \"edt_custom\" 1)"))
+      (action_tile "rb_csv"
+        (strcat "(setq VDB-mode \"csv\")"
+                "(set_tile \"rb_default\" \"0\") (set_tile \"rb_csv\" \"1\") (set_tile \"rb_custom\" \"0\")"
+                "(mode_tile \"lst_default\" 1) (mode_tile \"edt_custom\" 1)"))
       (action_tile "rb_custom"
         (strcat "(setq VDB-mode \"custom\")"
-                "(set_tile \"rb_default\" \"0\") (set_tile \"rb_custom\" \"1\")"
+                "(set_tile \"rb_default\" \"0\") (set_tile \"rb_csv\" \"0\") (set_tile \"rb_custom\" \"1\")"
                 "(mode_tile \"lst_default\" 1) (mode_tile \"edt_custom\" 0)"
                 "(mode_tile \"edt_custom\" 2)"))
       (action_tile "accept"
@@ -660,6 +674,9 @@
       (setq dlgRet (start_dialog))
       (if (= dlgRet 1)
         (cond
+          ((= VDB-mode "csv")
+           (setq VDB-FromCsv T)
+           (setq result (strcat VDB-CsvPrefix "<Code>")))
           ((= VDB-mode "custom")
            (setq VDB-custom (VDB-Trim VDB-custom))
            (if (= VDB-custom "")
@@ -699,7 +716,7 @@
 (defun c:VIDDGPSTOBOX
   (/ csvFile fh headerLine headers idxC idxN idxE idxZ idxT
      line fields rowNo code north east elev tm allRev records
-     groups codes labels selCodes targetLayer
+     groups codes labels selCodes targetLayer codeLayer
      g res totMade totFail totSkip dataRows validRows skippedRows)
 
   (setq vdb-*old-error* *error*)
@@ -789,9 +806,13 @@
   (if (null targetLayer)
     (progn (VDB-Error "Cancelled by user.") (exit))
   )
-  (setq targetLayer (VDB-SanitizeLayerName targetLayer))
-  (if (null (VDB-EnsureLayer targetLayer 3))
-    (progn (VDB-Error (strcat "Could not create layer " targetLayer)) (exit))
+  (if (not VDB-FromCsv)
+    (progn
+      (setq targetLayer (VDB-SanitizeLayerName targetLayer))
+      (if (null (VDB-EnsureLayer targetLayer 3))
+        (progn (VDB-Error (strcat "Could not create layer " targetLayer)) (exit))
+      )
+    )
   )
 
   ;; 5. Build rectangles ------------------------------------------------------
@@ -799,7 +820,8 @@
   (princ "\nVIDDGPSTOBOX")
   (princ "\n========================================")
   (princ (strcat "\nFile:         " csvFile))
-  (princ (strcat "\nTarget layer: " targetLayer))
+  (princ (strcat "\nTarget layer: "
+                 (if VDB-FromCsv (strcat VDB-CsvPrefix "<Code> (from CSV)") targetLayer)))
   (princ (strcat "\nRows: " (itoa dataRows) "  valid: " (itoa validRows)
                  "  skipped (no code / bad number): " (itoa skippedRows)))
   (if (null idxT)
@@ -820,7 +842,12 @@
   (foreach g groups
     (if (member (car g) selCodes)
       (progn
-        (setq res (VDB-BuildGroup (car g) (cdr g) targetLayer))
+        (setq codeLayer
+          (if VDB-FromCsv
+            (VDB-SanitizeLayerName (strcat VDB-CsvPrefix (car g)))
+            targetLayer))
+        (if VDB-FromCsv (VDB-EnsureLayer codeLayer 3))
+        (setq res (VDB-BuildGroup (car g) (cdr g) codeLayer))
         (setq totMade (+ totMade (nth 0 res))
               totFail (+ totFail (nth 1 res))
               totSkip (+ totSkip (nth 2 res)))

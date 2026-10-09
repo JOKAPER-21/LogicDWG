@@ -17,16 +17,17 @@ logicDwg : dialog {
   : boxed_column {
     label = "Generate from CSV";
     : row { : cap { label = "Survey points"; }   : btn { key = "sp";    label = "Generate"; } }
-    : row { : cap { label = "Rail track"; }      : btn { key = "track"; label = "Generate"; } }
-    : row { : cap { label = "Chainage Runner"; } : btn { key = "chainRev"; label = "Reverse"; } : btn { key = "chain"; label = "Generate"; } }
+    : row { : cap { label = "Rail track"; }      : btn { key = "trackEx"; label = "Export"; } : btn { key = "track"; label = "Generate"; } }
+    : row { : cap { label = "Chainage"; } : btn { key = "chainRev"; label = "Reverse"; } : btn { key = "chain"; label = "Generate"; } }
     : row { : cap { label = "Ohe"; }             : btn { key = "ohe";   label = "Generate"; } }
     : row { : cap { label = "Building"; }        : btn { key = "building"; label = "Generate"; } }
   }
 
-  : boxed_row {
+  : boxed_column {
     label = "Settings";
-    : btn { key = "cadMerge"; label = "Cad Merge Layer"; }
-    : btn { key = "settings"; label = "Dim settings"; }
+    : row { : cap { label = "Delete Cad Layers"; } : btn { key = "cadMerge"; label = "Delete"; } }
+    : row { : cap { label = "Dim Settings"; }      : btn { key = "settings"; label = "Apply"; } }
+    : row { : cap { label = "Convert Dal unit"; }  : btn { key = "dimMToFt"; label = "Convert"; } }
   }
 
   spacer_1;
