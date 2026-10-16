@@ -18,9 +18,10 @@ logicDwg : dialog {
     label = "Generate from CSV";
     : row { : cap { label = "Survey points"; }   : btn { key = "sp";    label = "Generate"; } }
     : row { : cap { label = "Rail track"; }      : btn { key = "trackEx"; label = "Export"; } : btn { key = "track"; label = "Generate"; } }
-    : row { : cap { label = "Chainage"; } : btn { key = "chainRev"; label = "Reverse"; } : btn { key = "chain"; label = "Generate"; } }
+    : row { : cap { label = "Chainage"; } : btn { key = "chain"; label = "Generate"; } }
     : row { : cap { label = "Ohe"; }             : btn { key = "ohe";   label = "Generate"; } }
     : row { : cap { label = "Building"; }        : btn { key = "building"; label = "Generate"; } }
+    : row { : cap { label = "Gradient"; }        : btn { key = "gradClean"; label = "Clean up"; } : btn { key = "gradAlign"; label = "Align"; } : btn { key = "grad"; label = "Generate"; } }
   }
 
   : boxed_column {

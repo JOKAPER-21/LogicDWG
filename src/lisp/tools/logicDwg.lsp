@@ -1,5 +1,5 @@
 ;;; ============================================================================
-;;; LogicDWG.lsp   |   Release 1.1.6   |   AutoCAD / Civil 3D 2026   |   Version 13
+;;; LogicDWG.lsp   |   Release 1.1.8   |   AutoCAD / Civil 3D 2026   |   Version 15
 ;;; Commands: LOGICDWG, VIDLOGICDWG
 ;;;
 ;;; The dialog is drawn in logicDwg.dcl (same folder as this file).
@@ -21,10 +21,12 @@
     ("sp"       CMD  "VIDDGPSTOSP")
     ("trackEx"  CMD  "VIDLINETOEXPORTLEVEL" "vidDgpsToExportLevel.lsp")
     ("track"    CMD  "VIDDGPSTOLINE")
-    ("chainRev" CAD  "REVERSE")
     ("chain"    CMD  "VIDCHAINAGERUNNER")
     ("ohe"      CMD  "VIDDGPSTOOHE")
     ("building" CMD  "VIDDGPSTOBOX")
+    ("gradClean" CMD "VIDGRADIENTCLEANUP" "vidGradientCleanup.lsp")
+    ("gradAlign" CMD "VIDGRADIENTALIGN" "vidGradientAlign.lsp")
+    ("grad"     CMD  "VIDGRADIENT" "vidGradient.lsp")
     ("cadMerge" CMD  "VIDCADMERGELAYERS")
     ("settings" SET  "VIDDIMSETTINGS" "vidDimSettings.lsp")
     ("dimMToFt" CMD  "VIDDIMMTOFT" "vidDimMToFt.lsp")
