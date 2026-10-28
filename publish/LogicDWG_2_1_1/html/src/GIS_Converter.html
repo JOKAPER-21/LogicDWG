@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VID GIS Converter</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --surface2: #1a1a1f;
+    --border: #2a2a32;
+    --border-focus: #4caf82;
+    --accent: #4caf82;
+    --accent-dim: rgba(76,175,130,0.12);
+    --accent-glow: rgba(76,175,130,0.25);
+    --success: #4caf82;
+    --success-dim: rgba(76,175,130,0.1);
+    --danger: #e06c75;
+    --danger-dim: rgba(224,108,117,0.08);
+    --warn: #d9a441;
+    --warn-dim: rgba(217,164,65,0.1);
+    --text-primary: #f0f0f5;
+    --text-secondary: #7a7a8c;
+    --text-muted: #444455;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --radius: 10px;
+    --radius-sm: 7px;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(76,175,130,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper { width: 100%; max-width: 760px; position: relative; z-index: 1; animation: fadeUp 0.5s ease both; transition: max-width 0.2s ease; }
+  .wrapper.wide { max-width: 1200px; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .header { margin-bottom: 1.5rem; padding: 0 0.25rem; }
+  .header-eyebrow { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+  .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .eyebrow-text { font-family: var(--mono); font-size: 0.68rem; font-weight: 500; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; }
+  .header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary); line-height: 1.1; }
+  .header h1 span { color: var(--accent); }
+  .header p { margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem; max-width: 46ch; }
+
+  .tabs { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; gap: 3px; margin-bottom: 1.25rem; overflow-x: auto; }
+  .tabs button { flex: 1; padding: 0.55rem 0.5rem; background: transparent; border: none; border-radius: 5px; color: var(--text-secondary); font-family: var(--sans); font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; }
+  .tabs button.active { background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 2px 8px rgba(76,175,130,0.35); }
+  .tabs button:hover:not(.active) { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.04) inset; margin-bottom: 1.25rem; }
+  .card-body { padding: 1.75rem; }
+  .section-label { font-family: var(--mono); font-size: 0.65rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem; }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeUp 0.3s ease both; }
+
+  /* Dropzone */
+  .dropzone { border: 1px dashed var(--border); border-radius: var(--radius); padding: 2rem 1.25rem; text-align: center; cursor: pointer; transition: all 0.18s; background: var(--surface2); }
+  .dropzone:hover, .dropzone.drag { border-color: var(--accent); background: var(--accent-dim); }
+  .dropzone svg { color: var(--text-muted); margin-bottom: 0.75rem; }
+  .dropzone h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.35rem; }
+  .dropzone p { font-size: 0.78rem; color: var(--text-secondary); }
+  .dropzone input { display: none; }
+
+  .filelist { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  .filelist .frow { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.5rem 0.75rem; font-family: var(--mono); font-size: 0.75rem; }
+  .frow .fname { color: var(--text-primary); }
+  .frow .fsize { color: var(--text-muted); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.65rem 1.1rem; border-radius: var(--radius-sm); font-family: var(--sans); font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--text-primary); transition: all 0.18s; }
+  .btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+
+  .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.9rem; }
+  .field label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.08em; text-transform: uppercase; }
+  select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--mono); font-size: 0.85rem; padding: 0.6rem 0.85rem; outline: none; }
+  select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-glow); }
+  input[type="text"], input[type="search"] { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--sans); font-size: 0.85rem; padding: 0.6rem 0.85rem; outline: none; }
+  input[type="text"]:focus, input[type="search"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+  .sep { height: 1px; background: var(--border); margin: 1.25rem 0; }
+
+  .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-top: 1rem; }
+  .stat { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.7rem 0.85rem; }
+  .stat .k { font-family: var(--mono); font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+  .stat .v { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
+  .stat.ok .v { color: var(--success); }
+  .stat.warn .v { color: var(--warn); }
+  .stat.err .v { color: var(--danger); }
+
+  .msg { border-radius: var(--radius-sm); padding: 0.65rem 0.9rem; font-size: 0.8rem; margin-top: 0.75rem; border: 1px solid; }
+  .msg.err { background: var(--danger-dim); border-color: rgba(224,108,117,0.3); color: var(--danger); }
+  .msg.warn { background: var(--warn-dim); border-color: rgba(217,164,65,0.3); color: var(--warn); }
+  .msg.ok { background: var(--success-dim); border-color: rgba(76,175,130,0.3); color: var(--success); }
+
+  .mode-pill { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--accent-dim); border: 1px solid rgba(76,175,130,0.2); border-radius: 20px; padding: 0.2rem 0.65rem; font-family: var(--mono); font-size: 0.62rem; font-weight: 600; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; }
+  .mode-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .mode-pill.pass { color: var(--success); }
+  .mode-pill.fail { color: var(--danger); background: var(--danger-dim); border-color: rgba(224,108,117,0.2); }
+  .mode-pill.fail::before { background: var(--danger); }
+
+  /* Preview table */
+  .table-wrap {
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-top: 0.75rem;
+    width: 100%;
+    max-width: 100%;
+    height: calc(100vh - 320px);
+    min-height: 260px;
+    max-height: 640px;
+  }
+  /* Themed scrollbars — WebKit */
+  .table-wrap::-webkit-scrollbar { width: 10px; height: 10px; }
+  .table-wrap::-webkit-scrollbar-track { background: var(--surface2); border-radius: 20px; }
+  .table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 20px; border: 2px solid var(--surface2); }
+  .table-wrap::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  .table-wrap::-webkit-scrollbar-corner { background: var(--surface2); }
+  /* Themed scrollbars — Firefox */
+  .table-wrap { scrollbar-width: thin; scrollbar-color: var(--border) var(--surface2); }
+  table { border-collapse: collapse; width: max-content; min-width: 100%; font-family: var(--mono); font-size: 0.72rem; }
+  thead th { position: sticky; top: 0; background: var(--surface2); color: var(--text-secondary); text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; transition: color 0.15s, background 0.15s; }
+  thead th:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+  thead th .th-inner { display: inline-flex; align-items: center; gap: 0.35rem; }
+  thead th .sort-arrow { font-family: var(--mono); font-size: 0.65rem; color: var(--text-muted); width: 0.8em; display: inline-block; }
+  thead th.sorted-asc .sort-arrow, thead th.sorted-desc .sort-arrow { color: var(--accent); }
+  tbody td { padding: 0.4rem 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-primary); white-space: nowrap; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+  .pager { display: flex; align-items: center; justify-content: space-between; margin-top: 0.75rem; font-family: var(--mono); font-size: 0.72rem; color: var(--text-secondary); }
+  .pager .btn { padding: 0.4rem 0.7rem; font-size: 0.72rem; }
+
+  .checkline { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+  .checkline input { accent-color: var(--accent); width: 15px; height: 15px; }
+
+  .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  @media (max-width: 520px) { .export-grid { grid-template-columns: 1fr; } }
+  .export-card { border: 1px solid var(--border); background: var(--surface2); border-radius: var(--radius-sm); padding: 1rem; display: flex; flex-direction: column; gap: 0.6rem; }
+  .export-card h4 { font-size: 0.85rem; font-weight: 600; }
+  .export-card p { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4; flex: 1; }
+
+  .about p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+  .about ul { margin: 0 0 0.75rem 1.1rem; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; }
+  .about code { font-family: var(--mono); background: var(--surface2); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.78rem; }
+
+  .footer { margin-top: 0.5rem; text-align: center; font-family: var(--mono); font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; }
+
+  .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <div class="header-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-text">Vignesh Infra Developers Private Limited</span>
+    </div>
+    <h1>GIS <span>Converter</span></h1>
+    <p>Convert Shapefile packages to CSV without losing attribute data. 100% client-side — your files never leave this browser.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="active" data-tab="home" onclick="showTab('home')">Home</button>
+    <button data-tab="converter" onclick="showTab('converter')">Converter</button>
+    <button data-tab="preview" onclick="showTab('preview')">Preview</button>
+    <button data-tab="export" onclick="showTab('export')">Export</button>
+    <button data-tab="about" onclick="showTab('about')">About</button>
+  </div>
+
+  <!-- HOME -->
+  <div class="panel active" id="panel-home">
+    <div class="card"><div class="card-body">
+      <div class="section-label">Welcome</div>
+      <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.7;margin-bottom:0.9rem;">
+        This tool reads a Shapefile package (<code style="font-family:var(--mono)">.shp</code>, <code style="font-family:var(--mono)">.shx</code>, <code style="font-family:var(--mono)">.dbf</code>, plus optional <code style="font-family:var(--mono)">.prj</code>/<code style="font-family:var(--mono)">.cpg</code>) directly in your browser, validates it against the original data, and lets you export to CSV — with or without geometry — as well as GeoJSON.
+      </p>
+      <div class="status-grid">
+        <div class="stat ok"><div class="k">Backend</div><div class="v">None</div></div>
+        <div class="stat ok"><div class="k">Upload to server</div><div class="v">Never</div></div>
+        <div class="stat ok"><div class="k">Data modification</div><div class="v">None</div></div>
+        <div class="stat ok"><div class="k">Hosting</div><div class="v">GitHub Pages</div></div>
+      </div>
+      <div class="btn-row"><button class="btn primary" onclick="showTab('converter')">Start converting →</button></div>
+    </div></div>
+  </div>
+
+  <!-- CONVERTER -->
+  <div class="panel" id="panel-converter">
+    <div class="card"><div class="card-body">
+      <div class="section-label">Upload</div>
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;display:block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <h3>Drop a ZIP or Shapefile components here</h3>
+        <p>or click to browse — .zip, or .shp + .shx + .dbf (+ .prj, .cpg optional)</p>
+        <input type="file" id="fileInput" multiple accept=".zip,.shp,.shx,.dbf,.prj,.cpg,.qpj,.sbn,.sbx,.xml,.qmd">
+      </div>
+      <div class="filelist" id="fileList"></div>
+      <div class="btn-row">
+        <button class="btn primary" id="validateBtn" onclick="processInput()" disabled>Validate & Load</button>
+        <button class="btn" onclick="resetAll()">Reset</button>
+      </div>
+      <div id="loadMsg"></div>
+    </div></div>
+
+    <div class="card hidden" id="validationCard"><div class="card-body">
+      <div class="section-label">Validation</div>
+      <div id="validationMsgs"></div>
+      <div class="status-grid" id="statGrid"></div>
+    </div></div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="panel" id="panel-preview">
+    <div class="card"><div class="card-body">
+      <div class="section-label">Attribute Preview</div>
+      <div id="previewEmpty" style="color:var(--text-secondary);font-size:0.85rem;">Load a Shapefile in the Converter tab first.</div>
+      <div id="previewContent" class="hidden">
+        <div class="field" style="margin-bottom:0.6rem;">
+          <input type="search" id="searchBox" placeholder="Search records..." oninput="renderTable()">
+        </div>
+        <div class="table-wrap"><table id="dataTable"><thead></thead><tbody></tbody></table></div>
+        <div class="pager">
+          <span id="pagerInfo"></span>
+          <div style="display:flex;gap:0.4rem;">
+            <button class="btn" onclick="prevPage()">← Prev</button>
+            <button class="btn" onclick="nextPage()">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="panel" id="panel-export">
+    <div class="card"><div class="card-body">
+      <div class="section-label">Export options</div>
+      <div id="exportEmpty" style="color:var(--text-secondary);font-size:0.85rem;">Load a Shapefile in the Converter tab first.</div>
+      <div id="exportContent" class="hidden">
+        <div class="export-grid">
+          <div class="export-card">
+            <h4>CSV — attributes only</h4>
+            <p>Every DBF field, no geometry column. Recommended for normal spreadsheet workflows.</p>
+            <button class="btn primary" onclick="exportCSV(false)">Download CSV</button>
+          </div>
+          <div class="export-card">
+            <h4>CSV — attributes + WKT</h4>
+            <p>All attributes plus a <code style="font-family:var(--mono)">WKT</code> column with full geometry preserved as text.</p>
+            <button class="btn primary" onclick="exportCSV(true)">Download CSV</button>
+          </div>
+          <div class="export-card">
+            <h4>GeoJSON</h4>
+            <p>Geometry and attributes together, in standard GeoJSON format.</p>
+            <button class="btn primary" onclick="exportGeoJSON()">Download GeoJSON</button>
+          </div>
+          <div class="export-card">
+            <h4>Original ZIP</h4>
+            <p>Re-download the exact package you uploaded, byte-for-byte unchanged.</p>
+            <button class="btn" onclick="exportOriginalZip()">Download ZIP</button>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="section-label">Integrity report</div>
+        <div id="integrityReport"></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="panel" id="panel-about">
+    <div class="card"><div class="card-body about">
+      <div class="section-label">About</div>
+      <p>VID GIS Converter reads Shapefile packages entirely inside your browser using the File API. Nothing is uploaded anywhere — files are parsed, validated and converted locally, and everything is discarded when you close or refresh the tab.</p>
+      <p><strong style="color:var(--text-primary);">No data loss policy</strong></p>
+      <ul>
+        <li>Original files are never modified or overwritten.</li>
+        <li>No field, record, or geometry is silently dropped.</li>
+        <li>Leading zeros and text-formatted IDs are preserved exactly as stored in the DBF.</li>
+        <li>Encoding is read from the .cpg file when present, otherwise it falls back to Windows-1252 / UTF-8.</li>
+        <li>Coordinates are never reprojected — the original CRS from the .prj file is reported, not altered.</li>
+      </ul>
+      <p><strong style="color:var(--text-primary);">Supported geometry types</strong>: Point, MultiPoint, PolyLine, Polygon (and their Z variants for coordinates; M/Z values are read but not required for WKT/GeoJSON output). MultiPatch attribute-only export is supported; full 3D geometry export is a future feature.</p>
+      <p>Large files are parsed in memory — very large shapefiles (over roughly 1 GB) may be limited by your device's available RAM.</p>
+    </div></div>
+  </div>
+
+  <div class="footer">VID · GIS Converter · Client-Side Shapefile → CSV / GeoJSON</div>
+</div>
+
+<script>
+/* ============================= STATE ============================= */
+const APP = {
+  rawFiles: {},        // lowercase-ext -> {name, buffer(ArrayBuffer)}
+  originalZipBlob: null,
+  basename: null,
+  fields: [],           // [{name, type, length, decimal}]
+  records: [],          // array of objects {field: value}
+  geometries: [],        // parallel array of geometry objects or null
+  geomType: null,
+  crsText: null,
+  crsEpsg: null,
+  encodingUsed: 'UTF-8',
+  inputFeatureCount: 0,
+  inputAttributeCount: 0,
+  page: 0,
+  pageSize: 25,
+  filtered: null,
+  loaded: false,
+  sortField: null,
+  sortDir: null   // 'asc' | 'desc' | null
+};
+
+/* ============================= TABS ============================= */
+function showTab(name){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelector('.wrapper').classList.toggle('wide', name==='preview');
+  if (name==='preview') renderTable();
+}
+
+/* ============================= FILE INPUT ============================= */
+const dz = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+let pendingFiles = [];
+
+dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', ()=> dz.classList.remove('drag'));
+dz.addEventListener('drop', e=>{
+  e.preventDefault(); dz.classList.remove('drag');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', e=> handleFiles(e.target.files));
+
+function handleFiles(fileListObj){
+  pendingFiles = Array.from(fileListObj);
+  const list = document.getElementById('fileList');
+  list.innerHTML = '';
+  pendingFiles.forEach(f=>{
+    const row = document.createElement('div');
+    row.className = 'frow';
+    row.innerHTML = '<span class="fname">'+escapeHTML(f.name)+'</span><span class="fsize">'+fmtBytes(f.size)+'</span>';
+    list.appendChild(row);
+  });
+  document.getElementById('validateBtn').disabled = pendingFiles.length===0;
+  document.getElementById('validationCard').classList.add('hidden');
+  document.getElementById('loadMsg').innerHTML = '';
+}
+
+function fmtBytes(n){
+  if(n<1024) return n+' B';
+  if(n<1024*1024) return (n/1024).toFixed(1)+' KB';
+  return (n/1024/1024).toFixed(2)+' MB';
+}
+function escapeHTML(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function resetAll(){
+  pendingFiles = [];
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileList').innerHTML = '';
+  document.getElementById('validateBtn').disabled = true;
+  document.getElementById('validationCard').classList.add('hidden');
+  document.getElementById('loadMsg').innerHTML = '';
+  document.getElementById('previewEmpty').classList.remove('hidden');
+  document.getElementById('previewContent').classList.add('hidden');
+  document.getElementById('exportEmpty').classList.remove('hidden');
+  document.getElementById('exportContent').classList.add('hidden');
+  Object.assign(APP, {rawFiles:{}, originalZipBlob:null, basename:null, fields:[], records:[], geometries:[], geomType:null, crsText:null, crsEpsg:null, encodingUsed:'UTF-8', inputFeatureCount:0, inputAttributeCount:0, page:0, filtered:null, loaded:false, sortField:null, sortDir:null});
+}
+
+/* ============================= MAIN PROCESS ============================= */
+async function processInput(){
+  const msgEl = document.getElementById('loadMsg');
+  msgEl.innerHTML = '<div class="msg ok"><span class="spinner" style="display:inline-block;vertical-align:middle;margin-right:6px;"></span>Reading files…</div>';
+  document.getElementById('validateBtn').disabled = true;
+
+  try {
+    let entries = {}; // lowercase filename -> {name, buffer}
+    const zipFile = pendingFiles.find(f=>/\.zip$/i.test(f.name));
+
+    if (zipFile) {
+      const buf = await zipFile.arrayBuffer();
+      APP.originalZipBlob = new Blob([buf], {type:'application/zip'});
+      const zip = await JSZip.loadAsync(buf);
+      const names = Object.keys(zip.files).filter(n=>!zip.files[n].dir);
+      for (const n of names) {
+        const data = await zip.files[n].async('arraybuffer');
+        const base = n.split('/').pop();
+        entries[base.toLowerCase()] = {name: base, buffer: data};
+      }
+    } else {
+      for (const f of pendingFiles) {
+        const buf = await f.arrayBuffer();
+        entries[f.name.toLowerCase()] = {name: f.name, buffer: buf};
+      }
+      // build an in-memory zip of originals for "download original" export
+      const zip = new JSZip();
+      pendingFiles.forEach(f=>{});
+      for (const f of pendingFiles) {
+        zip.file(f.name, await f.arrayBuffer());
+      }
+      APP.originalZipBlob = await zip.generateAsync({type:'blob'});
+    }
+
+    APP.rawFiles = entries;
+
+    // find basename via .shp
+    const shpKey = Object.keys(entries).find(k=>k.endsWith('.shp'));
+    if (!shpKey) throw new Error('No .shp file found in the upload.');
+    const base = shpKey.slice(0,-4);
+    APP.basename = base;
+
+    const shxKey = base + '.shx';
+    const dbfKey = base + '.dbf';
+    const prjKey = base + '.prj';
+    const cpgKey = base + '.cpg';
+
+    const missing = [];
+    if (!entries[shxKey]) missing.push('.shx');
+    if (!entries[dbfKey]) missing.push('.dbf');
+
+    const msgs = [];
+    if (missing.length) {
+      msgs.push({type:'err', text: 'Missing required component(s): ' + missing.join(', ') + '. Cannot proceed without these.'});
+    }
+    if (!entries[prjKey]) msgs.push({type:'warn', text: 'No .prj found — coordinate reference system is unknown. Conversion will still proceed.'});
+    if (!entries[cpgKey]) msgs.push({type:'warn', text: 'No .cpg found — encoding will be auto-guessed (Windows-1252 fallback).'});
+
+    if (missing.length) {
+      renderValidation(msgs, null);
+      msgEl.innerHTML = '';
+      return;
+    }
+
+    // Encoding
+    let encoding = 'windows-1252';
+    if (entries[cpgKey]) {
+      const cpgText = new TextDecoder('utf-8').decode(entries[cpgKey].buffer).trim();
+      encoding = mapCpgToEncoding(cpgText);
+      APP.encodingUsed = cpgText || encoding;
+    } else {
+      APP.encodingUsed = 'Windows-1252 (assumed)';
+    }
+
+    // PRJ
+    if (entries[prjKey]) {
+      APP.crsText = new TextDecoder('utf-8').decode(entries[prjKey].buffer).trim();
+      const m = APP.crsText.match(/AUTHORITY\[\s*"EPSG"\s*,\s*"(\d+)"\s*\]\s*\]\s*$/i);
+      APP.crsEpsg = m ? ('EPSG:'+m[1]) : null;
+    } else {
+      APP.crsText = null; APP.crsEpsg = null;
+    }
+
+    // Parse DBF
+    const dbfParsed = parseDBF(entries[dbfKey].buffer, encoding);
+    APP.fields = dbfParsed.fields;
+    APP.records = dbfParsed.records;
+    APP.inputAttributeCount = dbfParsed.records.length;
+
+    // Parse SHP
+    const shpParsed = parseSHP(entries[shpKey].buffer);
+    APP.geometries = shpParsed.geometries;
+    APP.geomType = shpParsed.typeName;
+    APP.inputFeatureCount = shpParsed.geometries.length;
+
+    // cross-check
+    if (APP.inputFeatureCount !== APP.inputAttributeCount) {
+      msgs.push({type:'err', text: 'Feature count ('+APP.inputFeatureCount+') does not match attribute record count ('+APP.inputAttributeCount+'). Export blocked.'});
+    } else {
+      msgs.push({type:'ok', text: 'Feature count and attribute record count match: ' + APP.inputFeatureCount + ' records.'});
+    }
+
+    const blocked = APP.inputFeatureCount !== APP.inputAttributeCount;
+    renderValidation(msgs, {
+      features: APP.inputFeatureCount,
+      fields: APP.fields.length,
+      encoding: APP.encodingUsed,
+      crs: APP.crsEpsg || (APP.crsText ? 'Custom / unrecognized' : 'Unknown'),
+      geometry: APP.geomType,
+      status: blocked ? 'FAIL' : 'PASS'
+    });
+
+    APP.loaded = !blocked;
+    msgEl.innerHTML = blocked ? '' : '<div class="msg ok">Loaded successfully. Switch to Preview or Export.</div>';
+
+    if (APP.loaded) {
+      APP.filtered = null;
+      APP.page = 0;
+      document.getElementById('previewEmpty').classList.add('hidden');
+      document.getElementById('previewContent').classList.remove('hidden');
+      document.getElementById('exportEmpty').classList.add('hidden');
+      document.getElementById('exportContent').classList.remove('hidden');
+      renderTable();
+      renderIntegrityReport();
+    }
+
+  } catch (err) {
+    msgEl.innerHTML = '<div class="msg err">' + escapeHTML(err.message || String(err)) + '</div>';
+  } finally {
+    document.getElementById('validateBtn').disabled = false;
+  }
+}
+
+function mapCpgToEncoding(cpg){
+  const c = cpg.toUpperCase();
+  if (c.includes('UTF-8') || c.includes('UTF8')) return 'utf-8';
+  if (c.includes('1252')) return 'windows-1252';
+  if (c.includes('8859-1') || c.includes('LATIN1')) return 'iso-8859-1';
+  if (c.includes('1256')) return 'windows-1256';
+  if (c.includes('932')) return 'shift_jis';
+  if (c.includes('936')) return 'gbk';
+  if (c.includes('949')) return 'euc-kr';
+  if (c.includes('950')) return 'big5';
+  return 'windows-1252';
+}
+
+function renderValidation(msgs, stats){
+  document.getElementById('validationCard').classList.remove('hidden');
+  const msgHTML = msgs.map(m=>'<div class="msg '+m.type+'">'+escapeHTML(m.text)+'</div>').join('');
+  document.getElementById('validationMsgs').innerHTML = msgHTML;
+  const grid = document.getElementById('statGrid');
+  if (!stats) { grid.innerHTML = ''; return; }
+  grid.innerHTML = [
+    stat('Features', stats.features, 'ok'),
+    stat('Fields', stats.fields, 'ok'),
+    stat('Encoding', stats.encoding, 'ok'),
+    stat('CRS', stats.crs, stats.crs==='Unknown'?'warn':'ok'),
+    stat('Geometry', stats.geometry, 'ok'),
+    stat('Status', stats.status, stats.status==='PASS'?'ok':'err')
+  ].join('');
+}
+function stat(k,v,cls){ return '<div class="stat '+cls+'"><div class="k">'+escapeHTML(k)+'</div><div class="v">'+escapeHTML(String(v))+'</div></div>'; }
+
+/* ============================= DBF PARSER ============================= */
+function parseDBF(buffer, encodingLabel){
+  const dv = new DataView(buffer);
+  const numRecords = dv.getUint32(4, true);
+  const headerLen = dv.getUint16(8, true);
+  const recordLen = dv.getUint16(10, true);
+
+  const fields = [];
+  let offset = 32;
+  while (offset < headerLen - 1) {
+    const b = new Uint8Array(buffer, offset, 11);
+    let end = 0; while (end < 11 && b[end] !== 0) end++;
+    const name = new TextDecoder('ascii').decode(b.slice(0, end));
+    const type = String.fromCharCode(dv.getUint8(offset+11));
+    const length = dv.getUint8(offset+16);
+    const decimal = dv.getUint8(offset+17);
+    if (name.length === 0 && type === '\r') break;
+    fields.push({name, type, length, decimal});
+    offset += 32;
+    if (dv.getUint8(offset) === 0x0D) break;
+  }
+
+  let decoder;
+  try { decoder = new TextDecoder(encodingLabel); } catch(e) { decoder = new TextDecoder('windows-1252'); }
+
+  const records = [];
+  let recOffset = headerLen;
+  for (let i = 0; i < numRecords; i++) {
+    if (recOffset + recordLen > buffer.byteLength) break;
+    const delFlag = dv.getUint8(recOffset);
+    let fo = recOffset + 1;
+    const rec = {};
+    for (const f of fields) {
+      const bytes = new Uint8Array(buffer, fo, f.length);
+      let text = decoder.decode(bytes);
+      // preserve raw value exactly except trimming trailing/leading pad spaces DBF uses for alignment
+      if (f.type === 'C') {
+        text = text.replace(/\0/g,'').replace(/\s+$/,'');
+      } else if (f.type === 'N' || f.type === 'F') {
+        text = text.replace(/\0/g,'').trim();
+      } else if (f.type === 'D') {
+        text = text.replace(/\0/g,'').trim();
+      } else if (f.type === 'L') {
+        text = text.trim();
+      } else {
+        text = text.replace(/\0/g,'');
+      }
+      rec[f.name] = text;
+      fo += f.length;
+    }
+    rec.__deleted = (delFlag === 0x2A);
+    records.push(rec);
+    recOffset += recordLen;
+  }
+  return {fields, records};
+}
+
+/* ============================= SHP PARSER ============================= */
+const SHAPE_TYPES = {0:'Null',1:'Point',3:'PolyLine',5:'Polygon',8:'MultiPoint',11:'PointZ',13:'PolyLineZ',15:'PolygonZ',18:'MultiPointZ',21:'PointM',23:'PolyLineM',25:'PolygonM',28:'MultiPointM',31:'MultiPatch'};
+
+function parseSHP(buffer){
+  const dv = new DataView(buffer);
+  const fileShapeType = dv.getInt32(32, true);
+  const typeName = SHAPE_TYPES[fileShapeType] || ('Unknown('+fileShapeType+')');
+  const geometries = [];
+  let offset = 100; // header is 100 bytes, big-endian record headers follow
+  const len = buffer.byteLength;
+
+  while (offset < len) {
+    if (offset + 8 > len) break;
+    const recNumber = dv.getInt32(offset, false);
+    const contentLen = dv.getInt32(offset+4, false); // in 16-bit words
+    const contentStart = offset + 8;
+    const contentBytes = contentLen * 2;
+    if (contentStart + contentBytes > len) break;
+
+    const shapeType = dv.getInt32(contentStart, true);
+    let geom = null;
+
+    if (shapeType === 0) {
+      geom = null;
+    } else if (shapeType === 1 || shapeType === 11 || shapeType === 21) {
+      const x = dv.getFloat64(contentStart+4, true);
+      const y = dv.getFloat64(contentStart+8, true);
+      geom = {type:'Point', coordinates:[x,y]};
+    } else if (shapeType === 8 || shapeType === 18 || shapeType === 28) {
+      const numPoints = dv.getInt32(contentStart+36, true);
+      const pts = [];
+      let p = contentStart + 40;
+      for (let i=0;i<numPoints;i++){ pts.push([dv.getFloat64(p,true), dv.getFloat64(p+8,true)]); p+=16; }
+      geom = {type:'MultiPoint', coordinates: pts};
+    } else if (shapeType === 3 || shapeType === 13 || shapeType === 23 || shapeType === 5 || shapeType === 15 || shapeType === 25) {
+      const numParts = dv.getInt32(contentStart+36, true);
+      const numPoints = dv.getInt32(contentStart+40, true);
+      const partsStart = contentStart + 44;
+      const parts = [];
+      for (let i=0;i<numParts;i++) parts.push(dv.getInt32(partsStart+i*4, true));
+      const pointsStart = partsStart + numParts*4;
+      const allPts = [];
+      let p = pointsStart;
+      for (let i=0;i<numPoints;i++){ allPts.push([dv.getFloat64(p,true), dv.getFloat64(p+8,true)]); p+=16; }
+      const rings = [];
+      for (let i=0;i<numParts;i++){
+        const start = parts[i];
+        const end = (i+1<numParts) ? parts[i+1] : numPoints;
+        rings.push(allPts.slice(start, end));
+      }
+      const isPolygon = (shapeType===5||shapeType===15||shapeType===25);
+      geom = { type: isPolygon ? 'Polygon' : 'MultiLineString', rings: rings };
+    } else {
+      geom = {type:'Unsupported', raw:true};
+    }
+
+    geometries.push(geom);
+    offset = contentStart + contentBytes;
+  }
+  return {geometries, typeName};
+}
+
+/* ============================= WKT / GEOJSON HELPERS ============================= */
+function ringToWKT(ring){ return '('+ring.map(pt=>pt[0]+' '+pt[1]).join(', ')+')'; }
+
+function geomToWKT(g){
+  if (!g) return '';
+  if (g.type === 'Point') return 'POINT ('+g.coordinates[0]+' '+g.coordinates[1]+')';
+  if (g.type === 'MultiPoint') return 'MULTIPOINT ('+g.coordinates.map(c=>c[0]+' '+c[1]).join(', ')+')';
+  if (g.type === 'MultiLineString') return 'MULTILINESTRING ('+g.rings.map(ringToWKT).join(', ')+')';
+  if (g.type === 'Polygon') return 'POLYGON ('+g.rings.map(ringToWKT).join(', ')+')';
+  return '';
+}
+
+function geomToGeoJSON(g){
+  if (!g) return null;
+  if (g.type === 'Point') return {type:'Point', coordinates:g.coordinates};
+  if (g.type === 'MultiPoint') return {type:'MultiPoint', coordinates:g.coordinates};
+  if (g.type === 'MultiLineString') return {type:'MultiLineString', coordinates:g.rings};
+  if (g.type === 'Polygon') return {type:'Polygon', coordinates:g.rings};
+  return null;
+}
+
+/* ============================= PREVIEW TABLE ============================= */
+function currentRows(){
+  const q = (document.getElementById('searchBox').value || '').toLowerCase().trim();
+  let rows = APP.records.map((r, idx) => ({r, idx}));
+  if (q) rows = rows.filter(({r}) => APP.fields.some(f => String(r[f.name]).toLowerCase().includes(q)));
+  if (APP.sortField && APP.sortDir) {
+    const dir = APP.sortDir === 'asc' ? 1 : -1;
+    rows = rows.slice().sort((a, b) => {
+      const va = a.r[APP.sortField], vb = b.r[APP.sortField];
+      const na = parseFloat(va), nb = parseFloat(vb);
+      const bothNumeric = va !== '' && vb !== '' && !isNaN(na) && !isNaN(nb);
+      let cmp;
+      if (bothNumeric) cmp = na - nb;
+      else cmp = String(va).localeCompare(String(vb), undefined, {numeric:true, sensitivity:'base'});
+      return cmp * dir;
+    });
+  }
+  return rows;
+}
+
+function sortBy(fieldName){
+  if (APP.sortField !== fieldName) {
+    APP.sortField = fieldName; APP.sortDir = 'asc';
+  } else if (APP.sortDir === 'asc') {
+    APP.sortDir = 'desc';
+  } else if (APP.sortDir === 'desc') {
+    APP.sortField = null; APP.sortDir = null;
+  } else {
+    APP.sortDir = 'asc';
+  }
+  APP.page = 0;
+  renderTable();
+}
+
+function renderTable(){
+  if (!APP.loaded) return;
+  const rows = currentRows();
+  APP.filtered = rows;
+  const totalPages = Math.max(1, Math.ceil(rows.length / APP.pageSize));
+  if (APP.page >= totalPages) APP.page = totalPages - 1;
+  if (APP.page < 0) APP.page = 0;
+  const start = APP.page * APP.pageSize;
+  const pageRows = rows.slice(start, start + APP.pageSize);
+
+  const thead = document.querySelector('#dataTable thead');
+  const tbody = document.querySelector('#dataTable tbody');
+  thead.innerHTML = '<tr>' + APP.fields.map(f=>{
+    const isSorted = APP.sortField === f.name;
+    const dirClass = isSorted ? ('sorted-'+APP.sortDir) : '';
+    const arrow = isSorted ? (APP.sortDir==='asc' ? '▲' : '▼') : '↕';
+    return '<th class="'+dirClass+'" onclick="sortBy(\''+f.name.replace(/'/g,"\\'")+'\')">'
+      + '<span class="th-inner">'+escapeHTML(f.name)+'<span class="sort-arrow">'+arrow+'</span></span></th>';
+  }).join('') + '</tr>';
+  tbody.innerHTML = pageRows.map(({r})=>'<tr>'+APP.fields.map(f=>'<td>'+escapeHTML(r[f.name])+'</td>').join('')+'</tr>').join('');
+
+  document.getElementById('pagerInfo').textContent =
+    'Showing ' + (rows.length===0?0:start+1) + '–' + Math.min(start+APP.pageSize, rows.length) + ' of ' + rows.length + ' records';
+}
+function prevPage(){ APP.page = Math.max(0, APP.page-1); renderTable(); }
+function nextPage(){ APP.page = APP.page+1; renderTable(); }
+
+/* ============================= INTEGRITY REPORT ============================= */
+function renderIntegrityReport(){
+  const status = (APP.inputFeatureCount === APP.inputAttributeCount) ? 'PASS' : 'FAIL';
+  const html = [
+    stat('Input features', APP.inputFeatureCount, 'ok'),
+    stat('Input attributes', APP.inputAttributeCount, 'ok'),
+    stat('Output CSV rows', APP.records.length, 'ok'),
+    stat('Fields', APP.fields.length, 'ok'),
+    stat('Encoding', APP.encodingUsed, 'ok'),
+    stat('Geometry', APP.geomType, 'ok'),
+    stat('CRS', APP.crsEpsg || (APP.crsText?'Custom':'Unknown'), (APP.crsEpsg||APP.crsText)?'ok':'warn'),
+    stat('Status', status, status==='PASS'?'ok':'err')
+  ].join('');
+  document.getElementById('integrityReport').innerHTML = '<div class="status-grid">'+html+'</div>';
+}
+
+/* ============================= CSV EXPORT ============================= */
+function csvEscape(val){
+  const s = (val===undefined || val===null) ? '' : String(val);
+  return '"' + s.replace(/"/g,'""') + '"';
+}
+
+function buildCSV(includeWKT){
+  const headers = APP.fields.map(f=>f.name).concat(includeWKT ? ['WKT'] : []);
+  const lines = [headers.map(csvEscape).join(',')];
+  APP.records.forEach((rec, i) => {
+    const row = APP.fields.map(f=>csvEscape(rec[f.name]));
+    if (includeWKT) row.push(csvEscape(geomToWKT(APP.geometries[i])));
+    lines.push(row.join(','));
+  });
+  return '\uFEFF' + lines.join('\r\n');
+}
+
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+
+function exportCSV(includeWKT){
+  if (!APP.loaded) return;
+  const csv = buildCSV(includeWKT);
+  const outRows = csv.split('\r\n').length - 1;
+  if (outRows !== APP.records.length) {
+    alert('Integrity check failed before export: row count mismatch. Export cancelled.');
+    return;
+  }
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  downloadBlob(blob, APP.basename + (includeWKT ? '_with_wkt' : '') + '.csv');
+}
+
+function exportGeoJSON(){
+  if (!APP.loaded) return;
+  const features = APP.records.map((rec, i) => {
+    const props = {};
+    APP.fields.forEach(f => props[f.name] = rec[f.name]);
+    return { type:'Feature', properties: props, geometry: geomToGeoJSON(APP.geometries[i]) };
+  });
+  const fc = { type:'FeatureCollection', crs: APP.crsEpsg ? {type:'name', properties:{name:APP.crsEpsg}} : undefined, features };
+  const blob = new Blob([JSON.stringify(fc)], {type:'application/geo+json'});
+  downloadBlob(blob, APP.basename + '.geojson');
+}
+
+function exportOriginalZip(){
+  if (!APP.originalZipBlob) return;
+  downloadBlob(APP.originalZipBlob, (APP.basename || 'original') + '_original.zip');
+}
+</script>
+</body>
+</html>

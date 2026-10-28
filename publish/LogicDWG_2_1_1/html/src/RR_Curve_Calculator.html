@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RR Curve Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --surface2: #1a1a1f;
+    --border: #2a2a32;
+    --border-focus: #4caf82;
+    --accent: #4caf82;
+    --accent-dim: rgba(76,175,130,0.12);
+    --accent-glow: rgba(76,175,130,0.25);
+    --success: #4caf82;
+    --success-dim: rgba(76,175,130,0.1);
+    --text-primary: #f0f0f5;
+    --text-secondary: #7a7a8c;
+    --text-muted: #444455;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --radius: 10px;
+    --radius-sm: 7px;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(76,175,130,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .header { margin-bottom: 1.75rem; padding: 0 0.25rem; }
+  .header-eyebrow { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+  .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .eyebrow-text { font-family: var(--mono); font-size: 0.68rem; font-weight: 500; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; }
+  .header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary); line-height: 1.1; }
+  .header h1 span { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.04) inset; }
+  .card-body { padding: 1.75rem; }
+
+  .section-label { font-family: var(--mono); font-size: 0.65rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem; }
+
+  .toggle-group { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; gap: 3px; }
+  .toggle-group button { flex: 1; padding: 0.55rem 0.4rem; background: transparent; border: none; border-radius: 5px; color: var(--text-secondary); font-family: var(--sans); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.18s ease; letter-spacing: 0.01em; white-space: nowrap; }
+  .toggle-group button.active { background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 2px 8px rgba(76,175,130,0.35); }
+  .toggle-group button:hover:not(.active) { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+
+  .toggle-group.angle-group button { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.6rem 0.4rem; }
+  .toggle-group.angle-group .a-deg { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; }
+  .toggle-group.angle-group .a-rad { font-family: var(--mono); font-size: 0.62rem; font-weight: 400; color: var(--text-muted); }
+  .toggle-group.angle-group button.active .a-rad { color: rgba(255,255,255,0.75); }
+
+  .formula-box { margin-top: 0.75rem; background: #0a0a0d; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem 1rem; font-family: var(--mono); font-size: 0.78rem; color: var(--text-secondary); letter-spacing: 0.02em; line-height: 1.7; min-height: 2.4rem; word-break: break-word; }
+  .formula-box .eq { color: var(--accent); font-weight: 600; }
+  .formula-box .ans { color: var(--text-primary); font-weight: 600; }
+
+  .angle-btn { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; padding: 0.5rem 0.4rem; }
+  .angle-deg { font-family: var(--mono); font-size: 0.88rem; font-weight: 600; }
+  .angle-rad { font-family: var(--mono); font-size: 0.62rem; opacity: 0.75; }
+
+  .field { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 1.1rem; }
+  .field label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .input-wrap { position: relative; }
+  .input-wrap .unit-badge { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: 0.7rem; font-weight: 500; color: var(--text-muted); pointer-events: none; letter-spacing: 0.05em; }
+
+  select, input[type="number"], input[type="text"] {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text-primary); font-family: var(--mono); font-size: 1rem; font-weight: 500;
+    padding: 0.7rem 2.8rem 0.7rem 0.85rem; outline: none; transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    appearance: none; -moz-appearance: textfield; letter-spacing: 0.02em;
+  }
+  select { padding-right: 2.5rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a8c' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.85rem center; }
+  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  select:focus, input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-glow); background: #16161c; }
+  input::placeholder { color: var(--text-muted); }
+
+  .sep { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+  .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .mode-pill { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--accent-dim); border: 1px solid rgba(76,175,130,0.2); border-radius: 20px; padding: 0.2rem 0.65rem; font-family: var(--mono); font-size: 0.62rem; font-weight: 600; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; }
+  .mode-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+  .result-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; transition: border-color 0.2s; }
+  .result-value { font-family: var(--mono); font-size: 1.6rem; font-weight: 600; line-height: 1; color: var(--text-primary); word-break: break-all; }
+
+  .copy-btn { flex-shrink: 0; display: flex; align-items: center; gap: 0.45rem; background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); font-family: var(--sans); font-size: 0.78rem; font-weight: 500; padding: 0.6rem 1rem; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+  .copy-btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: var(--text-primary); }
+  .copy-btn.copied { background: var(--success-dim); border-color: rgba(76,175,130,0.3); color: var(--success); }
+
+  .footer { margin-top: 1.25rem; text-align: center; font-family: var(--mono); font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; }
+
+  .pop { animation: pop 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes pop { from { transform: scale(0.96); opacity: 0.7; } to { transform: scale(1); opacity: 1; } }
+
+  @media (max-width: 420px) {
+    body { padding: 1rem 0.75rem; }
+    .card-body { padding: 1.25rem; }
+    .header h1 { font-size: 1.65rem; }
+    .result-value { font-size: 1.35rem; }
+  }
+  @media (max-width: 340px) {
+    .result-box { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .copy-btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <div class="header-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-text">Vignesh Infra Developers Private Limited</span>
+    </div>
+    <h1>RR <span>Curve</span></h1>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+
+      <div class="section-label">Configuration</div>
+
+      <div class="field">
+        <label>Curve Type</label>
+        <div class="toggle-group">
+          <button class="active" data-group="curveType" onclick="setToggle('curveType','Inner',this)">Inner</button>
+          <button data-group="curveType" onclick="setToggle('curveType','Outer',this)">Outer</button>
+        </div>
+      </div>
+
+      <div class="section-label">Values</div>
+
+      <div class="field">
+        <label>Angle</label>
+        <div class="toggle-group">
+          <button class="active angle-btn" data-angle="12" data-radius="441.36" onclick="setAngle('12','441.36',this)">
+            <span class="angle-deg">12&deg;</span><span class="angle-rad">(441.36)</span>
+          </button>
+          <button class="angle-btn" data-angle="8.5" data-radius="232.26" onclick="setAngle('8.5','232.26',this)">
+            <span class="angle-deg">8.5&deg;</span><span class="angle-rad">(232.26)</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:0;">
+        <label for="radius">Radius</label>
+        <div class="input-wrap">
+          <input id="radius" type="number" inputmode="decimal" step="any" placeholder="Enter value" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="result-header">
+        <div class="section-label" style="margin-bottom:0;">Result</div>
+        <div class="mode-pill" id="modeTag">INNER</div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-value pop" id="output">RR=000</div>
+        <button class="copy-btn" id="copyBtn" onclick="copyResult()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span id="copyLabel">Copy</span>
+        </button>
+      </div>
+
+      <div class="formula-box" id="formulaDisplay">&mdash;</div>
+
+    </div>
+  </div>
+
+  <div class="footer">VID &middot; RR Curve Calculator &middot; Survey Calculator</div>
+</div>
+
+<script>
+  const state = { curveType: 'Inner', angle: '12', angleRadius: '441.36' };
+
+  function setToggle(group, val, btn) {
+    state[group] = val;
+    document.querySelectorAll('[data-group="' + group + '"]').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('modeTag').textContent = val.toUpperCase();
+    calculate();
+  }
+
+  function setAngle(angle, angleRadius, btn) {
+    state.angle = angle;
+    state.angleRadius = angleRadius;
+    document.querySelectorAll('.angle-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    calculate();
+  }
+
+  function calculate() {
+    const radiusInput = document.getElementById('radius');
+    const output = document.getElementById('output');
+    const formula = document.getElementById('formulaDisplay');
+    const radiusVal = parseFloat(radiusInput.value);
+    const angleConst = parseFloat(state.angleRadius);
+
+    if (!radiusInput.value.trim() || isNaN(radiusVal)) {
+      output.textContent = 'RR=000';
+      formula.innerHTML = '&mdash;';
+    } else {
+      let rr;
+      if (state.curveType === 'Inner') {
+        rr = (radiusVal * angleConst) / (radiusVal + angleConst);
+      } else {
+        rr = (radiusVal * angleConst) / (radiusVal - angleConst);
+      }
+      const rrRounded = Math.round(rr);
+      output.textContent = 'RR=' + rrRounded;
+
+      const opSym = state.curveType === 'Inner' ? '+' : '&minus;';
+      formula.innerHTML = '(' + radiusVal + ' <span class="eq">&times;</span> ' + angleConst + ') <span class="eq">&divide;</span> (' + radiusVal + ' <span class="eq">' + opSym + '</span> ' + angleConst + ') <span class="eq">=</span> <span class="ans">' + rrRounded + '</span>';
+    }
+
+    output.classList.remove('pop');
+    void output.offsetWidth;
+    output.classList.add('pop');
+
+    document.getElementById('copyBtn').classList.remove('copied');
+    document.getElementById('copyLabel').textContent = 'Copy';
+  }
+
+  function copyResult() {
+    const text = ' ' + document.getElementById('output').textContent;
+    const btn = document.getElementById('copyBtn');
+    const lbl = document.getElementById('copyLabel');
+    function onSuccess() {
+      btn.classList.add('copied'); lbl.textContent = 'Copied!';
+      setTimeout(function() { btn.classList.remove('copied'); lbl.textContent = 'Copy'; }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(function() { fallbackCopy(text, onSuccess); });
+    } else { fallbackCopy(text, onSuccess); }
+  }
+
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  calculate();
+</script>
+</body>
+</html>

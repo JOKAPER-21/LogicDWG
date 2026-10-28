@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chainage Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --surface2: #1a1a1f;
+    --border: #2a2a32;
+    --border-focus: #4caf82;
+    --accent: #4caf82;
+    --accent-dim: rgba(76,175,130,0.12);
+    --accent-glow: rgba(76,175,130,0.25);
+    --success: #4caf82;
+    --success-dim: rgba(76,175,130,0.1);
+    --danger: #e06c75;
+    --danger-dim: rgba(224,108,117,0.08);
+    --text-primary: #f0f0f5;
+    --text-secondary: #7a7a8c;
+    --text-muted: #444455;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --radius: 10px;
+    --radius-sm: 7px;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(76,175,130,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .header { margin-bottom: 1.75rem; padding: 0 0.25rem; }
+  .header-eyebrow { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+  .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .eyebrow-text { font-family: var(--mono); font-size: 0.68rem; font-weight: 500; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; }
+  .header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary); line-height: 1.1; }
+  .header h1 span { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.04) inset; }
+  .card-body { padding: 1.75rem; }
+
+  .section-label { font-family: var(--mono); font-size: 0.65rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem; }
+
+  .toggle-row { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+  .toggle-group { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; gap: 3px; }
+  .toggle-group button { flex: 1; padding: 0.55rem 0.4rem; background: transparent; border: none; border-radius: 5px; color: var(--text-secondary); font-family: var(--sans); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.18s ease; letter-spacing: 0.01em; white-space: nowrap; }
+  .toggle-group button.active { background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 2px 8px rgba(76,175,130,0.35); }
+  .toggle-group button:hover:not(.active) { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+
+  .field { display: flex; flex-direction: column; gap: 0.45rem; margin-bottom: 0.75rem; }
+  .field label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .input-wrap { position: relative; }
+  .input-wrap .unit-badge { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: 0.7rem; font-weight: 500; color: var(--text-muted); pointer-events: none; letter-spacing: 0.05em; }
+
+  input[type="number"] { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--mono); font-size: 1rem; font-weight: 500; padding: 0.7rem 2.8rem 0.7rem 0.85rem; outline: none; transition: border-color 0.18s, box-shadow 0.18s, background 0.18s; appearance: none; -moz-appearance: textfield; letter-spacing: 0.02em; }
+  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-glow); background: #16161c; }
+  input[type="number"]::placeholder { color: var(--text-muted); }
+
+  /* Chainage KM dynamic */
+  .chkm-section { margin-bottom: 0.75rem; }
+  .chkm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+  .chkm-header label { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.08em; text-transform: uppercase; }
+  .chkm-count { font-family: var(--mono); font-size: 0.6rem; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 0.15rem 0.55rem; }
+
+  .chkm-list { display: flex; flex-direction: column; gap: 0.45rem; }
+
+  .chkm-row { display: flex; align-items: center; gap: 0.45rem; animation: slideIn 0.2s ease both; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+  .chkm-row .input-wrap { flex: 1; }
+  .chkm-idx { font-family: var(--mono); font-size: 0.6rem; color: var(--text-muted); min-width: 1.2rem; text-align: center; flex-shrink: 0; }
+
+  .btn-remove { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 2rem; height: 2.4rem; border-radius: var(--radius-sm); background: var(--danger-dim); border: 1px solid rgba(224,108,117,0.2); color: var(--danger); cursor: pointer; transition: all 0.18s; }
+  .btn-remove:hover { background: rgba(224,108,117,0.18); border-color: var(--danger); }
+  .btn-remove:disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+
+  .btn-add { margin-top: 0.5rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.6rem; background: var(--accent-dim); border: 1px dashed rgba(76,175,130,0.35); border-radius: var(--radius-sm); color: var(--accent); font-family: var(--sans); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.18s; letter-spacing: 0.04em; }
+  .btn-add:hover { background: rgba(76,175,130,0.2); border-color: var(--accent); }
+
+  .chkm-total { margin-top: 0.45rem; display: flex; align-items: center; justify-content: flex-end; gap: 0.35rem; font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted); }
+  .chkm-total .total-val { color: var(--accent); font-weight: 600; }
+
+  .sep { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+  .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .mode-pill { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--accent-dim); border: 1px solid rgba(76,175,130,0.2); border-radius: 20px; padding: 0.2rem 0.65rem; font-family: var(--mono); font-size: 0.62rem; font-weight: 600; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; }
+  .mode-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+  .result-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; transition: border-color 0.2s; }
+  .result-value { font-family: var(--mono); font-size: 1.6rem; font-weight: 600; line-height: 1; display: flex; align-items: baseline; gap: 0.1rem; flex-wrap: wrap; }
+  .ch-prefix { color: var(--text-muted); font-size: 1rem; font-weight: 400; }
+  .ch-sign-neg { color: #e06c75; }
+  .ch-sign-pos { color: var(--success); }
+  .ch-num { color: var(--text-primary); }
+  .ch-unit { color: var(--text-muted); font-size: 1rem; font-weight: 400; }
+
+  .copy-btn { flex-shrink: 0; display: flex; align-items: center; gap: 0.45rem; background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); font-family: var(--sans); font-size: 0.78rem; font-weight: 500; padding: 0.6rem 1rem; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.18s; white-space: nowrap; }
+  .copy-btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: var(--text-primary); }
+  .copy-btn.copied { background: var(--success-dim); border-color: rgba(76,175,130,0.3); color: var(--success); }
+  .copy-btn svg { opacity: 0.7; }
+
+  .formula-box { margin-top: 0.75rem; background: #0a0a0d; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem 1rem; font-family: var(--mono); font-size: 0.78rem; color: var(--text-secondary); letter-spacing: 0.02em; line-height: 1.7; min-height: 2.4rem; word-break: break-word; }
+  .formula-box .eq { color: var(--accent); font-weight: 600; }
+  .formula-box .ans { color: var(--text-primary); font-weight: 600; }
+
+  .footer { margin-top: 1.25rem; text-align: center; font-family: var(--mono); font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; }
+
+  .pop { animation: pop 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes pop { from { transform: scale(0.96); opacity: 0.7; } to { transform: scale(1); opacity: 1; } }
+
+  @media (max-width: 420px) {
+    body { padding: 1rem 0.75rem; }
+    .card-body { padding: 1.25rem; }
+    .header h1 { font-size: 1.65rem; }
+    .result-value { font-size: 1.35rem; }
+    input[type="number"] { font-size: 0.95rem; padding: 0.65rem 2.5rem 0.65rem 0.75rem; }
+  }
+  @media (max-width: 340px) {
+    .result-box { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .copy-btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <div class="header-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-text">Vignesh Infra Developers Private Limited</span>
+    </div>
+    <h1>Chainage<span> Calculator</span></h1>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+
+      <!-- Toggles -->
+      <div class="section-label">Configuration</div>
+      <div class="toggle-row">
+        <div class="field" style="margin-bottom:0;">
+          <label>Side</label>
+          <div class="toggle-group">
+            <button class="active" data-group="side" onclick="setToggle('side','Left',this)">Left</button>
+            <button data-group="side" onclick="setToggle('side','Right',this)">Right</button>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Type</label>
+          <div class="toggle-group">
+            <button class="active" data-group="type" onclick="setToggle('type','FrontBack',this)">With Chainage</button>
+            <button data-group="type" onclick="setToggle('type','Center',this)">Without Chainage</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Values -->
+      <div class="section-label">Values</div>
+
+      <!-- Flag KM -->
+      <div class="field">
+        <label>Flag KM</label>
+        <div class="input-wrap">
+          <input type="number" id="flagKM" step="0.01" oninput="calculate()" placeholder="0.00">
+          <span class="unit-badge">km</span>
+        </div>
+      </div>
+
+      <!-- Dynamic Chainage KM -->
+      <div class="chkm-section" id="chKMSection">
+        <div class="chkm-header">
+          <label>Chainage KM</label>
+          <span class="chkm-count" id="chkmCount">1 field</span>
+        </div>
+        <div class="chkm-list" id="chkmList"></div>
+        <div class="chkm-total" id="chkmTotalRow" style="display:none;">
+          Total: <span class="total-val" id="chkmTotal">0.00</span>&nbsp;km
+        </div>
+        <button class="btn-add" onclick="addChainageField()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Chainage KM
+        </button>
+      </div>
+
+      <!-- Current KM -->
+      <div class="field" style="margin-bottom:0;">
+        <label>Current KM</label>
+        <div class="input-wrap">
+          <input type="number" id="currentKM" step="0.01" oninput="calculate()" placeholder="0.00">
+          <span class="unit-badge">km</span>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- Result -->
+      <div class="result-header">
+        <div class="section-label" style="margin-bottom:0;">Result</div>
+        <div class="mode-pill" id="modeTag">LEFT · WITH CHAINAGE</div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-value" id="resultVal">
+          <span class="ch-prefix">(CH:&nbsp;</span>
+          <span id="signSpan" class="ch-sign-neg">(-)</span>
+          <span class="ch-num" id="numSpan">—</span>
+          <span class="ch-unit">&nbsp;m)</span>
+        </div>
+        <button class="copy-btn" id="copyBtn" onclick="copyResult()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span id="copyLabel">Copy</span>
+        </button>
+      </div>
+
+      <div class="formula-box" id="formulaDisplay">—</div>
+
+    </div>
+  </div>
+
+  <div class="footer">VID · Chainage Calculator · Survey Calculator</div>
+</div>
+
+<script>
+  const state = { side: 'Left', type: 'FrontBack' };
+  let chkmCounter = 0;
+
+  function addChainageField(initVal) {
+    chkmCounter++;
+    const list = document.getElementById('chkmList');
+    const id = 'chkm_' + chkmCounter;
+    const idx = list.children.length + 1;
+
+    const row = document.createElement('div');
+    row.className = 'chkm-row';
+    row.dataset.id = id;
+    row.innerHTML =
+      '<span class="chkm-idx">#' + idx + '</span>' +
+      '<div class="input-wrap">' +
+        '<input type="number" id="' + id + '" value="' + (initVal !== undefined ? initVal : '') + '" step="0.01" placeholder="0.00" oninput="calculate()">' +
+        '<span class="unit-badge">km</span>' +
+      '</div>' +
+      '<button class="btn-remove" onclick="removeChainageField(this)" title="Remove">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+      '</button>';
+    list.appendChild(row);
+
+    updateRemoveButtons();
+    updateIndices();
+    calculate();
+    document.getElementById(id).focus();
+  }
+
+  function removeChainageField(btn) {
+    const row = btn.closest('.chkm-row');
+    row.style.transition = 'opacity 0.15s, transform 0.15s';
+    row.style.opacity = '0';
+    row.style.transform = 'translateY(-4px)';
+    setTimeout(function() {
+      row.remove();
+      updateRemoveButtons();
+      updateIndices();
+      calculate();
+    }, 150);
+  }
+
+  function updateRemoveButtons() {
+    const rows = document.querySelectorAll('.chkm-row');
+    const count = rows.length;
+    rows.forEach(function(r) {
+      r.querySelector('.btn-remove').disabled = count <= 1;
+    });
+    document.getElementById('chkmCount').textContent = count + (count === 1 ? ' field' : ' fields');
+  }
+
+  function updateIndices() {
+    document.querySelectorAll('.chkm-row').forEach(function(r, i) {
+      r.querySelector('.chkm-idx').textContent = '#' + (i + 1);
+    });
+  }
+
+  function getChainageValues() {
+    return Array.from(document.querySelectorAll('.chkm-row input')).map(function(inp) {
+      return parseFloat(inp.value) || 0;
+    });
+  }
+
+  function setToggle(group, val, btn) {
+    state[group] = val;
+    document.querySelectorAll('[data-group="' + group + '"]').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    if (group === 'type') {
+      document.getElementById('chKMSection').style.display = val === 'Center' ? 'none' : 'block';
+    }
+    calculate();
+  }
+
+  function fmt(n) { return n.toFixed(2); }
+
+  function padCh(n) {
+    var parts = Math.abs(n).toFixed(2).split('.');
+    var intPart = parts[0].padStart(3, '0');
+    return intPart + '.' + parts[1];
+  }
+
+  function calculate() {
+    const flagKM    = parseFloat(document.getElementById('flagKM').value) || 0;
+    const currentKM = parseFloat(document.getElementById('currentKM').value) || 0;
+    const isRight   = state.side === 'Right';
+    const isCenter  = state.type === 'Center';
+
+    let result, formulaHTML;
+
+    if (isCenter) {
+      result = flagKM - currentKM;
+      formulaHTML = fmt(flagKM) + ' <span class="eq">-</span> ' + fmt(currentKM)
+        + ' <span class="eq">=</span> <span class="ans">' + Math.abs(Math.round(result)) + '</span>';
+      document.getElementById('chkmTotalRow').style.display = 'none';
+    } else {
+      const vals = getChainageValues();
+      const totalCh = vals.reduce(function(a, b) { return a + b; }, 0);
+
+      // Show total only when more than 1 field
+      const totalRow = document.getElementById('chkmTotalRow');
+      if (vals.length > 1) {
+        totalRow.style.display = 'flex';
+        document.getElementById('chkmTotal').textContent = fmt(totalCh);
+      } else {
+        totalRow.style.display = 'none';
+      }
+
+      // Build chainage part of formula
+      var chParts = vals.map(fmt).join(' <span class="eq">+</span> ');
+      var chExpr  = vals.length > 1 ? '( ' + chParts + ' )' : fmt(totalCh);
+
+      if (isRight) {
+        result = (totalCh - flagKM) + currentKM;
+        formulaHTML = '( ' + chExpr + ' <span class="eq">-</span> ' + fmt(flagKM) + ' ) <span class="eq">+</span> '
+          + fmt(currentKM) + ' <span class="eq">=</span> <span class="ans">' + fmt(Math.abs(result)) + '</span>';
+      } else {
+        result = (flagKM + totalCh) - currentKM;
+        formulaHTML = '( ' + fmt(flagKM) + ' <span class="eq">+</span> ' + chExpr + ' ) <span class="eq">-</span> '
+          + fmt(currentKM) + ' <span class="eq">=</span> <span class="ans">' + fmt(Math.abs(result)) + '</span>';
+      }
+    }
+
+    const signEl = document.getElementById('signSpan');
+    signEl.className = isRight ? 'ch-sign-pos' : 'ch-sign-neg';
+    signEl.textContent = isRight ? '(+)' : '(-)';
+
+    document.getElementById('numSpan').textContent = isCenter
+      ? String(Math.abs(Math.round(result))).padStart(3, '0')
+      : padCh(result);
+    document.getElementById('formulaDisplay').innerHTML = formulaHTML;
+    document.getElementById('modeTag').textContent =
+      state.side.toUpperCase() + ' · ' + (isCenter ? 'WITHOUT CHAINAGE' : 'WITH CHAINAGE');
+
+    const rv = document.getElementById('resultVal');
+    rv.classList.remove('pop');
+    void rv.offsetWidth;
+    rv.classList.add('pop');
+
+    document.getElementById('copyBtn').classList.remove('copied');
+    document.getElementById('copyLabel').textContent = 'Copy';
+  }
+
+  function copyResult() {
+    const sign = document.getElementById('signSpan').textContent;
+    const num  = document.getElementById('numSpan').textContent;
+    const text = ' (CH:' + sign + num + 'm)';
+    const btn  = document.getElementById('copyBtn');
+    const lbl  = document.getElementById('copyLabel');
+    function onSuccess() {
+      btn.classList.add('copied'); lbl.textContent = 'Copied!';
+      setTimeout(function() { btn.classList.remove('copied'); lbl.textContent = 'Copy'; }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onSuccess).catch(function() { fallbackCopy(text, onSuccess); });
+    } else { fallbackCopy(text, onSuccess); }
+  }
+
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // Init
+  addChainageField();
+</script>
+</body>
+</html>
