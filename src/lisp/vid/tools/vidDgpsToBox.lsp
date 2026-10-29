@@ -1,51 +1,54 @@
 ;;; ============================================================================
-;;; Vid Dgps To Box
-;;; Command : VIDDGPSTOBOX
+;;; Vid Dgps To Box   (v3 - pick-track version)
+;;; Command : Viddgpstobox   (VIDDGPSTOBOX)
 ;;; ----------------------------------------------------------------------------
-;;; Builds a PERFECT RECTANGLE from the 3 or 4 DGPS points of every Code group
-;;; (e.g. "Motor Room") in a CSV file.
+;;; Builds a PERFECT RECTANGLE from the 3 or 4 DGPS points that are close to
+;;; each other inside every Code group (e.g. "Motor Room") of a CSV file.
 ;;;
 ;;; WORKFLOW
+;;;   0. Select the TRACK polyline(s) in the drawing (any layer). The MTEXT
+;;;      labels are rotated to the tangent of the nearest selected curve.
+;;;      Press Enter to skip -> labels follow the box direction instead.
 ;;;   1. Select the DGPS CSV file.
-;;;   2. Dialog 1 [Select Layers] : pick the Code groups (one or many).
-;;;      The list is sorted A-Z (ascending).
-;;;   3. Dialog 2 [Layer Options] : pick a default layer or type a custom layer.
-;;;      Press [OK].
-;;;   4. One closed LWPOLYLINE rectangle is created for each group.
+;;;   2. GROUP all rows by the "Code" column (case-insensitive:
+;;;      "Gate" and "GATE" are ONE group).
+;;;   3. SORT the points of each group by "Local Time".
+;;;   4. CLUSTER: walk the time-sorted list and gather 3 to 4 NEARBY points
+;;;      (each point must be within VDB-ClusterDist of the previous one).
+;;;        - 4 nearby points and the 4th lies within VDB-DevTol of the
+;;;          computed 4th corner      -> rectangle from 4 points
+;;;        - otherwise 3 nearby points -> rectangle from 3 points
+;;;          (the 4th point starts the next cluster)
+;;;        - fewer than 3 nearby points -> skipped and reported
+;;;   5. Dialog 1 [Select Layers] : pick the Code groups (at least one).
+;;;      Dialog 2 [Layer Options]: pick / type the layer. Press [OK].
+;;;   6. One closed LWPOLYLINE rectangle + one MTEXT (Code) per cluster.
+;;;      The whole run is ONE undo step (type U to remove everything).
 ;;;
-;;; RECTANGLE RULE  (points are sorted by "Local Time" inside each group)
+;;; RECTANGLE RULE  (points inside a cluster, in time order)
 ;;;   rec(0) = 1st point  -> start corner
 ;;;   rec(1) = 2nd point  -> gives the DIRECTION and the LENGTH (rec0 to rec1)
-;;;   rec(2) = 3rd point  -> gives the WIDTH (its offset across the direction),
-;;;                          on whichever side rec(2) lies
-;;;   rec(3) = computed automatically (4th DGPS point, if any, is not needed)
+;;;   rec(2) = 3rd point  -> gives the WIDTH (its offset across the direction)
+;;;   rec(3) = computed automatically
 ;;;
 ;;;        rec(3) *------------------* rec(2)
 ;;;               |                  |
-;;;               |                  |
 ;;;        rec(0) *------------------* rec(1)
 ;;;
-;;; GROUP SIZE
-;;;   3 or 4 points -> one rectangle.
-;;;   More points   -> split in time order: multiple of 4 -> sets of 4,
-;;;                    else multiple of 3 -> sets of 3, else sets of 4 and the
-;;;                    remainder is reported (a remainder of 3 is still used).
-;;;   Fewer than 3  -> skipped and reported.
-;;;
 ;;; Elevation of the rectangle = average elevation of the points used.
-;;; Dialog 1 auto-selects room / building / temple / LC style groups
-;;; (VDB-AutoSelectList); the CSV word APANDENT is written as ABANDONED
-;;; BUILDING in the MTEXT.
-;;; Each box also gets an MTEXT (Code) at its centre, middle-centre justified,
-;;; width = text length, rotated to the tangent of the nearest curve on layer
-;;; 1-TRACK (box direction if none), on the same layer as the box.
+;;; MTEXT = Code at box centre, middle-centre, width = text length, rotated to
+;;; the tangent of the nearest USER-SELECTED track polyline (box direction if
+;;; none was selected).
 ;;; ============================================================================
 
 (vl-load-com)
 
 (setq vdb-*fh*          nil)
-;; MTEXT settings (edit freely)
-(setq VDB-TrackLayer  "1-TRACK")   ; layer whose tangent sets the text rotation
+(setq vdb-*undo*        nil)
+
+;; ---- settings (edit freely) ------------------------------------------------
+(setq VDB-ClusterDist 80.0)        ; max distance (m) between consecutive points of one box
+(setq VDB-DevTol      1.0)         ; max distance (m) of 4th point from the computed 4th corner
 (setq VDB-TextHeight  0.5)         ; text height in drawing units
 (setq VDB-TrackSS     nil)
 (setq VDB-CsvPrefix   "1-TRACK_")  ; [From CSV] layer = prefix + Code
@@ -61,7 +64,7 @@
     "APANDENT" "ABANDONED" "STATION" "STATION BUILDING" "STATION BUILDINGS"
     "BLDG" "SHED" "SHET" "OFFICE" "OFFICES" "PARKING" "PARKINGS"
     "CONSTRUCTION" "QUARTER" "QUARTERS" "HOTEL" "HOTELS" "SHOP" "SHOPS"
-    "TEMPLE" "TEMPLES" "LC" "LCS" "LEVEL CROSSING"))
+    "TEMPLE" "TEMPLES" "LC" "LCS" "LEVEL CROSSING" "LODGE" "LODGES"))
 
 ;; MTEXT wording replacements  (CSV word . text placed in the drawing)
 (setq VDB-TextReplace '(("APANDENT" . "ABANDONED BUILDING")))
@@ -166,6 +169,17 @@
   )
 )
 
+;; remove characters that would break a DCL string
+(defun VDB-Safe (s / i ch out)
+  (setq i 1 out "")
+  (while (<= i (strlen s))
+    (setq ch (substr s i 1))
+    (if (or (= ch "\"") (= ch "\\")) (setq ch "'"))
+    (setq out (strcat out ch) i (1+ i))
+  )
+  out
+)
+
 ;; ---------------------------------------------------------------------------
 ;; CSV reading (binary safe - DGPS files contain 0x1A in lat/long text)
 ;; ---------------------------------------------------------------------------
@@ -220,14 +234,20 @@
   )
 )
 
-(defun VDB-GroupByCode (records / groups code cell)
+;; GROUP by Code - case-insensitive ("Gate" + "GATE" = one group).
+;; Returns list of (displayCode . records); display = first spelling seen.
+(defun VDB-GroupByCode (records / groups key cell g)
   (setq groups '())
   (foreach rec records
-    (setq code (VDB-RCode rec))
-    (setq cell (assoc code groups))
+    (setq key (strcase (VDB-RCode rec)) cell nil)
+    (foreach g groups
+      (if (and (null cell) (= (strcase (car g)) key))
+        (setq cell g)
+      )
+    )
     (if cell
       (setq groups (subst (append cell (list rec)) cell groups))
-      (setq groups (append groups (list (cons code (list rec)))))
+      (setq groups (append groups (list (cons (VDB-RCode rec) (list rec)))))
     )
   )
   groups
@@ -235,9 +255,9 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Rectangle maths
-;; recs = 3 or 4 records, already time-sorted.  Returns 4 corner points or nil.
+;; recs = 3 or 4 records, time-sorted.  Returns 4 corner points or nil.
 ;; ---------------------------------------------------------------------------
-(defun VDB-RectCorners (recs / p0 p1 p2 dx dy d ux uy nx ny vx vy L W z c1 c2 c3 cnt)
+(defun VDB-RectCorners (recs / p0 p1 p2 dx dy d ux uy nx ny vx vy L W z cnt)
   (setq p0 (VDB-RPt (nth 0 recs))
         p1 (VDB-RPt (nth 1 recs))
         p2 (VDB-RPt (nth 2 recs)))
@@ -290,6 +310,63 @@
 )
 
 ;; ---------------------------------------------------------------------------
+;; CLUSTERING  (points already sorted by time)
+;; Returns (list sets leftoverCount); each set = 3 or 4 records.
+;; ---------------------------------------------------------------------------
+(defun VDB-Dist2D (ra rb)
+  (distance (list (nth 1 ra) (nth 2 ra)) (list (nth 1 rb) (nth 2 rb)))
+)
+
+(defun VDB-FirstN (lst n / out k)
+  (setq out '() k 0)
+  (while (< k n)
+    (setq out (append out (list (nth k lst))) k (1+ k))
+  )
+  out
+)
+
+(defun VDB-Cluster (lst / n i sets left cl c3 c4 p4 use)
+  (setq n (length lst) i 0 sets '() left 0)
+  (while (< i n)
+    ;; gather up to 4 points, each close to the previous one
+    (setq cl (list (nth i lst)))
+    (while (and (< (length cl) 4)
+                (< (+ i (length cl)) n)
+                (<= (VDB-Dist2D (last cl) (nth (+ i (length cl)) lst))
+                    VDB-ClusterDist))
+      (setq cl (append cl (list (nth (+ i (length cl)) lst))))
+    )
+    (if (< (length cl) 3)
+      (setq left (+ left (length cl))
+            i    (+ i (length cl)))
+      (progn
+        (setq use 3)
+        ;; 4th point accepted only if it sits on the computed 4th corner
+        (if (= (length cl) 4)
+          (progn
+            (setq c3 (VDB-RectCorners (VDB-FirstN cl 3)))
+            (if c3
+              (progn
+                (setq c4 (nth 3 c3)
+                      p4 (VDB-RPt (nth 3 cl)))
+                (if (<= (distance (list (car c4) (cadr c4))
+                                  (list (car p4) (cadr p4)))
+                        VDB-DevTol)
+                  (setq use 4)
+                )
+              )
+            )
+          )
+        )
+        (setq sets (append sets (list (VDB-FirstN cl use)))
+              i    (+ i use))
+      )
+    )
+  )
+  (list sets left)
+)
+
+;; ---------------------------------------------------------------------------
 ;; Auto-select + wording helpers
 ;; ---------------------------------------------------------------------------
 ;; " ROOM " style normal form: separators become spaces, upper case
@@ -338,8 +415,7 @@
 )
 
 ;; ---------------------------------------------------------------------------
-;; MTEXT label: Code text at box centre, rotated to the tangent of the nearest
-;; polyline on layer TRACK, middle-centre justified, width = text length.
+;; MTEXT label
 ;; ---------------------------------------------------------------------------
 (defun VDB-MTextSafe (s / i ch out)
   (setq i 1 out "")
@@ -362,13 +438,19 @@
   a
 )
 
-;; tangent direction (radians) of nearest TRACK curve at pt, or nil
-(defun VDB-TrackAngle (pt / i en best bd cp d par dv ang)
+;; tangent direction (radians) of nearest TRACK curve at pt, or nil.
+;; Distance is measured in plan (2D): the test point is lifted/dropped to each
+;; curve's own elevation so the DGPS height does not disturb the search.
+(defun VDB-TrackAngle (pt / i en best bd cp d par dv ang sp tp)
   (setq best nil bd 1e99 i 0)
   (if VDB-TrackSS
     (while (< i (sslength VDB-TrackSS))
       (setq en (ssname VDB-TrackSS i))
-      (setq cp (vl-catch-all-apply 'vlax-curve-getClosestPointTo (list en pt)))
+      (setq sp (vl-catch-all-apply 'vlax-curve-getStartPoint (list en)))
+      (setq tp (if (and sp (not (vl-catch-all-error-p sp)))
+                 (list (car pt) (cadr pt) (caddr sp))
+                 pt))
+      (setq cp (vl-catch-all-apply 'vlax-curve-getClosestPointTo (list en tp)))
       (if (and cp (not (vl-catch-all-error-p cp)))
         (progn
           (setq d (distance (list (car pt) (cadr pt) 0.0)
@@ -425,14 +507,14 @@
       )
     )
   )
-  ;; defined width = actual text length
+  ;; defined width = actual text length (+5% so the last letter never wraps)
   (if e
     (progn
       (setq ed (entget e))
       (setq tb (vl-catch-all-apply 'textbox (list ed)))
       (if (and tb (not (vl-catch-all-error-p tb)))
         (progn
-          (setq w (- (car (cadr tb)) (car (car tb))))
+          (setq w (* 1.05 (- (car (cadr tb)) (car (car tb)))))
           (if (> w 1e-6)
             (entmod (subst (cons 41 w) (assoc 41 ed) ed))
           )
@@ -443,40 +525,9 @@
   e
 )
 
-;; Split sorted list into sets. Returns (list sets leftoverCount)
-(defun VDB-Split (lst / n step sets i k chunk)
-  (setq n (length lst))
-  (setq step (cond ((= (rem n 4) 0) 4)
-                   ((= (rem n 3) 0) 3)
-                   (T 4)))
-  (setq sets '() i 0)
-  (while (<= (+ i step) n)
-    (setq chunk '() k 0)
-    (while (< k step)
-      (setq chunk (append chunk (list (nth (+ i k) lst))))
-      (setq k (1+ k))
-    )
-    (setq sets (append sets (list chunk)))
-    (setq i (+ i step))
-  )
-  ;; a leftover of exactly 3 is still a valid rectangle
-  (if (= (- n i) 3)
-    (progn
-      (setq chunk '() k 0)
-      (while (< k 3)
-        (setq chunk (append chunk (list (nth (+ i k) lst))))
-        (setq k (1+ k))
-      )
-      (setq sets (append sets (list chunk)))
-      (setq i n)
-    )
-  )
-  (list sets (- n i))
-)
-
 ;; Build all rectangles for one code group.  Returns (made failed leftover)
 (defun VDB-BuildGroup (code recs layer / sorted res sets left made failed idx corners)
-  (setq sorted (vl-sort recs 'VDB-TimeLess))
+  (setq sorted (vl-sort recs 'VDB-TimeLess))       ; sort by Local Time
   (setq made 0 failed 0 left 0)
   (if (< (length sorted) 3)
     (progn
@@ -485,7 +536,7 @@
       (setq left (length sorted))
     )
     (progn
-      (setq res  (VDB-Split sorted)
+      (setq res  (VDB-Cluster sorted)              ; nearby 3-4 point sets
             sets (car res)
             left (cadr res)
             idx  0)
@@ -498,20 +549,22 @@
             (VDB-MakeLabel corners code layer
               (atan (- (cadr (nth 1 corners)) (cadr (nth 0 corners)))
                     (- (car  (nth 1 corners)) (car  (nth 0 corners)))))
+            (princ (strcat "\n  " code " #" (itoa idx) ": "
+                           (itoa (length s)) " pts, "
+                           (rtos (distance (nth 0 corners) (nth 1 corners)) 2 2) " x "
+                           (rtos (distance (nth 1 corners) (nth 2 corners)) 2 2)))
           )
           (progn
             (setq failed (1+ failed))
-            (princ (strcat "\n  " code " set " (itoa idx)
-                           ": degenerate points, rectangle not created."))
+            (princ (strcat "\n  " code " #" (itoa idx)
+                           ": degenerate (collinear / duplicate) points, not created."))
           )
         )
       )
       (if (> left 0)
         (princ (strcat "\n  " code ": " (itoa left)
-                       " extra point(s) ignored."))
+                       " point(s) not near any other - ignored."))
       )
-      (princ (strcat "\n  " code " -> " (itoa made) " rectangle(s) from "
-                     (itoa (length sorted)) " pts"))
     )
   )
   (list made failed left)
@@ -523,6 +576,9 @@
 (defun VDB-Error (msg)
   (if vdb-*fh*
     (progn (vl-catch-all-apply 'close (list vdb-*fh*)) (setq vdb-*fh* nil))
+  )
+  (if vdb-*undo*
+    (progn (command "_.undo" "_end") (setq vdb-*undo* nil))
   )
   (if vdb-*old-clayer*  (setvar "CLAYER"  vdb-*old-clayer*))
   (if vdb-*old-cmdecho* (setvar "CMDECHO" vdb-*old-cmdecho*))
@@ -537,8 +593,7 @@
 
 ;; ===========================================================================
 ;; DIALOG 1 - Select Layers (code groups).  Returns list of codes, or nil if
-;; cancelled.  If nothing is highlighted, ALL codes are returned.
-;; labels = list of display strings (same order as codes)
+;; cancelled.  At least one group must be highlighted.
 ;; ===========================================================================
 (defun VDB-SelectDialog (codes labels / dlgName f dcl_id dlgRet result tkns idx autoIdx i)
   (setq dlgName (vl-filename-mktemp "vdbSel" (getvar "TEMPPREFIX") ".dcl"))
@@ -579,20 +634,18 @@
       (if (/= autoIdx "") (set_tile "lst_codes" autoIdx))
       (setq VDB-selIdx "")
       (action_tile "btn_select"
-        "(setq VDB-selIdx (get_tile \"lst_codes\")) (done_dialog 1)")
+        (strcat "(setq VDB-selIdx (get_tile \"lst_codes\"))"
+                "(if (= (VDB-Trim VDB-selIdx) \"\")"
+                "  (alert \"Select at least one group.\")"
+                "  (done_dialog 1))"))
       (action_tile "cancel" "(done_dialog 0)")
       (setq dlgRet (start_dialog))
-      (if (= dlgRet 1)
+      (if (and (= dlgRet 1) (/= (VDB-Trim VDB-selIdx) ""))
         (progn
           (setq result '())
-          (if (/= (VDB-Trim VDB-selIdx) "")
-            (progn
-              (setq tkns (read (strcat "(" VDB-selIdx ")")))
-              (foreach idx tkns
-                (if (nth idx codes) (setq result (append result (list (nth idx codes)))))
-              )
-            )
-            (setq result codes)
+          (setq tkns (read (strcat "(" VDB-selIdx ")")))
+          (foreach idx tkns
+            (if (nth idx codes) (setq result (append result (list (nth idx codes)))))
           )
         )
       )
@@ -702,17 +755,6 @@
   result
 )
 
-;; remove characters that would break a DCL string
-(defun VDB-Safe (s / i ch out)
-  (setq i 1 out "")
-  (while (<= i (strlen s))
-    (setq ch (substr s i 1))
-    (if (or (= ch "\"") (= ch "\\")) (setq ch "'"))
-    (setq out (strcat out ch) i (1+ i))
-  )
-  out
-)
-
 ;; ===========================================================================
 ;; MAIN COMMAND
 ;; ===========================================================================
@@ -729,6 +771,12 @@
   (setq vdb-*old-osmode*  (getvar "OSMODE"))
   (setvar "CMDECHO" 0)
   (setvar "OSMODE"  0)
+
+  ;; 0. Select track polyline(s) (replaces the old 1-TRACK layer detection) ---
+  (setq VDB-TrackSS nil)
+  (princ "\nSelect TRACK polyline(s) for text rotation <Enter = none>: ")
+  (setq VDB-TrackSS
+    (ssget '((0 . "LWPOLYLINE,POLYLINE,LINE,ARC,SPLINE"))))
 
   ;; 1. CSV file ---------------------------------------------------------------
   (setq csvFile
@@ -790,9 +838,8 @@
     (progn (VDB-Error "No valid records (with a Code) found in CSV.") (exit))
   )
 
+  ;; 3. GROUP by Code (case-insensitive), then list sorted A-Z ---------------
   (setq groups (VDB-GroupByCode records))
-
-  ;; sort code groups A-Z (ascending, case-insensitive)
   (setq groups
     (vl-sort groups
       '(lambda (a b) (< (strcase (car a)) (strcase (car b))))))
@@ -804,13 +851,13 @@
                   (list (strcat (car g) "   (" (itoa (length (cdr g))) " pts)"))))
   )
 
-  ;; 3. Dialog 1 : Select Layers ----------------------------------------------
+  ;; 4. Dialog 1 : Select Layers ----------------------------------------------
   (setq selCodes (VDB-SelectDialog codes labels))
   (if (or (null selCodes) (= (length selCodes) 0))
     (progn (VDB-Error "Cancelled by user.") (exit))
   )
 
-  ;; 4. Dialog 2 : Layer Options ----------------------------------------------
+  ;; 5. Dialog 2 : Layer Options ----------------------------------------------
   (setq targetLayer (VDB-LayerDialog selCodes))
   (if (null targetLayer)
     (progn (VDB-Error "Cancelled by user.") (exit))
@@ -824,7 +871,7 @@
     )
   )
 
-  ;; 5. Build rectangles ------------------------------------------------------
+  ;; 6. Build rectangles (one undo step) --------------------------------------
   (princ "\n========================================")
   (princ "\nVIDDGPSTOBOX")
   (princ "\n========================================")
@@ -833,19 +880,20 @@
                  (if VDB-FromCsv (strcat VDB-CsvPrefix "<Code> (from CSV)") targetLayer)))
   (princ (strcat "\nRows: " (itoa dataRows) "  valid: " (itoa validRows)
                  "  skipped (no code / bad number): " (itoa skippedRows)))
+  (princ (strcat "\nCluster distance: " (rtos VDB-ClusterDist 2 1)
+                 " m   4th-point tolerance: " (rtos VDB-DevTol 2 2) " m"))
   (if (null idxT)
     (princ "\nWARNING: no 'Local Time' column - CSV row order is used.")
   )
   (princ "\n----------------------------------------")
 
-  (setq VDB-TrackSS
-    (ssget "_X" (list (cons 8 VDB-TrackLayer)
-                      '(0 . "LWPOLYLINE,POLYLINE,LINE,ARC,SPLINE"))))
   (if VDB-TrackSS
-    (princ (strcat "\nTrack curves on " VDB-TrackLayer ": " (itoa (sslength VDB-TrackSS))))
-    (princ (strcat "\nWARNING: no curves on layer " VDB-TrackLayer
-                   " - text follows the box direction."))
+    (princ (strcat "\nTrack curves selected: " (itoa (sslength VDB-TrackSS))))
+    (princ "\nNo track selected - text follows the box direction.")
   )
+
+  (command "_.undo" "_begin")
+  (setq vdb-*undo* T)
 
   (setq totMade 0 totFail 0 totSkip 0)
   (foreach g groups
@@ -863,6 +911,9 @@
       )
     )
   )
+
+  (command "_.undo" "_end")
+  (setq vdb-*undo* nil)
 
   (princ "\n----------------------------------------")
   (setq VDB-TrackSS nil)
