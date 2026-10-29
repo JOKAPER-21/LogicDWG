@@ -9,6 +9,7 @@
 (setq LogicDWG:Files
   '("logicDwg.lsp"
     "vidBankCutting.lsp"
+    "vidBlockLayer.lsp"
     "vidCadMergeLayers.lsp"
     "vidCadOptimize.lsp"
     "vidChainageRunner.lsp"
@@ -25,7 +26,9 @@
     "vidIndexCurve.lsp"
     "vidIndexGradient.lsp"
     "vidMapZone.lsp"
+    "vidRotText.lsp"
     "vidRwBoundary.lsp"
+    "vidTr.lsp"
   )
 )
 
@@ -163,7 +166,7 @@
   (if (= loaded (length LogicDWG:Files))
     (progn
       (princ "\n\nLogicDWG is ready. Type VIDLOGICDWG to open.")
-      (princ "\nCommands: VIDCHAINAGERUNNER, VIDDGPSTOBOX, VIDLINETOEXPORTLEVEL, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDDIMSETTINGS, VIDDIMMTOFT, VIDGRADIENT, VIDGRADIENTALIGN, VIDGRADIENTCLEANUP, VIDINDEXGRADIENT, VIDINDEXCURVE, VIDCADMERGELAYERS, VIDCADOPTIMIZE, VIDRWBOUNDARY, VIDBANKCUTTING, VIDMAPZONE")
+      (princ "\nCommands: VIDCHAINAGERUNNER, VIDDGPSTOBOX, VIDLINETOEXPORTLEVEL, VIDDGPSTOLINE, VIDDGPSTOOHE, VIDDGPSTOSP, VIDDIMSETTINGS, VIDDIMMTOFT, VIDGRADIENT, VIDGRADIENTALIGN, VIDGRADIENTCLEANUP, VIDINDEXGRADIENT, VIDINDEXCURVE, VIDCADMERGELAYERS, VIDCADOPTIMIZE, VIDRWBOUNDARY, VIDBANKCUTTING, VIDBLOCKLAYER, VIDMAPZONE, VIDROTTEXT, VIDTR")
     )
     (princ "\n\nWARNING: LogicDWG did not load completely - see messages above.")
   )

@@ -1,5 +1,5 @@
 ;;; ============================================================================
-;;; LogicDWG.lsp   |   Release 1.2.1   |   AutoCAD / Civil 3D 2026   |   Version 20
+;;; LogicDWG.lsp   |   Release 1.2.1   |   AutoCAD / Civil 3D 2026   |   Version 23
 ;;; Commands: LOGICDWG, VIDLOGICDWG
 ;;;
 ;;; The dialog is drawn in logicDwg.dcl (same folder as this file).
@@ -26,6 +26,7 @@
     ("building" CMD  "VIDDGPSTOBOX")
     ("boundary" CMD  "VIDRWBOUNDARY" "vidRwBoundary.lsp")
     ("bankCutting" CMD "VIDBANKCUTTING" "vidBankCutting.lsp")
+    ("tr"       CMD  "VIDTR" "vidTr.lsp")
     ("gradClean" CMD "VIDGRADIENTCLEANUP" "vidGradientCleanup.lsp")
     ("indexGrad" CMD "VIDINDEXGRADIENT" "vidIndexGradient.lsp")
     ("indexCurve" CMD "VIDINDEXCURVE" "vidIndexCurve.lsp")
@@ -33,8 +34,10 @@
     ("grad"     CMD  "VIDGRADIENT" "vidGradient.lsp")
     ("cadMerge" CMD  "VIDCADMERGELAYERS")
     ("cadOptimize" CMD "VIDCADOPTIMIZE" "vidCadOptimize.lsp")
+    ("blockLayer" CMD "VIDBLOCKLAYER" "vidBlockLayer.lsp")
     ("settings" SET  "VIDDIMSETTINGS" "vidDimSettings.lsp")
     ("dimMToFt" CMD  "VIDDIMMTOFT" "vidDimMToFt.lsp")
+    ("rotText" CMD   "VIDROTTEXT" "vidRotText.lsp")
   )
 )
 
