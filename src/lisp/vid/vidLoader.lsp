@@ -33,6 +33,7 @@
     "vidRwBoundary.lsp"
     "vidTr.lsp"
     "vidLogicDwgGuide.lsp"
+    "vidLogicDwgOnlineTools.lsp"
     "vidSurveySettings.lsp"
     "vidPublish.lsp"
   )

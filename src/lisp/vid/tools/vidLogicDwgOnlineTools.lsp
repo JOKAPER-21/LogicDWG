@@ -1,7 +1,7 @@
 (vl-load-com)
 
 (defun c:VIDLOGICDWGONLINETOOLS (/ url result)
-  (setq url "https://jokaper-21.github.io/LogicDWG/src/html/home.html")
+  (setq url "https://jokaper-21.github.io/LogicDWG/src/onlineTools/home.html")
 
   (setq result
     (startapp "explorer.exe" url)

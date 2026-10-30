@@ -1,6 +1,6 @@
 (vl-load-com)
 
-(defun c:VIDLOGICDWGONLINETOOLS (/ url result)
+(defun c:VIDLOGICDWGGUIDE (/ url result)
   (setq url "https://jokaper-21.github.io/LogicDWG/src/guide/index.html")
 
   (setq result

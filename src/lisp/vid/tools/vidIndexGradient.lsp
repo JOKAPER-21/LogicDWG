@@ -13,9 +13,9 @@
 (vl-load-com)
 
 ;; Layers
-(setq VID:LYR-BAR "1-VIG_VID_CH_SCALE_BAR"   ; scale bar boxes + hatch, index mtext, 2 m and 3 m ticks
-      VID:LYR-RL  "1-VIG_VID_RAIL_LEVEL"     ; rail_level mtext + rail_level polylines
-      VID:LYR-RF  "1-VIG_VID_RISE_FALL"      ; rise_fall mtext + rise_fall polyline
+(setq VID:LYR-BAR "1-VIG_CH_SCALE_BAR"   ; scale bar boxes + hatch, index mtext, 2 m and 3 m ticks
+      VID:LYR-RL  "1-VIG_RAIL_LEVEL"     ; rail_level mtext + rail_level polylines
+      VID:LYR-RF  "1-VIG_RISE_FALL"      ; rise_fall mtext + rise_fall polyline
 )
 
 ;; Layer colours (AutoCAD colour index): green, red, yellow

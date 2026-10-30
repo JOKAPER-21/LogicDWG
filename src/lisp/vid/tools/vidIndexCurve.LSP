@@ -15,8 +15,8 @@
 (vl-load-com)
 
 ;; Layers
-(setq VIDC:LYR-TRACK "1-VIC_Rail_Track"   ; track geometry polyline
-      VIDC:LYR-TEXT  "1-VIC_Rail_Text"    ; curve labels (radius / degree)
+(setq VIDC:LYR-TRACK "1-VIC_RAIL_TRACK"   ; track geometry polyline
+      VIDC:LYR-TEXT  "1-VIC_RAIL_TEXT"    ; curve labels (radius / degree)
 )
 
 ;; Layer colours (AutoCAD colour index): magenta, cyan
