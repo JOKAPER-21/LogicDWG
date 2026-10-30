@@ -6,10 +6,10 @@
 ;;;   Select a polyline / 3D polyline, then a dialog asks for
 ;;;       Start Chainage : [ 21/000 ]   (km / metre in ONE box, "/" delimiter)
 ;;;       Interval       : <value>      (whole number, metres)
-;;;       Track Type     : [ Up v ]     (Up / Down)
+;;;       Track Type     : [ Up v ]     (Up / Down / Loop)
 ;;;       [Cancel] [Ok]
 ;;;   A CSV "Chainage,Elevation" is written automatically to the drawing folder:
-;;;       <drawing name>_<track type>_railLevel_v01.csv   e.g.  MyLine_Up_railLevel_v01.csv
+;;;       rl_<drawing name>_v01_<track type>.csv   e.g.  rl_MyLine_v01_Up.csv
 ;;;   If that file already exists the version goes up (v02, v03 ...);
 ;;;   every <drawing name> + <track type> combination counts its own versions.
 ;;;   (Unsaved drawing / folder not writable -> a Save dialog is shown.)
@@ -68,7 +68,9 @@
      (setq VEL-Km       (atoi (vl-string-trim " " (car parts)))
            VEL-M        (atoi (vl-string-trim " " (cadr parts)))
            VEL-Interval (atoi (vl-string-trim " " iv))
-           VEL-Type     (if (= (get_tile "pop_type") "1") "Down" "Up"))
+           VEL-Type     (cond ((= (get_tile "pop_type") "1") "Down")
+                              ((= (get_tile "pop_type") "2") "Loop")
+                              (T "Up")))
      T)
   )
 )
@@ -78,7 +80,11 @@
   (if (< n 10) (strcat "0" (itoa n)) (itoa n))
 )
 
-;; <dwg name>_<track type>_railLevel_vNN.csv in the drawing folder, next free version
+;; rl_<dwg name>_vNN_<track type>.csv in the drawing folder, next free version
+(defun VEL-FileName (base n)
+  (strcat "rl_" base "_v" (VEL-Pad2 n) "_" VEL-Type ".csv")
+)
+
 (defun VEL-AutoName (/ dir base n path)
   (setq dir  (getvar "DWGPREFIX")
         base (vl-filename-base (getvar "DWGNAME"))
@@ -87,10 +93,10 @@
     nil
     (progn
       (if (/= (substr dir (strlen dir)) "\\") (setq dir (strcat dir "\\")))
-      (setq path (strcat dir base "_" VEL-Type "_railLevel_v" (VEL-Pad2 n) ".csv"))
+      (setq path (strcat dir (VEL-FileName base n)))
       (while (findfile path)
         (setq n (1+ n))
-        (setq path (strcat dir base "_" VEL-Type "_railLevel_v" (VEL-Pad2 n) ".csv"))
+        (setq path (strcat dir (VEL-FileName base n)))
       )
       path
     )
@@ -127,7 +133,9 @@
       (add_list "Down")
       (add_list "Loop")
       (end_list)
-      (set_tile "pop_type" (if (= VEL-Type "Down") "1" "0"))
+      (set_tile "pop_type" (cond ((= VEL-Type "Down") "1")
+                                 ((= VEL-Type "Loop") "2")
+                                 (T "0")))
       (mode_tile "edt_kmm" 2)
       (action_tile "accept" "(if (VEL-Validate) (done_dialog 1))")
       (action_tile "cancel" "(done_dialog 0)")
@@ -168,7 +176,7 @@
          (setq file (VEL-AutoName))
          (if (or (null file) (null (setq f (open file "w"))))
            (setq file (getfiled "Save CSV As"
-                                (strcat (vl-filename-base (getvar "DWGNAME")) "_" VEL-Type "_railLevel_v01.csv")
+                                (VEL-FileName (vl-filename-base (getvar "DWGNAME")) 1)
                                 "csv" 1))
            (close f)
          )
