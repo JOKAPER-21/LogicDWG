@@ -3,19 +3,19 @@
 ;;; Command : VIDCHAINAGERUNNER
 ;;; Version : v3
 ;;;   v3: * Dialog:  ( ) Forward  ( ) Backward
-;;;                  KM / metre : [ 21/000 ]      (one box, "/" delimiter)
+;;;                  KM/Meter   : [ 21/000 ]      (one box, "/" delimiter)
 ;;;                  Increment  : [   ]
 ;;;                  [x] Add Symbol   (off = the three fields below are disabled)
 ;;;                  Symbol Name   : [ vid_kmArrow_001 ]
 ;;;                  Symbol Height : [ 120 ]
-;;;                  Direction     : [ Up v ]
+;;;                  Symbol Direction : [ LHS v ]
 ;;;                  [Cancel] [Ok]
 ;;;       * The "N polyline(s) selected" / "Select objects" labels are gone.
 ;;;       * The "Total Length = ..." text is replaced by the block
 ;;;         symbol block (imported from vid_blocks_tools.dwg), placed at the
 ;;;         END of every selected polyline:
-;;;            Up   -> left  side of the polyline
-;;;            Down -> right side of the polyline
+;;;            LHS -> left  side of the polyline
+;;;            RHS -> right side of the polyline
 ;;;         Symbol Height = distance of the block from the polyline.
 ;;;       * Block attributes (tag kmArrow):
 ;;;            top    : KM <entered km + 1>        e.g.  KM 22
@@ -36,7 +36,9 @@
 (if (null VCR-Step)   (setq VCR-Step   100))
 (if (null VCR-Arrow)  (setq VCR-Arrow  "vid_kmArrow_001"))
 (if (null VCR-ArrowH) (setq VCR-ArrowH 120.0))
-(if (null VCR-Side)   (setq VCR-Side   "Up"))
+(if (null VCR-Side)   (setq VCR-Side   "LHS"))
+(if (= VCR-Side "Up")     (setq VCR-Side "LHS"))   ;; values left by an older version
+(if (= VCR-Side "Down")   (setq VCR-Side "RHS"))
 (if (null VCR-UseSym) (setq VCR-UseSym "1"))   ;; "1" = place symbol, "0" = no symbol
 
 (setq VCR-DwgName  "vid_blocks_tools.dwg")
@@ -47,6 +49,7 @@
 (setq VCR-OldError nil)
 (setq VCR-OldLay   nil)
 (setq VCR-OldEcho  nil)
+(setq VCR-OldDyn   nil)   ;; DYNPROMPT = prompt text shown next to the cursor
 
 ;; ---------------------------------------------------------------------------
 ;; Helpers
@@ -108,7 +111,7 @@
      (if (= VCR-UseSym "1")
        (setq VCR-Arrow  nm
              VCR-ArrowH ht
-             VCR-Side   (if (= (get_tile "pop_side") "1") "Down" "Up")))
+             VCR-Side   (if (= (get_tile "pop_side") "1") "RHS" "LHS")))
      T)
   )
 )
@@ -134,12 +137,12 @@
       "    : radio_button { key = \"rb_fwd\"; label = \"Forward\";  value = \"1\"; }"
       "    : radio_button { key = \"rb_bwd\"; label = \"Backward\"; value = \"0\"; }"
       "  }"
-      "  : edit_box { key = \"edt_kmm\";    label = \"KM / metre (e.g. 21/000):\"; edit_width = 10; }"
+      "  : edit_box { key = \"edt_kmm\";    label = \"KM/Meter:\"; edit_width = 10; }"
       "  : edit_box { key = \"edt_inc\";    label = \"Increment:\";                edit_width = 10; }"
       "  : toggle { key = \"tgl_sym\"; label = \"Add Symbol\"; }"
       "  : edit_box { key = \"edt_arrow\";  label = \"Symbol Name:\";   edit_width = 20; }"
       "  : edit_box { key = \"edt_arrowh\"; label = \"Symbol Height:\"; edit_width = 10; }"
-      "  : popup_list { key = \"pop_side\"; label = \"Direction:\";     edit_width = 10; }"
+      "  : popup_list { key = \"pop_side\"; label = \"Symbol Direction:\"; edit_width = 10; }"
       "  spacer_1;"
       "  : row {"
       "    alignment = centered;"
@@ -160,10 +163,10 @@
       (set_tile "edt_arrow"  VCR-Arrow)
       (set_tile "edt_arrowh" (rtos VCR-ArrowH 2 (if (equal VCR-ArrowH (fix VCR-ArrowH) 1e-9) 0 2)))
       (start_list "pop_side")
-      (add_list "Up")
-      (add_list "Down")
+      (add_list "LHS")
+      (add_list "RHS")
       (end_list)
-      (set_tile "pop_side" (if (= VCR-Side "Down") "1" "0"))
+      (set_tile "pop_side" (if (= VCR-Side "RHS") "1" "0"))
       (set_tile "tgl_sym" VCR-UseSym)
       (VCR-SymToggle VCR-UseSym)
       (action_tile "tgl_sym" "(VCR-SymToggle $value)")
@@ -182,6 +185,7 @@
 (defun VCR-Error (msg)
   (if VCR-OldLay  (setvar "CLAYER" VCR-OldLay))
   (if VCR-OldEcho (setvar "CMDECHO" VCR-OldEcho))
+  (if VCR-OldDyn  (setvar "DYNPROMPT" VCR-OldDyn))
   (setq *error* VCR-OldError)
   (if (and msg (/= msg "Function cancelled") (/= msg "quit / exit abort"))
     (princ (strcat "\nVIDCHAINAGERUNNER ERROR: " msg))
@@ -453,14 +457,14 @@
     (setq dist (if (= dir "Forward") (+ dist step) (- dist step)))
   )
 
-  ;; arrow block at the last vertex:  Up = left side, Down = right side
+  ;; arrow block at the last vertex:  LHS = left side, RHS = right side
   (if useArrow
     (progn
       (setq endParam (vlax-curve-getEndParam ent))
       (setq endPt    (vlax-curve-getEndPoint ent))
       (setq endDeriv (vlax-curve-getFirstDeriv ent endParam))
       (setq endAng   (angle '(0 0 0) endDeriv))
-      (setq sideAng  (if (= VCR-Side "Down") (- endAng (/ pi 2.0)) (+ endAng (/ pi 2.0))))
+      (setq sideAng  (if (= VCR-Side "RHS") (- endAng (/ pi 2.0)) (+ endAng (/ pi 2.0))))
       (setq arrPt    (polar endPt sideAng VCR-ArrowH))
       (setq arr (vl-catch-all-apply 'vla-InsertBlock
                   (list ms (vlax-3d-point arrPt) VCR-Arrow 1.0 1.0 1.0 endAng)))
@@ -492,8 +496,10 @@
   (setq *error* VCR-Error)
   (setq VCR-OldLay  (getvar "CLAYER"))
   (setq VCR-OldEcho (getvar "CMDECHO"))
+  ;; hide the prompt label that floats next to the cursor (restored at the end)
+  (setq VCR-OldDyn  (getvar "DYNPROMPT"))
+  (if VCR-OldDyn (setvar "DYNPROMPT" 0))
 
-  (princ "\nSelect polyline(s) (chainage runs in the increasing-chainage direction of each): ")
   (setq ss (ssget '((0 . "LWPOLYLINE,POLYLINE"))))
 
   (cond
@@ -540,6 +546,7 @@
                     ", increment " (itoa VCR-Step) "."))
     )
   )
+  (if VCR-OldDyn (setvar "DYNPROMPT" VCR-OldDyn))
   (setq *error* VCR-OldError)
   (princ)
 )
