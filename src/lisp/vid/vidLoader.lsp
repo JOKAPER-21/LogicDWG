@@ -17,7 +17,7 @@
     "vidCadOptimize.lsp"
     "vidChainageRunner.lsp"
     "vidDgpsToBox.lsp"
-    "vidDgpsToExportLevel.lsp"
+    "vidLineToExportLevel.lsp"
     "vidDgpsToLine.lsp"
     "vidDgpsToOhe.lsp"
     "vidDgpsToSp.lsp"
@@ -32,6 +32,9 @@
     "vidRotText.lsp"
     "vidRwBoundary.lsp"
     "vidTr.lsp"
+    "vidLogicDwgOnlineTools.lsp"
+    "vidSurveySettings.lsp"
+    "vidPublish.lsp"
   )
 )
 
