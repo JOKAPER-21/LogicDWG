@@ -32,7 +32,7 @@
     "vidRotText.lsp"
     "vidRwBoundary.lsp"
     "vidTr.lsp"
-    "vidLogicDwgOnlineTools.lsp"
+    "vidLogicDwgGuide.lsp"
     "vidSurveySettings.lsp"
     "vidPublish.lsp"
   )
