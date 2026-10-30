@@ -4,7 +4,7 @@
 ;;; Block   : name asked at run time, default vid_gradient_001
 ;;;           (imported from vid_blocks_tools.dwg, searched in the same
 ;;;           folder as this LSP, then the vid/tools support folders)
-;;; CSV     : G_POSITION,G_CHAINAGE,G_RAILLEVEL,G_LINE,G_TAIL,G_HEAD,G_NOTE
+;;; CSV     : vid_ch,rw_ch,railLevel,lineType,before,current,note
 ;;; ======================================================================
 
 ;; ---- locate this LSP's folder at load time (used to find the DWG) ----
@@ -260,7 +260,7 @@
                 (progn
                   (progn
                     ;; ---- 3. read CSV ----
-                    ;; G_POSITION,G_CHAINAGE,G_RAILLEVEL,G_LINE,G_TAIL,G_HEAD,G_NOTE
+                    ;; vid_ch,rw_ch,railLevel,lineType,before,current,note
                     (setq fp (open file "r"))
                     (setq hdr (read-line fp)) ;; header: also used to detect the delimiter
                     (setq delim (if (and hdr (vl-string-search "\t" hdr)) "\t" ","))
@@ -291,7 +291,7 @@
                           skipped 0)
 
                     (foreach km-data km-list
-                      ;; G_POSITION = distance along the selected polyline
+                      ;; vid_ch = distance along the selected polyline
                       (setq offset-dist (atof (nth 0 km-data)))
 
                       (if (and (>= offset-dist 0.0) (<= offset-dist pl-length))
