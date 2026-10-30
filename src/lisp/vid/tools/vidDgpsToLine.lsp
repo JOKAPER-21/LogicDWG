@@ -1,7 +1,11 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Line
 ;;; Release: 1.5.8 | Civil 3D 2026
-;;; Version: 14
+;;; Version: 15
+;;;   v15: * Layer Options dialog re-laid out: (o) Default Layers [full list, "1-TRACK"
+;;;          pre-selected], ( ) Custom Layer [text box], ( ) CSV Code.
+;;;        * Blank Custom Layer name keeps the dialog open instead of silently
+;;;          falling back to a default layer.
 ;;;   v14: * Angle filter now has its own whole-number box (+/- deg, default 5).
 ;;;        * Codes R, R1, R2, R3 ... R<n> are selected automatically in the list.
 ;;;        * Layer Options: new radio [From CSV] -> layer "1-TRACK_<Code>" is
@@ -810,55 +814,47 @@
 ;; Returns chosen layer name string, or nil if cancelled.
 ;; ===========================================================================
 (defun DGPS-LayerOptionsDialog (selectedCodes / dcl_id dlgName result
-                                 modeChoice customName defaultChoice
-                                 codeLabel dcl_text f selIdxStr dlgRet idx nm)
+                                 modeChoice customName defaultChoice defIdx
+                                 dcl_text f selIdxStr dlgRet)
 
   (setq dlgName (vl-filename-mktemp "dgpsOpt" (getvar "TEMPPREFIX") ".dcl"))
 
-  ;; Build label for codes in use
-  (if (and selectedCodes (> (length selectedCodes) 0))
-    (progn
-      (setq codeLabel "")
-      (foreach c selectedCodes
-        (setq codeLabel (strcat codeLabel (if (= codeLabel "") "" ", ") c))
-      )
-      (if (> (strlen codeLabel) 40)
-        (setq codeLabel (strcat (substr codeLabel 1 37) "..."))
-      )
-    )
-    (setq codeLabel "all codes")
-  )
-
+  ;; Layout (v15):
+  ;;   (o) Default Layers
+  ;;         [ list of all default layers - "1-TRACK" pre-selected ]
+  ;;   ( ) Custom Layer
+  ;;         [ text box ]
+  ;;   ( ) CSV Code
   (setq dcl_text
     (strcat
       "dgps_layer_opt : dialog {\n"
       "  label = \"Layer Options\";\n"
       "\n"
+      "  : radio_button { key = \"rb_default\"; label = \"Default Layers\"; value = \"1\"; }\n"
       "  : row {\n"
-      "    : radio_button { key = \"rb_default\"; label = \"Default layers\";  value = \"1\"; }\n"
-      "    : radio_button { key = \"rb_csv\";     label = \"From CSV\"; value = \"0\"; }\n"
+      "    : spacer { width = 3; fixed_width = true; }\n"
+      "    : list_box {\n"
+      "      key             = \"lst_default\";\n"
+      "      height          = 15;\n"
+      "      width           = 40;\n"
+      "      fixed_width_font = false;\n"
+      "      multiple_select  = false;\n"
+      "      allow_accept     = false;\n"
+      "    }\n"
       "  }\n"
       "\n"
-      "  : list_box {\n"
-      "    key             = \"lst_default\";\n"
-      "    height          = 20;\n"
-      "    width           = 48;\n"
-      "    fixed_width_font = false;\n"
-      "    multiple_select  = false;\n"
-      "    allow_accept     = false;\n"
+      "  : radio_button { key = \"rb_custom\"; label = \"Custom Layer\"; value = \"0\"; }\n"
+      "  : row {\n"
+      "    : spacer { width = 3; fixed_width = true; }\n"
+      "    : edit_box {\n"
+      "      key        = \"edt_custom\";\n"
+      "      label      = \"\";\n"
+      "      edit_width = 36;\n"
+      "      is_enabled = false;\n"
+      "    }\n"
       "  }\n"
       "\n"
-      "  : radio_button { key = \"rb_custom\"; label = \"Custom layer for ("
-      codeLabel
-      ")\"; value = \"0\"; }\n"
-      "\n"
-      "  : edit_box {\n"
-      "    key   = \"edt_custom\";\n"
-      "    label = \"Custom layer name\";\n"
-      "    width = 40;\n"
-      "    edit_width = 36;\n"
-      "    is_enabled = false;\n"
-      "  }\n"
+      "  : radio_button { key = \"rb_csv\"; label = \"CSV Code\"; value = \"0\"; }\n"
       "\n"
       "  spacer_1;\n"
       "  : row {\n"
@@ -870,7 +866,6 @@
     )
   )
 
-  ;; Write DCL
   (setq f (open dlgName "w"))
   (write-line dcl_text f)
   (close f)
@@ -881,42 +876,35 @@
   (if (and dcl_id (new_dialog "dgps_layer_opt" dcl_id))
     (progn
       (setq modeChoice "default")
-      (setq defaultChoice nil)
       (setq customName "")
-
-      ;; Radio defaults
       (setq DGPS-LayerFromCsv nil)
-      (set_tile "rb_default" "1")
-      (set_tile "rb_csv"     "0")
-      (set_tile "rb_custom"  "0")
 
-      ;; Populate default layer list
+      ;; Radio defaults: Default Layers selected
+      (set_tile "rb_default" "1")
+      (set_tile "rb_custom"  "0")
+      (set_tile "rb_csv"     "0")
+      (mode_tile "lst_default" 0)
+      (mode_tile "edt_custom"  1)
+
+      ;; Show ALL default layers
       (start_list "lst_default" 3)
       (foreach lyr DGPS-DefaultLayers (add_list lyr))
       (end_list)
 
-      ;; Pre-select first item
-      (set_tile "lst_default" "0")
-      (setq defaultChoice (nth 0 DGPS-DefaultLayers))
+      ;; Pre-select "1-TRACK" (falls back to first item if not in list)
+      (setq defIdx (vl-position "1-TRACK" DGPS-DefaultLayers))
+      (if (null defIdx) (setq defIdx 0))
+      (set_tile "lst_default" (itoa defIdx))
+      (setq defaultChoice (nth defIdx DGPS-DefaultLayers))
 
       ;; Radio callbacks
       (action_tile "rb_default"
         (strcat
           "(setq modeChoice \"default\")"
           "(set_tile \"rb_default\" \"1\")"
+          "(set_tile \"rb_custom\"  \"0\")"
           "(set_tile \"rb_csv\"     \"0\")"
-          "(set_tile \"rb_custom\"  \"0\")"
           "(mode_tile \"lst_default\" 0)"
-          "(mode_tile \"edt_custom\"  1)"
-        )
-      )
-      (action_tile "rb_csv"
-        (strcat
-          "(setq modeChoice \"csv\")"
-          "(set_tile \"rb_default\" \"0\")"
-          "(set_tile \"rb_csv\"     \"1\")"
-          "(set_tile \"rb_custom\"  \"0\")"
-          "(mode_tile \"lst_default\" 1)"
           "(mode_tile \"edt_custom\"  1)"
         )
       )
@@ -924,38 +912,48 @@
         (strcat
           "(setq modeChoice \"custom\")"
           "(set_tile \"rb_default\" \"0\")"
-          "(set_tile \"rb_csv\"     \"0\")"
           "(set_tile \"rb_custom\"  \"1\")"
+          "(set_tile \"rb_csv\"     \"0\")"
           "(mode_tile \"lst_default\" 1)"
           "(mode_tile \"edt_custom\"  0)"
           "(mode_tile \"edt_custom\"  2)"
         )
       )
+      (action_tile "rb_csv"
+        (strcat
+          "(setq modeChoice \"csv\")"
+          "(set_tile \"rb_default\" \"0\")"
+          "(set_tile \"rb_custom\"  \"0\")"
+          "(set_tile \"rb_csv\"     \"1\")"
+          "(mode_tile \"lst_default\" 1)"
+          "(mode_tile \"edt_custom\"  1)"
+        )
+      )
 
-      ;; List selection callback
+      ;; List selection
       (action_tile "lst_default"
         (strcat
           "(setq selIdxStr (get_tile \"lst_default\"))"
           "(if (and selIdxStr (/= (vl-string-trim \" \" selIdxStr) \"\"))"
-          "  (setq defaultChoice (nth (atoi selIdxStr) DGPS-DefaultLayers))"
-          ")"
+          "  (setq defaultChoice (nth (atoi selIdxStr) DGPS-DefaultLayers)))"
         )
       )
 
-      ;; Custom name edit callback
+      ;; Custom name edit
       (action_tile "edt_custom"
         "(setq customName (get_tile \"edt_custom\"))"
       )
 
-      ;; OK
+      ;; OK - stays open if Custom Layer is chosen but the box is blank
       (action_tile "accept"
         (strcat
           "(setq customName (get_tile \"edt_custom\"))"
           "(setq selIdxStr  (get_tile \"lst_default\"))"
           "(if (and selIdxStr (/= (vl-string-trim \" \" selIdxStr) \"\"))"
-          "  (setq defaultChoice (nth (atoi selIdxStr) DGPS-DefaultLayers))"
-          ")"
-          "(done_dialog 1)"
+          "  (setq defaultChoice (nth (atoi selIdxStr) DGPS-DefaultLayers)))"
+          "(if (and (= modeChoice \"custom\") (= (vl-string-trim \" \" customName) \"\"))"
+          "  (progn (alert \"Enter a custom layer name.\") (mode_tile \"edt_custom\" 2))"
+          "  (done_dialog 1))"
         )
       )
       (action_tile "cancel" "(done_dialog 0)")
@@ -963,28 +961,16 @@
       (setq dlgRet (start_dialog))
 
       (if (= dlgRet 1)
-        (progn
-          (cond
-            ((= modeChoice "csv")
-             (setq DGPS-LayerFromCsv T)
-             (setq result "1-TRACK_")
-            )
-            ((= modeChoice "custom")
-             (setq customName (DGPS-Trim customName))
-             (if (= customName "")
-               (progn
-                 (alert "Custom layer name cannot be blank. Using default.")
-                 (setq result defaultChoice)
-               )
-               (setq result customName)
-             )
-            )
-            (T  ; "default"
-             (if defaultChoice
-               (setq result defaultChoice)
-               (setq result (nth 0 DGPS-DefaultLayers))
-             )
-            )
+        (cond
+          ((= modeChoice "csv")
+           (setq DGPS-LayerFromCsv T)
+           (setq result "1-TRACK_")
+          )
+          ((= modeChoice "custom")
+           (setq result (DGPS-Trim customName))
+          )
+          (T
+           (setq result (if defaultChoice defaultChoice "1-TRACK"))
           )
         )
         (setq result nil)
