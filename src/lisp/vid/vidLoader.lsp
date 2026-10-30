@@ -5,6 +5,9 @@
 
 (vl-load-com)
 
+;; Preserve the actual loader path, including APPLOAD/drag-and-drop locations.
+(setq LogicDWG:LoaderPath *load-truename*)
+
 ;; Tool files, in load order.
 (setq LogicDWG:Files
   '("logicDwg.lsp"
@@ -35,31 +38,36 @@
 ;; Find the tools folder. Works when this loader is on the Support File
 ;; Search Path, when it was loaded with APPLOAD / drag-and-drop from any
 ;; folder, or (last resort) by asking the user to pick logicDwg.lsp.
-(defun LogicDWG:FindToolsDir (/ p dir)
+(defun LogicDWG:FindToolsDir (/ p dir loaderDir)
   (cond
-    ;; vid\tools\logicDwg.lsp  or  tools\logicDwg.lsp on the search path
-    ((setq p (findfile "vid/tools/logicDwg.lsp")) (vl-filename-directory p))
-    ((setq p (findfile "tools/logicDwg.lsp"))     (vl-filename-directory p))
-    ((setq p (findfile "logicDwg.lsp"))           (vl-filename-directory p))
-    ;; loader found -> .\tools next to it
-    ((and (setq p (findfile "vidLoader.lsp"))
-          (setq dir (strcat (vl-filename-directory p) "\\tools"))
-          (findfile (strcat dir "\\logicDwg.lsp"))
+    ((setq p (findfile "vid/tools/logicDwg.lsp"))
+     (vl-filename-directory p))
+    ((setq p (findfile "tools/logicDwg.lsp"))
+     (vl-filename-directory p))
+    ((setq p (findfile "logicDwg.lsp"))
+     (vl-filename-directory p))
+    (T
+     (setq loaderDir
+       (if LogicDWG:LoaderPath
+         (vl-filename-directory LogicDWG:LoaderPath)
+         nil
+       )
      )
-     dir
-    )
-    ;; Same folder as the last-used DWG / current folder
-    ((and (setq dir (strcat (getvar "DWGPREFIX") "tools"))
-          (findfile (strcat dir "\\logicDwg.lsp"))
+     (cond
+       ((and loaderDir
+             (setq dir (strcat loaderDir "\\tools"))
+             (findfile (strcat dir "\\logicDwg.lsp")))
+        dir)
+       ((and (setq dir (strcat (getvar "DWGPREFIX") "tools"))
+             (findfile (strcat dir "\\logicDwg.lsp")))
+        dir)
+       ((setq p (getfiled
+                  "Locate LogicDWG tools folder (select logicDwg.lsp)"
+                  "" "lsp" 4))
+        (vl-filename-directory p))
+       (T nil)
      )
-     dir
     )
-    ;; Ask the user
-    ((setq p (getfiled "Locate LogicDWG tools folder (select logicDwg.lsp)"
-                       "" "lsp" 4))
-     (vl-filename-directory p)
-    )
-    (T nil)
   )
 )
 
@@ -139,6 +147,84 @@
   )
 )
 
+
+;; Locate and load the railway CUIX.
+;; Searches beside the loader, beside the tools folder, and AutoCAD's support path.
+(defun LogicDWG:FindCUIX (/ loader base toolsBase candidates p found)
+  (setq loader LogicDWG:LoaderPath)
+  (if (not loader)
+    (setq loader (or (findfile "vidLoader.lsp") (findfile "vidLoader_fixed.lsp")))
+  )
+  (if loader
+    (setq base (vl-filename-directory loader))
+  )
+  (if LogicDWG:ToolsDir
+    (setq toolsBase (vl-filename-directory LogicDWG:ToolsDir))
+  )
+  (setq candidates
+    (append
+      (if base
+        (list
+          (strcat base "\\cui\\vid_railway.cuix")
+          (strcat base "\\vid_railway.cuix")
+          (strcat base "\\..\\cui\\vid_railway.cuix")
+        )
+        nil
+      )
+      (if toolsBase
+        (list
+          (strcat toolsBase "\\cui\\vid_railway.cuix")
+          (strcat toolsBase "\\vid_railway.cuix")
+        )
+        nil
+      )
+      (list "vid_railway.cuix")
+    )
+  )
+  (foreach candidate candidates
+    (if (and (not found) (setq p (findfile candidate)))
+      (setq found p)
+    )
+  )
+  found
+)
+
+(defun LogicDWG:LoadCUI (/ cuiPath acad menuGroups result)
+  (setq cuiPath (LogicDWG:FindCUIX))
+  (cond
+    ((null cuiPath)
+     (princ "\n  [MISSING] vid_railway.cuix was not found.")
+     (princ "\n  Expected: <vid folder>\\cui\\vid_railway.cuix")
+     (princ "\n  Also searched the loader folder, tools parent, and AutoCAD support paths.")
+     nil
+    )
+    (T
+     (princ (strcat "\n  CUI file: " cuiPath))
+     (setq result
+       (vl-catch-all-apply
+         '(lambda ()
+            (setq acad (vlax-get-acad-object))
+            (setq menuGroups (vla-get-MenuGroups acad))
+            (vla-Load menuGroups cuiPath)
+          )
+         '()
+       )
+     )
+     (if (vl-catch-all-error-p result)
+       (progn
+         (princ (strcat "\n  [ERROR] CUI load failed: "
+                        (vl-catch-all-error-message result)))
+         nil
+       )
+       (progn
+         (princ "\n  [OK]      cui\\vid_railway.cuix loaded")
+         T
+       )
+     )
+    )
+  )
+)
+
 (defun LogicDWG:LoadAll (/ loaded missing)
   (setq LogicDWG:ToolsDir (LogicDWG:FindToolsDir))
   (setq loaded 0 missing 0)
@@ -146,6 +232,8 @@
   (princ "\n============================================================")
   (princ "\n LogicDWG 1.2.1")
   (princ "\n============================================================")
+
+  (LogicDWG:LoadCUI)
 
   (if (null LogicDWG:ToolsDir)
     (princ "\nTools folder not found. Put the 'tools' folder next to vidLoader.lsp.")
