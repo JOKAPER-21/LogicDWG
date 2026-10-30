@@ -1,7 +1,11 @@
 ;;; ============================================================================
 ;;; Vid Line To Export Level
 ;;; Command : VIDLINETOEXPORTLEVEL   (EXPORTLEVEL20 still works)
-;;; Version : v24  (was EXPORTLEVEL20)
+;;; Version : v25  (was EXPORTLEVEL20)
+;;;   v25: DYNPROMPT is switched OFF while the command runs, so the floating
+;;;        "Select objects:" label beside the cursor (Dynamic Input) does not
+;;;        appear.  The original DYNPROMPT value is restored when the command
+;;;        finishes, is cancelled, or hits an error.
 ;;; Works in AutoCAD and AutoCAD Civil 3D (core AutoLISP / ActiveX only).
 ;;;   Select a polyline / 3D polyline, then a dialog asks for
 ;;;       Start Chainage : [ 21/000 ]   (km / metre in ONE box, "/" delimiter)
@@ -148,8 +152,26 @@
   ret
 )
 
-(defun c:VIDLINETOEXPORTLEVEL (/ ent obj len dist startM ch elev pt data file f)
+(defun c:VIDLINETOEXPORTLEVEL (/ ent obj len dist startM ch elev pt data file f
+                                 oldErr oldDyn)
   (vl-load-com)
+
+  ;; Hide the floating Dynamic Input prompt; restore on exit / cancel / error.
+  (setq oldDyn (getvar "DYNPROMPT")
+        oldErr *error*)
+  (setq *error*
+    (lambda (msg)
+      (if oldDyn (setvar "DYNPROMPT" oldDyn))
+      (setq *error* oldErr)
+      (if (and msg
+               (not (wcmatch (strcase msg) "*CANCEL*,*QUIT*,*EXIT*")))
+        (princ (strcat "\nVIDLINETOEXPORTLEVEL ERROR: " msg))
+      )
+      (princ)
+    )
+  )
+  (if oldDyn (setvar "DYNPROMPT" 0))
+
   (setq ent (car (entsel "\nSelect polyline with elevation: ")))
 
   (cond
@@ -195,6 +217,10 @@
      )
     )
   )
+
+  ;; Restore the user's original DYNPROMPT and error handler.
+  (if oldDyn (setvar "DYNPROMPT" oldDyn))
+  (setq *error* oldErr)
   (princ)
 )
 
