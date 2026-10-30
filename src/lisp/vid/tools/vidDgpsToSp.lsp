@@ -1,7 +1,9 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Survey Points
 ;;; Release: 1.1.3 | Civil 3D 2026
-;;; Version: 04
+;;; Version: 05
+;;;   v05: Layer dialog re-laid out:  (o) Custom Layer [text box, default 1-SURVEY]
+;;;        ( ) CSV Each Code   ( ) CSV Point Name / Code / Elevation
 ;;;   v04: command flow  ->  1) select CSV   2) "Survey Point Layer" dialog
 ;;;        Layer options:
 ;;;          Custom                            one layer, name typed in the box
@@ -172,10 +174,10 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Layer-name option dialog
-;; [Custom]                         -> one layer for everything, name typed in
+;; [Custom Layer]                   -> one layer for everything, name typed in
 ;;                                      the text box (default "1-SURVEY").
-;; [Each Code]                       -> one "sp_<CODE>" layer per CSV code (capitals).
-;; [Point Name / Code / Elevation]   -> "sp_POINT NAME", "sp_CODE", "sp_ELEVATION".
+;; [CSV Each Code]                  -> one "sp_<CODE>" layer per CSV code (capitals).
+;; [CSV Point Name / Code / Elev.]   -> "sp_POINT NAME", "sp_CODE", "sp_ELEVATION".
 ;; Returns (MODE NAME) where MODE is "CUSTOM", "CODE" or "FIELD", or nil if cancelled.
 ;; ---------------------------------------------------------------------------
 (setq dgps-*lm* "CUSTOM")          ; last used mode
@@ -189,16 +191,17 @@
     (progn
       (write-line "dgpslayer : dialog {" fh)
       (write-line "  label = \"Survey Point Layer\";" fh)
-      (write-line "  : boxed_radio_column {" fh)
-      (write-line "    label = \"Layer option\";" fh)
-      (write-line "    : radio_button { key = \"rb_custom\"; label = \"Custom\"; }" fh)
-      (write-line "    : radio_button { key = \"rb_code\"; label = \"Each Code\"; }" fh)
-      (write-line "    : radio_button { key = \"rb_field\"; label = \"Point Name / Code / Elevation\"; }" fh)
+      (write-line "  : radio_button { key = \"rb_custom\"; label = \"Custom Layer\"; }" fh)
+      (write-line "  : row {" fh)
+      (write-line "    : spacer { width = 3; fixed_width = true; }" fh)
+      (write-line "    : edit_box {" fh)
+      (write-line "      key = \"eb_layer\"; label = \"\";" fh)
+      (write-line "      edit_width = 30; allow_accept = true;" fh)
+      (write-line "    }" fh)
       (write-line "  }" fh)
-      (write-line "  : edit_box {" fh)
-      (write-line "    key = \"eb_layer\"; label = \"Custom layer:\";" fh)
-      (write-line "    edit_width = 26; allow_accept = true;" fh)
-      (write-line "  }" fh)
+      (write-line "  : radio_button { key = \"rb_code\"; label = \"CSV Each Code\"; }" fh)
+      (write-line "  : radio_button { key = \"rb_field\"; label = \"CSV Point Name / Code / Elevation\"; }" fh)
+      (write-line "  spacer_1;" fh)
       (write-line "  ok_cancel;" fh)
       (write-line "}" fh)
       (close fh)
@@ -211,8 +214,11 @@
           nil
         )
         (progn
-          ;; Initial state.
+          ;; Initial state (last used mode; first run = Custom Layer / 1-SURVEY).
           (set_tile "eb_layer" dgps-*ln*)
+          (set_tile "rb_custom" "0")
+          (set_tile "rb_code"   "0")
+          (set_tile "rb_field"  "0")
           (cond
             ((= dgps-*lm* "CODE")
              (set_tile "rb_code" "1")
@@ -229,13 +235,19 @@
             )
           )
 
-          ;; Show / hide (enable / disable) the text box.
+          ;; Radio buttons are independent tiles, so switch them by hand.
           (action_tile "rb_custom"
-            "(mode_tile \"eb_layer\" 0)(mode_tile \"eb_layer\" 2)")
+            (strcat
+              "(set_tile \"rb_custom\" \"1\")(set_tile \"rb_code\" \"0\")(set_tile \"rb_field\" \"0\")"
+              "(mode_tile \"eb_layer\" 0)(mode_tile \"eb_layer\" 2)"))
           (action_tile "rb_code"
-            "(mode_tile \"eb_layer\" 1)")
+            (strcat
+              "(set_tile \"rb_custom\" \"0\")(set_tile \"rb_code\" \"1\")(set_tile \"rb_field\" \"0\")"
+              "(mode_tile \"eb_layer\" 1)"))
           (action_tile "rb_field"
-            "(mode_tile \"eb_layer\" 1)")
+            (strcat
+              "(set_tile \"rb_custom\" \"0\")(set_tile \"rb_code\" \"0\")(set_tile \"rb_field\" \"1\")"
+              "(mode_tile \"eb_layer\" 1)"))
 
           (action_tile "accept"
             (strcat
