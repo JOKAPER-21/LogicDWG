@@ -125,6 +125,7 @@
       (start_list "pop_type")
       (add_list "Up")
       (add_list "Down")
+      (add_list "Loop")
       (end_list)
       (set_tile "pop_type" (if (= VEL-Type "Down") "1" "0"))
       (mode_tile "edt_kmm" 2)

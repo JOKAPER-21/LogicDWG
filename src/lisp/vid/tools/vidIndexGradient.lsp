@@ -1,21 +1,33 @@
 ;;; ============================================================
 ;;; VIDINDEXGRADIENT - Railway Gradient Index Plan Generator
 ;;; Command : VIDINDEXGRADIENT
+;;;
+;;; 1. Select the CSV (vid_ch, cal_rail_level, rise_fall)
+;;; 2. Enter the horizontal / vertical scale (m per 1000 m)
+;;; 3. Pick the insertion point
+;;;
+;;; Draws, above the picked point: index numbers, ticks and scale bar,
+;;; then the profile (rail level text + lines, gradient line, rise/fall text).
 ;;; ============================================================
 
 (vl-load-com)
 
 ;; Layers
-(setq VID:LYR-BAR "1-VIG VID_CH SCALE BAR"   ; scale bar boxes + hatch, index mtext, 2 m and 3 m ticks
-      VID:LYR-RL  "1-VIG RAIL_LEVEL"         ; rail_level mtext + rail_level polylines
-      VID:LYR-RF  "1-VIG RISE_FALL"          ; rise_fall mtext + rise_fall polyline
+(setq VID:LYR-BAR "1-VIG_VID_CH_SCALE_BAR"   ; scale bar boxes + hatch, index mtext, 2 m and 3 m ticks
+      VID:LYR-RL  "1-VIG_VID_RAIL_LEVEL"     ; rail_level mtext + rail_level polylines
+      VID:LYR-RF  "1-VIG_VID_RISE_FALL"      ; rise_fall mtext + rise_fall polyline
 )
 
 ;; Layer colours (AutoCAD colour index): green, red, yellow
-(setq VID:CLR-BAR 3   ; 1-VIG VID_CH SCALE BAR = green
-      VID:CLR-RL  1   ; 1-VIG RAIL_LEVEL       = red
-      VID:CLR-RF  2   ; 1-VIG RISE_FALL        = yellow
+(setq VID:CLR-BAR 3   ; 1-VIG_VID_CH_SCALE_BAR = green
+      VID:CLR-RL  1   ; 1-VIG_VID_RAIL_LEVEL   = red
+      VID:CLR-RF  2   ; 1-VIG_VID_RISE_FALL    = yellow
 )
+
+;; The profile (stations, rail level, rise/fall) starts this far ABOVE the picked
+;; point = exactly the top of the scale bar (no gap):
+;;   index text 2 + gap 0.5 + tick 3 + bar 2.5 = 8 m
+(setq VID:PROFILE-OFFSET 8.0)
 
 ;; Last used dialog values: (hValue vValue), in metres per 1000 m
 (if (not *VID:vals*)
@@ -149,10 +161,11 @@
 ;;; Drawing
 ;;; ------------------------------------------------------------
 (defun VID:draw-profile (rows opts ip / hVal vVal
-                         i row ch rl rf newCH newRL baseNewCH xOff basePt
+                         i row ch rl rf newCH newRL baseNewCH xOff basePt baseY
                          topVerts baseXs rfVals lyrBar lyrRL lyrRF)
   (setq lyrBar VID:LYR-BAR lyrRL VID:LYR-RL lyrRF VID:LYR-RF)
   (setq hVal (nth 0 opts) vVal (nth 1 opts))
+  (setq baseY (+ (cadr ip) VID:PROFILE-OFFSET))   ; = top of the scale bar
   (setq baseNewCH (VID:scale (float (car (car rows))) hVal))
   (setq topVerts '() baseXs '() rfVals '())
 
@@ -165,7 +178,7 @@
     (setq newCH (VID:scale ch hVal))
     (setq newRL (VID:scale rl vVal))
     (setq xOff  (- newCH baseNewCH))
-    (setq basePt (list (+ (car ip) xOff) (cadr ip) 0.0))
+    (setq basePt (list (+ (car ip) xOff) baseY 0.0))
     (setq topVerts (append topVerts (list (VID:draw-station basePt rl newRL lyrBar lyrRL))))
     (setq baseXs   (append baseXs (list (car basePt))))
     (setq rfVals   (append rfVals (list rf)))
@@ -173,7 +186,7 @@
   )
 
   (VID:draw-gradient-line topVerts lyrRF)
-  (VID:draw-rf-labels baseXs rfVals (cadr ip) lyrRF)
+  (VID:draw-rf-labels baseXs rfVals baseY lyrRF)
   ;; xOff now holds the drawn length of the whole profile (last row)
   (VID:draw-scalebar ip hVal xOff lyrBar)
 )
@@ -330,17 +343,22 @@
   )
 )
 
-;; Scale bar below the baseline.
-;;   - boxes 2.5 high, each <hVal> / 2 wide, alternating filled / empty
-;;   - one 3 m tick under the bar at every <hVal> (= 1 KM) with index 0,1,2...
+;; Scale bar ABOVE the picked point, bottom to top:
+;;     picked point
+;;     index numbers  0 1 2 3 ...   (text sits right above the picked point)
+;;     ticks          one 3 m tick at every <hVal> (= 1 KM)
+;;     bar boxes      2.5 high, each <hVal> / 2 wide, alternating filled / empty
 ;;   - covers the whole profile, rounded up to a full KM
+;;   - the whole block is 8 m high; the profile starts right on top of it
+;;     (VID:PROFILE-OFFSET = 8 m above the picked point, no gap)
 (defun VID:draw-scalebar (ip hVal totalLen lyr /
-                          n k segW x0 x1 y0 y1 yTick)
+                          n k segW x0 x1 y0 y1 yTxt yTickLo)
   (setq n (max 1 (fix (+ (/ totalLen hVal) 0.999999)))) ; KM count, rounded up
   (setq segW (/ hVal 2.0))
-  (setq y1 (cadr ip))        ; bar top    = baseline
-  (setq y0 (- y1 2.5))       ; bar bottom = 2.5 below
-  (setq yTick (- y0 3.0))    ; tick end   = 3 below the bar
+  (setq yTxt    (cadr ip))        ; index text bottom = picked point
+  (setq yTickLo (+ yTxt 2.5))     ; ticks start above the text (2 m text + 0.5 gap)
+  (setq y0      (+ yTickLo 3.0))  ; tick top = bar bottom (3 m tick)
+  (setq y1      (+ y0 2.5))       ; bar top = 2.5 above bar bottom
 
   ;; bar boxes
   (setq k 0)
@@ -357,17 +375,17 @@
     (setq k (1+ k))
   )
 
-  ;; ticks + index numbers
+  ;; ticks (below the bar) + index numbers (above the picked point)
   (setq k 0)
   (while (<= k n)
     (setq x0 (+ (car ip) (* k hVal)))
     (entmake (list '(0 . "LWPOLYLINE") '(100 . "AcDbEntity") (cons 8 lyr)
                    '(100 . "AcDbPolyline") '(90 . 2) '(70 . 0)
-                   (cons 10 (list x0 y0)) (cons 10 (list x0 yTick))))
+                   (cons 10 (list x0 yTickLo)) (cons 10 (list x0 y0))))
     (entmake (list '(0 . "MTEXT") '(100 . "AcDbEntity") (cons 8 lyr)
                    '(100 . "AcDbMText")
-                   (cons 10 (list x0 (- yTick 0.5) 0.0))
-                   (cons 40 2.0) (cons 71 2) (cons 1 (itoa k))))
+                   (cons 10 (list x0 yTxt 0.0))
+                   (cons 40 2.0) (cons 71 8) (cons 1 (itoa k))))
     (setq k (1+ k))
   )
 )
