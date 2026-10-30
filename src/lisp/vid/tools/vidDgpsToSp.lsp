@@ -1,7 +1,14 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Survey Points
 ;;; Release: 1.1.3 | Civil 3D 2026
-;;; Version: 03
+;;; Version: 04
+;;;   v04: command flow  ->  1) select CSV   2) "Survey Point Layer" dialog
+;;;        Layer options:
+;;;          Custom                            one layer, name typed in the box
+;;;          Each Code                         sp_<CODE>, all capitals, spaces kept
+;;;                                            e.g. sp_R1  sp_R2  sp_LC  sp_BUILDING
+;;;          Point Name / Code / Elevation     sp_POINT NAME / sp_CODE / sp_ELEVATION
+;;;                                            (the POINT marker goes on sp_POINT)
 ;;;   v03: survey POINT display style is set while the points are made
 ;;;        (same result as the PTYPE / Point Style dialog):
 ;;;          PDMODE = 35   (X inside a circle)
@@ -116,6 +123,7 @@
 ;; ---------------------------------------------------------------------------
 ;; Layer-name sanitization
 ;; Original Code is never changed for displayed text.
+;; Spaces are KEPT (no "_" for space); other illegal characters become "_".
 ;; ---------------------------------------------------------------------------
 (defun DGPS-SanitizeLayerName (s / src i ch out)
   (setq src (DGPS-Trim s)
@@ -123,8 +131,7 @@
         out "")
   (while (<= i (strlen src))
     (setq ch (substr src i 1))
-    (if (or (= ch " ")
-            (= ch "<") (= ch ">") (= ch "/") (= ch "\\")
+    (if (or (= ch "<") (= ch ">") (= ch "/") (= ch "\\")
             (= ch "\"") (= ch ":") (= ch ";") (= ch "?")
             (= ch "*") (= ch "|") (= ch ",") (= ch "=")
             (= ch "`"))
@@ -165,11 +172,11 @@
 
 ;; ---------------------------------------------------------------------------
 ;; Layer-name option dialog
-;; [Custom]   -> one layer for everything, name typed in the text box
-;;               (default "1-SURVEY"). Box is selected on entry / click,
-;;               so typing or double-click + type renames it.
-;; [CSV Code] -> existing behaviour: one "sp_<Code>" layer per CSV code.
-;; Returns (MODE NAME) where MODE is "CUSTOM" or "CSV", or nil if cancelled.
+;; [Custom]                         -> one layer for everything, name typed in
+;;                                      the text box (default "1-SURVEY").
+;; [Each Code]                       -> one "sp_<CODE>" layer per CSV code (capitals).
+;; [Point Name / Code / Elevation]   -> "sp_POINT NAME", "sp_CODE", "sp_ELEVATION".
+;; Returns (MODE NAME) where MODE is "CUSTOM", "CODE" or "FIELD", or nil if cancelled.
 ;; ---------------------------------------------------------------------------
 (setq dgps-*lm* "CUSTOM")          ; last used mode
 (setq dgps-*ln* "1-SURVEY")        ; last used custom name
@@ -182,10 +189,11 @@
     (progn
       (write-line "dgpslayer : dialog {" fh)
       (write-line "  label = \"Survey Point Layer\";" fh)
-      (write-line "  : boxed_radio_row {" fh)
-      (write-line "    label = \"Name type\";" fh)
-      (write-line "    : radio_button { key = \"rb_custom\"; label = \"Custom Name\"; }" fh)
-      (write-line "    : radio_button { key = \"rb_csv\"; label = \"CSV Code\"; }" fh)
+      (write-line "  : boxed_radio_column {" fh)
+      (write-line "    label = \"Layer option\";" fh)
+      (write-line "    : radio_button { key = \"rb_custom\"; label = \"Custom\"; }" fh)
+      (write-line "    : radio_button { key = \"rb_code\"; label = \"Each Code\"; }" fh)
+      (write-line "    : radio_button { key = \"rb_field\"; label = \"Point Name / Code / Elevation\"; }" fh)
       (write-line "  }" fh)
       (write-line "  : edit_box {" fh)
       (write-line "    key = \"eb_layer\"; label = \"Custom layer:\";" fh)
@@ -205,27 +213,33 @@
         (progn
           ;; Initial state.
           (set_tile "eb_layer" dgps-*ln*)
-          (if (= dgps-*lm* "CSV")
-            (progn
-              (set_tile "rb_csv" "1")
-              (mode_tile "eb_layer" 1)
+          (cond
+            ((= dgps-*lm* "CODE")
+             (set_tile "rb_code" "1")
+             (mode_tile "eb_layer" 1)
             )
-            (progn
-              (set_tile "rb_custom" "1")
-              (mode_tile "eb_layer" 0)
-              (mode_tile "eb_layer" 2)
+            ((= dgps-*lm* "FIELD")
+             (set_tile "rb_field" "1")
+             (mode_tile "eb_layer" 1)
+            )
+            (T
+             (set_tile "rb_custom" "1")
+             (mode_tile "eb_layer" 0)
+             (mode_tile "eb_layer" 2)
             )
           )
 
           ;; Show / hide (enable / disable) the text box.
           (action_tile "rb_custom"
             "(mode_tile \"eb_layer\" 0)(mode_tile \"eb_layer\" 2)")
-          (action_tile "rb_csv"
+          (action_tile "rb_code"
+            "(mode_tile \"eb_layer\" 1)")
+          (action_tile "rb_field"
             "(mode_tile \"eb_layer\" 1)")
 
           (action_tile "accept"
             (strcat
-              "(setq dgps-*lm* (if (= (get_tile \"rb_csv\") \"1\") \"CSV\" \"CUSTOM\"))"
+              "(setq dgps-*lm* (cond ((= (get_tile \"rb_code\") \"1\") \"CODE\") ((= (get_tile \"rb_field\") \"1\") \"FIELD\") (T \"CUSTOM\")))"
               "(setq dgps-*ln* (get_tile \"eb_layer\"))"
               "(done_dialog 1)"))
           (action_tile "cancel" "(done_dialog 0)")
@@ -656,7 +670,8 @@
      line fields rowNo dataRows validRows skippedRows
      allRev allRecords rec pname code north east elev localTime
      groups g spLayer spPt spName spCode spElev spLayers
-     p x y z sampleCount i layerOpt layerMode customLayer)
+     p x y z sampleCount i layerOpt layerMode customLayer
+     ptLayer nmLayer cdLayer elLayer lyr)
 
   (setq dgps-*old-error* *error*)
   (setq *error* VIDDGPSTOSP-Error)
@@ -668,9 +683,14 @@
 
   (setvar "CMDECHO" 0)
   (setvar "OSMODE" 0)
-  (DGPS-SetPointStyle)          ; PDMODE 35, absolute size 0.800
 
-  ;; Ask layer option: [Custom] / [CSV Code].
+  ;; 1) Select CSV.
+  (setq csvFile (getfiled "Select DGPS CSV File" "" "csv" 4))
+  (if (null csvFile)
+    (progn (VIDDGPSTOSP-Error "No CSV file selected.") (exit))
+  )
+
+  ;; 2) Survey Point Layer dialog: Custom / Each Code / Point Name-Code-Elevation.
   (setq layerOpt (DGPS-AskLayerMode))
   (if (null layerOpt)
     (progn (VIDDGPSTOSP-Error "Function cancelled") (exit))
@@ -678,11 +698,7 @@
   (setq layerMode   (car layerOpt))
   (setq customLayer (cadr layerOpt))
 
-  ;; Select CSV.
-  (setq csvFile (getfiled "Select DGPS CSV File" "" "csv" 4))
-  (if (null csvFile)
-    (progn (VIDDGPSTOSP-Error "No CSV file selected.") (exit))
-  )
+  (DGPS-SetPointStyle)          ; PDMODE 35, absolute size 0.800
 
   ;; Same binary-safe CSV reader as DGPS2PLINE v12.
   (setq openResult (DGPS-OpenCSV csvFile))
@@ -804,18 +820,34 @@
 
   (foreach rec allRecords
     (setq code (DGPS-R-Code rec))
-    (setq spLayer
-      (if (= layerMode "CUSTOM")
-        customLayer                                        ; [Custom]
-        (strcat "sp_" (DGPS-SanitizeLayerName code))       ; [CSV Code]
+    (cond
+      ;; [Custom] one layer for everything
+      ((= layerMode "CUSTOM")
+       (setq ptLayer customLayer nmLayer customLayer
+             cdLayer customLayer elLayer customLayer)
+      )
+      ;; [Each Code] sp_<CODE>, capitals, spaces kept
+      ((= layerMode "CODE")
+       (setq spLayer (strcat "sp_" (DGPS-SanitizeLayerName (strcase code))))
+       (setq ptLayer spLayer nmLayer spLayer
+             cdLayer spLayer elLayer spLayer)
+      )
+      ;; [Point Name / Code / Elevation] one layer per text kind
+      (T
+       (setq ptLayer "sp_POINT"
+             nmLayer "sp_POINT NAME"
+             cdLayer "sp_CODE"
+             elLayer "sp_ELEVATION")
       )
     )
 
-    (if (not (tblsearch "LAYER" spLayer))
-      (DGPS-EnsureLayer spLayer 4)
-    )
-    (if (null (member spLayer spLayers))
-      (setq spLayers (cons spLayer spLayers))
+    (foreach lyr (list ptLayer nmLayer cdLayer elLayer)
+      (if (not (tblsearch "LAYER" lyr))
+        (DGPS-EnsureLayer lyr 4)
+      )
+      (if (null (member lyr spLayers))
+        (setq spLayers (cons lyr spLayers))
+      )
     )
 
     ;; Exact E,N,Z survey coordinate.
@@ -825,22 +857,22 @@
     (setq p (list x y z))
 
     ;; POINT.
-    (if (DGPS-MakePoint p spLayer)
+    (if (DGPS-MakePoint p ptLayer)
       (setq spPt (1+ spPt))
     )
 
     ;; Point Name - Middle Right, exact survey coordinate.
-    (if (DGPS-MakeMText p (DGPS-R-PName rec) 0.5 spLayer 6)
+    (if (DGPS-MakeMText p (DGPS-R-PName rec) 0.5 nmLayer 6)
       (setq spName (1+ spName))
     )
 
     ;; Code - Top Left, exact survey coordinate.
-    (if (DGPS-MakeMText p code 0.5 spLayer 1)
+    (if (DGPS-MakeMText p code 0.5 cdLayer 1)
       (setq spCode (1+ spCode))
     )
 
     ;; Elevation - Bottom Left, exact survey coordinate.
-    (if (DGPS-MakeMText p (DGPS-R-Elev rec) 0.5 spLayer 7)
+    (if (DGPS-MakeMText p (DGPS-R-Elev rec) 0.5 elLayer 7)
       (setq spElev (1+ spElev))
     )
   )
@@ -919,5 +951,5 @@
 )
 
 
-(princ "\nVIDDGPSTOSP_v03 loaded. Type VIDDGPSTOSP to run.")
+(princ "\nVIDDGPSTOSP_v04 loaded. Type VIDDGPSTOSP to run.")
 (princ)
