@@ -4,7 +4,8 @@
 ;;; ============================================================================
 ;;;
 ;;; Sets up the dimension style "Standard" (Dimension Style Manager >
-;;; Modify) and the text style "Standard":
+;;; Modify) and the text style "Standard".  If either does not exist it is
+;;; created first.  When everything is done, REGENALL is run.
 ;;;
 ;;;   Symbols and Arrows   Arrow size              1.5
 ;;;   Text                 Text style              Standard  (font: Arial)
@@ -54,6 +55,58 @@
   (not (vl-catch-all-error-p res))
 )
 
+;; Create the text style if it does not exist.  Returns T if it exists afterwards.
+(defun VIDDim:EnsureTextStyle (styleName / doc res)
+  (if (not (tblsearch "STYLE" styleName))
+    (progn
+      (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+      (setq res
+        (vl-catch-all-apply
+          '(lambda () (vla-Add (vla-get-TextStyles doc) styleName))
+        )
+      )
+      (if (vl-catch-all-error-p res)
+        (princ (strcat "\nCould not create text style " styleName "."))
+        (princ (strcat "\nText style " styleName " did not exist - created."))
+      )
+    )
+  )
+  (if (tblsearch "STYLE" styleName) T nil)
+)
+
+;; Create the dimension style if it does not exist.  Returns T if it exists afterwards.
+(defun VIDDim:EnsureDimStyle (styleName / doc res)
+  (if (not (tblsearch "DIMSTYLE" styleName))
+    (progn
+      (setq doc (vla-get-ActiveDocument (vlax-get-acad-object)))
+      (setq res
+        (vl-catch-all-apply
+          '(lambda () (vla-Add (vla-get-DimStyles doc) styleName))
+        )
+      )
+      (if (vl-catch-all-error-p res)
+        (princ (strcat "\nCould not create dimension style " styleName "."))
+        (princ (strcat "\nDimension style " styleName " did not exist - created."))
+      )
+    )
+  )
+  (if (tblsearch "DIMSTYLE" styleName) T nil)
+)
+
+;; REGENALL - regenerate the drawing and all viewports.
+(defun VIDDim:RegenAll (/ res)
+  (setq res (vl-catch-all-apply '(lambda () (command "._REGENALL"))))
+  (if (vl-catch-all-error-p res)
+    (vl-catch-all-apply
+      '(lambda ()
+         (vla-Regen (vla-get-ActiveDocument (vlax-get-acad-object)) 1) ; acAllViewports
+       )
+    )
+  )
+  (princ "\nREGENALL done.")
+  (princ)
+)
+
 (defun c:VIDDIMSETTINGS (/ *error* oldEcho oldStyle dimName tsName fontName styleHt)
 
   (defun *error* (msg)
@@ -76,12 +129,16 @@
   )
   (setvar "CMDECHO" 0)
 
+  ;; Create the styles first if they do not exist yet
+  (VIDDim:EnsureTextStyle tsName)
+  (VIDDim:EnsureDimStyle dimName)
+
   (cond
-    ((not (tblsearch "DIMSTYLE" dimName))
-     (princ (strcat "\nVIDDIMSETTINGS: dimension style \"" dimName "\" not found."))
-    )
     ((not (tblsearch "STYLE" tsName))
-     (princ (strcat "\nVIDDIMSETTINGS: text style \"" tsName "\" not found."))
+     (princ (strcat "\nVIDDIMSETTINGS: text style \"" tsName "\" could not be created."))
+    )
+    ((not (tblsearch "DIMSTYLE" dimName))
+     (princ (strcat "\nVIDDIMSETTINGS: dimension style \"" dimName "\" could not be created."))
     )
     (T
      (setq oldStyle (getvar "DIMSTYLE"))
@@ -131,6 +188,9 @@
      )
     )
   )
+
+  ;; All functions done - regenerate everything
+  (VIDDim:RegenAll)
 
   (setvar "CMDECHO" oldEcho)
   (princ)

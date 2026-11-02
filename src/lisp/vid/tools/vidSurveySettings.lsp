@@ -6,8 +6,8 @@
 ;;;   - Text Height : [ number ]                  -> TEXT / MTEXT height on those layers
 ;;;   - Point style : [ PDMODE drop-down ]        -> all 20 PDMODE values
 ;;;   - Point Size  : [ number ]                  -> PDSIZE
-;;; Defaults: Text Height 0.5, Point Size 0.5 (whole numbers are shown without
-;;; decimals, e.g. 1 not 1.0000).
+;;; Defaults: Text Height 0.5, PDMODE 35 (Cross + Circle), Point Size 0.5
+;;; (whole numbers are shown without decimals, e.g. 1 not 1.0000).
 ;;; Leave Text Height or Point Size blank to leave that setting unchanged.
 ;;; PDMODE / PDSIZE are drawing-wide; they are applied when at least one POINT
 ;;; exists on the selected layers (same rule as v02).
@@ -17,6 +17,7 @@
 (setq VSH-*lastLayers* nil)   ; layer choice remembered between runs
 (setq VSH-*defH*  0.5)        ; default Text Height
 (setq VSH-*defHP* 0.5)        ; default Point Size
+(setq VSH-*defPm* 35)         ; default PDMODE (35 = Cross + Circle)
 
 ;; PDMODE values and their names (shape + optional circle / square)
 (setq VSH-*pdmodes*
@@ -179,11 +180,11 @@
 
           (set_tile "h" (VSH:Fmt VSH-*defH*))
 
-          ;; PDMODE drop-down, current value preselected
+          ;; PDMODE drop-down, default value (35) preselected
           (start_list "pdm")
           (foreach p VSH-*pdmodes* (add_list (cdr p)))
           (end_list)
-          (setq curPm (getvar "PDMODE") pmIdx 0 i 0)
+          (setq curPm VSH-*defPm* pmIdx 0 i 0)
           (foreach p VSH-*pdmodes*
             (if (= (car p) curPm) (setq pmIdx i))
             (setq i (1+ i))

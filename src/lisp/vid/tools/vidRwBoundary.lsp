@@ -1,6 +1,6 @@
 ;;; ============================================================================
 ;;; vidRwBoundary.lsp   (was setBoundaryYard_v02.lsp / SETBOUNDARYYD)
-;;; Command: VIDRWBOUNDARY
+;;; Command: VIDRWBOUNDARYTEXT
 ;;; Labels the distance from a boundary polyline to a rail track, with an
 ;;; optional chainage line ("@ KM 21/000").
 ;;;
@@ -393,13 +393,13 @@
 )
 
 ;; ---- command -------------------------------------------------------------------
-(defun c:VIDRWBOUNDARY (/ *error* kmv n undoOpen)
+(defun c:VIDRWBOUNDARYTEXT (/ *error* kmv n undoOpen)
   (setq *vrb-bnd* nil *vrb-trk* nil)   ; selections are not remembered
   (defun *error* (msg)
     (if (> (getvar "CMDACTIVE") 0) (command))
     (if undoOpen (command "_.UNDO" "_End"))
     (if (and msg (not (wcmatch (strcase msg) "*CANCEL*,*QUIT*,*EXIT*")))
-      (princ (strcat "\nVIDRWBOUNDARY error: " msg)))
+      (princ (strcat "\nVIDRWBOUNDARYTEXT error: " msg)))
     (princ)
   )
 
@@ -421,10 +421,10 @@
       (setq undoOpen nil)
       (princ (strcat "\n" (itoa n) " label(s) added."))
     )
-    (princ "\nVIDRWBOUNDARY cancelled.")
+    (princ "\nVIDRWBOUNDARYTEXT cancelled.")
   )
   (princ)
 )
 
-(princ "\nType VIDRWBOUNDARY to run the command.")
+(princ "\nType VIDRWBOUNDARYTEXT to run the command.")
 (princ)

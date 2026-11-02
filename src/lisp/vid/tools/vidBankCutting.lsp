@@ -1,5 +1,7 @@
 ;; ============================================
-;; BANK CUTTING TOOL v25
+;; BANK CUTTING TOOL v26
+;; v26: DYNMODE OFF only while the file is selected (ON afterwards, original
+;;      value restored at the end); UP / DN chosen with [Down] [Up] buttons
 ;; Blocks are imported from vid_blocks_tools.dwg
 ;; (support/vid/tools - same folder as vidGradient.lsp)
 ;;   bank_cutting_up / bank_cutting_dn
@@ -126,13 +128,64 @@
   (princ)
 )
 
+;; --------------------------------------------------------------------------
+;; Direction dialog:  [Down] [Up]  /  [Cancel] (centered)
+;; Returns "UP", "DN" or nil (cancel)
+;; --------------------------------------------------------------------------
+(setq *BC-LastDir* "UP")
+
+(defun BC-direction-dialog (/ dlgName f dcl_id dlgRet result)
+  (setq dlgName (vl-filename-mktemp "bcDir" (getvar "TEMPPREFIX") ".dcl"))
+  (setq f (open dlgName "w"))
+  (write-line
+    (strcat
+      "bc_dir : dialog {\n"
+      "  label = \"Bank Cutting - Direction\";\n"
+      "  : row {\n"
+      "    alignment = centered;\n"
+      "    : button { key = \"btn_dn\"; label = \"Down\"; width = 12; fixed_width = true; }\n"
+      "    : button { key = \"btn_up\"; label = \"Up\";   width = 12; fixed_width = true; }\n"
+      "  }\n"
+      "  spacer_1;\n"
+      "  : row {\n"
+      "    alignment = centered;\n"
+      "    : button { key = \"cancel\"; label = \"Cancel\"; width = 12; fixed_width = true; is_cancel = true; }\n"
+      "  }\n"
+      "}\n")
+    f)
+  (close f)
+
+  (setq dcl_id (load_dialog dlgName))
+  (setq result nil)
+  (if (and (> dcl_id 0) (new_dialog "bc_dir" dcl_id))
+    (progn
+      (setq *BC-DirSel* nil)
+      ;; click a button = choose that direction and close
+      (action_tile "btn_dn" "(setq *BC-DirSel* \"DN\") (done_dialog 1)")
+      (action_tile "btn_up" "(setq *BC-DirSel* \"UP\") (done_dialog 1)")
+      (action_tile "cancel" "(done_dialog 0)")
+      ;; keyboard focus on the last used direction
+      (mode_tile (if (= *BC-LastDir* "DN") "btn_dn" "btn_up") 2)
+      (setq dlgRet (start_dialog))
+      (if (= dlgRet 1)
+        (setq result *BC-DirSel* *BC-LastDir* *BC-DirSel*)
+      )
+    )
+    (prompt "\nvidBankCutting: could not open direction dialog.")
+  )
+  (if (> dcl_id 0) (unload_dialog dcl_id))
+  (vl-catch-all-apply 'vl-file-delete (list dlgName))
+  result
+)
+
 (defun C:vidBankCutting ( / e1 e2 t1 t2 n1 n2 diff h rev
                  pt pl foot dist dir ang blk dwg e d nxt mark pick-pt
-                 ucsang oldos oldecho *error*)
+                 ucsang oldos oldecho olddyn *error*)
 
   (defun *error* (msg)
     (if oldos   (setvar "osmode" oldos))
     (if oldecho (setvar "cmdecho" oldecho))
+    (if olddyn  (setvar "dynmode" olddyn))
     (if (and msg (not (wcmatch (strcase msg) "*CANCEL*,*QUIT*,*EXIT*")))
       (prompt (strcat "\nError: " msg)))
     (princ)
@@ -141,7 +194,11 @@
   (prompt "\n--- BC TOOL v25 ---")
 
   ;; 0. IMPORT BLOCKS FROM vid_blocks_tools.dwg
+  ;;    DYNMODE is OFF only while the file is selected, ON afterwards
+  (setq olddyn (getvar "dynmode"))
+  (setvar "dynmode" 0)
   (setq dwg (BC-find-dwg))
+  (setvar "dynmode" 3)
   (if (not dwg)
     (progn (alert "vid_blocks_tools.dwg not found!") (exit))
   )
@@ -210,8 +267,7 @@
                    2 2))
 
   ;; 4. DIRECTION
-  (initget "UP DN")
-  (setq dir (getkword "\nDirection [UP/DN]: "))
+  (setq dir (BC-direction-dialog))
   (if (null dir)
     (progn (alert "Direction not selected!") (exit))
   )
@@ -281,6 +337,7 @@
 
   (setvar "osmode" oldos)
   (setvar "cmdecho" oldecho)
+  (setvar "dynmode" olddyn)
 
   (prompt "\nDone macha!")
   (princ)

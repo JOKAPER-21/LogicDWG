@@ -6,10 +6,13 @@
 ;;; each other inside every Code group (e.g. "Motor Room") of a CSV file.
 ;;;
 ;;; WORKFLOW
-;;;   0. Select the TRACK polyline(s) in the drawing (any layer). The MTEXT
-;;;      labels are rotated to the tangent of the nearest selected curve.
-;;;      Press Enter to skip -> labels follow the box direction instead.
-;;;   1. Select the DGPS CSV file.
+;;;   0. Select the DGPS CSV file (asked first, DYNMODE = OFF).
+;;;   1. DYNMODE = ON, then the "Select Track Polyline" dialog opens:
+;;;        (o) List Existing Layers (multiple selection) - every track curve
+;;;            on the highlighted layer(s) is used
+;;;        ( ) Manually - pick the track polyline(s) yourself
+;;;      The MTEXT labels are rotated to the tangent of the nearest track curve.
+;;;      Manual + Enter (nothing picked) -> labels follow the box direction.
 ;;;   2. GROUP all rows by the "Code" column (case-insensitive:
 ;;;      "Gate" and "GATE" are ONE group).
 ;;;   3. SORT the points of each group by "Local Time".
@@ -49,11 +52,15 @@
 ;; ---- settings (edit freely) ------------------------------------------------
 (setq VDB-ClusterDist 80.0)        ; max distance (m) between consecutive points of one box
 (setq VDB-DevTol      1.0)         ; max distance (m) of 4th point from the computed 4th corner
-(setq VDB-TextHeight  0.5)         ; text height in drawing units
+(setq VDB-TextHeight  2.0)         ; text height in drawing units
 (setq VDB-TrackSS     nil)
+(setq VDB-TrackLayer  "1-TRACK")   ; layer pre-selected in the track layer list
+(setq VDB-TrackMode   "list")      ; dialog default: "list" or "manual"
+(setq VDB-TrackLayers nil)         ; layers chosen last time (remembered)
 (setq VDB-CsvPrefix   "1-TRACK_")  ; [From CSV] layer = prefix + Code
 (setq VDB-FromCsv     nil)
 (setq VDB-TextFlip180 T)           ; T = turn the label 180 deg from the track tangent
+(setq VDB-TextUpper   T)           ; T = label text always UPPER CASE (nil = keep CSV spelling)
 
 ;; Groups selected automatically in dialog 1 when a Code contains one of these.
 ;;   "word"  = the Code contains the entry as a whole word  (Motor Room -> ROOM)
@@ -72,6 +79,7 @@
 (setq vdb-*old-clayer*  nil)
 (setq vdb-*old-cmdecho* nil)
 (setq vdb-*old-osmode*  nil)
+(setq vdb-*old-dynmode* nil)
 
 ;; Layers offered in dialog 2 (edit freely)
 (setq VDB-DefaultLayers
@@ -411,7 +419,7 @@
       (setq start (+ pos (strlen (cdr pr))))
     )
   )
-  out
+  (if VDB-TextUpper (strcase out) out)      ; force UPPER CASE
 )
 
 ;; ---------------------------------------------------------------------------
@@ -583,6 +591,7 @@
   (if vdb-*old-clayer*  (setvar "CLAYER"  vdb-*old-clayer*))
   (if vdb-*old-cmdecho* (setvar "CMDECHO" vdb-*old-cmdecho*))
   (if vdb-*old-osmode*  (setvar "OSMODE"  vdb-*old-osmode*))
+  (if vdb-*old-dynmode* (setvar "DYNMODE" vdb-*old-dynmode*))
   (setq *error* vdb-*old-error*)
   (if (and msg (/= msg "Function cancelled") (/= msg "quit / exit abort"))
     (princ (strcat "\nVIDDGPSTOBOX ERROR: " msg))
@@ -658,37 +667,42 @@
 )
 
 ;; ===========================================================================
-;; DIALOG 2 - Layer Options.  Returns layer name or nil if cancelled.
+;; DIALOG 2 - Layer Options (same window style as vidDgpsToLine.lsp)
+;;   (o) Default Layers   [ list ]
+;;   ( ) Custom Layer     [ text box ]
+;;   ( ) CSV Code
+;; Returns layer name or nil if cancelled.
 ;; ===========================================================================
-(defun VDB-LayerDialog (selCodes / dlgName f dcl_id dlgRet result codeLabel)
+(defun VDB-LayerDialog (selCodes / dlgName f dcl_id dlgRet result)
   (setq dlgName (vl-filename-mktemp "vdbOpt" (getvar "TEMPPREFIX") ".dcl"))
-  (setq codeLabel "")
-  (foreach c selCodes
-    (setq codeLabel (strcat codeLabel (if (= codeLabel "") "" ", ") c))
-  )
-  (if (> (strlen codeLabel) 40)
-    (setq codeLabel (strcat (substr codeLabel 1 37) "..."))
-  )
   (setq f (open dlgName "w"))
   (write-line
     (strcat
       "vdb_opt : dialog {\n"
-      "  label = \"Dgps To Box - Layer Options\";\n"
+      "  label = \"Layer Options\";\n"
+      "\n"
+      "  : radio_button { key = \"rb_default\"; label = \"Default Layers\"; value = \"1\"; }\n"
       "  : row {\n"
-      "    : radio_button { key = \"rb_default\"; label = \"Default layers\"; value = \"1\"; }\n"
-      "    : radio_button { key = \"rb_csv\"; label = \"From CSV\"; value = \"0\"; }\n"
+      "    : spacer { width = 3; fixed_width = true; }\n"
+      "    : list_box {\n"
+      "      key = \"lst_default\"; height = 15; width = 40;\n"
+      "      fixed_width_font = false; multiple_select = false; allow_accept = false;\n"
+      "    }\n"
       "  }\n"
-      "  : list_box {\n"
-      "    key = \"lst_default\"; height = 16; width = 48;\n"
-      "    fixed_width_font = false; multiple_select = false; allow_accept = false;\n"
+      "\n"
+      "  : radio_button { key = \"rb_custom\"; label = \"Custom Layer\"; value = \"0\"; }\n"
+      "  : row {\n"
+      "    : spacer { width = 3; fixed_width = true; }\n"
+      "    : edit_box { key = \"edt_custom\"; label = \"\"; edit_width = 36; is_enabled = false; }\n"
       "  }\n"
-      "  : radio_button { key = \"rb_custom\"; label = \"Custom layer for (" (VDB-Safe codeLabel) ")\"; value = \"0\"; }\n"
-      "  : edit_box { key = \"edt_custom\"; label = \"Custom layer name\"; width = 40; edit_width = 36; is_enabled = false; }\n"
+      "\n"
+      "  : radio_button { key = \"rb_csv\"; label = \"CSV Code\"; value = \"0\"; }\n"
+      "\n"
       "  spacer_1;\n"
       "  : row {\n"
       "    alignment = centered;\n"
-      "    : button { key = \"accept\"; label = \"OK\"; width = 10; fixed_width = true; is_default = true; }\n"
-      "    : button { key = \"cancel\"; label = \"Cancel\"; width = 10; fixed_width = true; is_cancel = true; }\n"
+      "    : button { key = \"accept\"; label = \"OK\";     width = 10; fixed_width = true; is_default = true; }\n"
+      "    : button { key = \"cancel\"; label = \"Cancel\"; width = 10; fixed_width = true; is_cancel  = true; }\n"
       "  }\n"
       "}\n")
     f)
@@ -701,8 +715,10 @@
       (setq VDB-mode "default" VDB-defIdx "0" VDB-custom "")
       (setq VDB-FromCsv nil)
       (set_tile "rb_default" "1")
-      (set_tile "rb_csv" "0")
-      (set_tile "rb_custom" "0")
+      (set_tile "rb_custom"  "0")
+      (set_tile "rb_csv"     "0")
+      (mode_tile "lst_default" 0)
+      (mode_tile "edt_custom"  1)
       (start_list "lst_default" 3)
       (foreach l VDB-DefaultLayers (add_list l))
       (end_list)
@@ -710,21 +726,24 @@
 
       (action_tile "rb_default"
         (strcat "(setq VDB-mode \"default\")"
-                "(set_tile \"rb_default\" \"1\") (set_tile \"rb_csv\" \"0\") (set_tile \"rb_custom\" \"0\")"
+                "(set_tile \"rb_default\" \"1\") (set_tile \"rb_custom\" \"0\") (set_tile \"rb_csv\" \"0\")"
                 "(mode_tile \"lst_default\" 0) (mode_tile \"edt_custom\" 1)"))
-      (action_tile "rb_csv"
-        (strcat "(setq VDB-mode \"csv\")"
-                "(set_tile \"rb_default\" \"0\") (set_tile \"rb_csv\" \"1\") (set_tile \"rb_custom\" \"0\")"
-                "(mode_tile \"lst_default\" 1) (mode_tile \"edt_custom\" 1)"))
       (action_tile "rb_custom"
         (strcat "(setq VDB-mode \"custom\")"
-                "(set_tile \"rb_default\" \"0\") (set_tile \"rb_csv\" \"0\") (set_tile \"rb_custom\" \"1\")"
+                "(set_tile \"rb_default\" \"0\") (set_tile \"rb_custom\" \"1\") (set_tile \"rb_csv\" \"0\")"
                 "(mode_tile \"lst_default\" 1) (mode_tile \"edt_custom\" 0)"
                 "(mode_tile \"edt_custom\" 2)"))
+      (action_tile "rb_csv"
+        (strcat "(setq VDB-mode \"csv\")"
+                "(set_tile \"rb_default\" \"0\") (set_tile \"rb_custom\" \"0\") (set_tile \"rb_csv\" \"1\")"
+                "(mode_tile \"lst_default\" 1) (mode_tile \"edt_custom\" 1)"))
+      ;; OK - stays open if Custom Layer is chosen but the box is blank
       (action_tile "accept"
         (strcat "(setq VDB-custom (get_tile \"edt_custom\"))"
                 "(setq VDB-defIdx (get_tile \"lst_default\"))"
-                "(done_dialog 1)"))
+                "(if (and (= VDB-mode \"custom\") (= (VDB-Trim VDB-custom) \"\"))"
+                "  (progn (alert \"Enter a custom layer name.\") (mode_tile \"edt_custom\" 2))"
+                "  (done_dialog 1))"))
       (action_tile "cancel" "(done_dialog 0)")
 
       (setq dlgRet (start_dialog))
@@ -734,12 +753,7 @@
            (setq VDB-FromCsv T)
            (setq result (strcat VDB-CsvPrefix "<Code>")))
           ((= VDB-mode "custom")
-           (setq VDB-custom (VDB-Trim VDB-custom))
-           (if (= VDB-custom "")
-             (progn
-               (alert "Custom layer name is blank - using the first default layer.")
-               (setq result (nth 0 VDB-DefaultLayers)))
-             (setq result VDB-custom)))
+           (setq result (VDB-Trim VDB-custom)))
           (T
            (setq result
              (if (and (/= (VDB-Trim VDB-defIdx) "") (nth (atoi VDB-defIdx) VDB-DefaultLayers))
@@ -756,35 +770,188 @@
 )
 
 ;; ===========================================================================
+;; TRACK DIALOG - same window style as the Layer Options dialog
+;;   (o) List Existing Layers  (multiple selection)
+;;         [ list of the layers in the drawing ]
+;;   ( ) Manually
+;; Returns (mode layerNames): ("list" ("1-TRACK" ...)) or ("manual" nil);
+;; nil if cancelled.
+;; ===========================================================================
+(defun VDB-AllLayers (/ rec nm lst)
+  (setq rec (tblnext "LAYER" T) lst '())
+  (while rec
+    (setq nm (cdr (assoc 2 rec)))
+    (setq lst (cons nm lst))
+    (setq rec (tblnext "LAYER"))
+  )
+  (acad_strlsort lst)
+)
+
+(defun VDB-TrackDialog (/ layers dlgName f dcl_id dlgRet result initSel i idx)
+  (setq layers (VDB-AllLayers))
+  (setq dlgName (vl-filename-mktemp "vdbTrk" (getvar "TEMPPREFIX") ".dcl"))
+  (setq f (open dlgName "w"))
+  (write-line
+    (strcat
+      "vdb_trk : dialog {\n"
+      "  label = \"Select Track Polyline\";\n"
+      "\n"
+      "  : radio_button { key = \"rb_list\"; label = \"List Existing Layers (multiple selection)\"; value = \"1\"; }\n"
+      "  : row {\n"
+      "    : spacer { width = 3; fixed_width = true; }\n"
+      "    : list_box {\n"
+      "      key = \"lst_layers\"; height = 15; width = 40;\n"
+      "      fixed_width_font = false; multiple_select = true; allow_accept = false;\n"
+      "    }\n"
+      "  }\n"
+      "\n"
+      "  : radio_button { key = \"rb_manual\"; label = \"Manually\"; value = \"0\"; }\n"
+      "\n"
+      "  spacer_1;\n"
+      "  : row {\n"
+      "    alignment = centered;\n"
+      "    : button { key = \"accept\"; label = \"OK\";     width = 10; fixed_width = true; is_default = true; }\n"
+      "    : button { key = \"cancel\"; label = \"Cancel\"; width = 10; fixed_width = true; is_cancel  = true; }\n"
+      "  }\n"
+      "}\n")
+    f)
+  (close f)
+
+  (setq dcl_id (load_dialog dlgName))
+  (setq result nil)
+  (if (and (> dcl_id 0) (new_dialog "vdb_trk" dcl_id))
+    (progn
+      (setq VDB-trkSel VDB-TrackMode VDB-trkIdx "")
+      (start_list "lst_layers" 3)
+      (foreach l layers (add_list l))
+      (end_list)
+      ;; pre-select the layers used last time, else the default track layer
+      (setq initSel "" i 0)
+      (foreach l layers
+        (if (member l (if VDB-TrackLayers VDB-TrackLayers (list VDB-TrackLayer)))
+          (setq initSel (strcat initSel (if (= initSel "") "" " ") (itoa i))))
+        (setq i (1+ i))
+      )
+      (if (/= initSel "") (set_tile "lst_layers" initSel))
+
+      (set_tile "rb_list"   (if (= VDB-TrackMode "manual") "0" "1"))
+      (set_tile "rb_manual" (if (= VDB-TrackMode "manual") "1" "0"))
+      (mode_tile "lst_layers" (if (= VDB-TrackMode "manual") 1 0))
+
+      (action_tile "rb_list"
+        (strcat "(setq VDB-trkSel \"list\")"
+                "(set_tile \"rb_list\" \"1\") (set_tile \"rb_manual\" \"0\")"
+                "(mode_tile \"lst_layers\" 0)"))
+      (action_tile "rb_manual"
+        (strcat "(setq VDB-trkSel \"manual\")"
+                "(set_tile \"rb_list\" \"0\") (set_tile \"rb_manual\" \"1\")"
+                "(mode_tile \"lst_layers\" 1)"))
+      ;; OK - stays open if List is chosen but no layer is highlighted
+      (action_tile "accept"
+        (strcat "(setq VDB-trkIdx (get_tile \"lst_layers\"))"
+                "(if (and (= VDB-trkSel \"list\") (= (VDB-Trim VDB-trkIdx) \"\"))"
+                "  (alert \"Select at least one layer, or choose Manually.\")"
+                "  (done_dialog 1))"))
+      (action_tile "cancel" "(done_dialog 0)")
+
+      (setq dlgRet (start_dialog))
+      (if (= dlgRet 1)
+        (progn
+          (setq VDB-TrackMode VDB-trkSel)
+          (if (= VDB-trkSel "list")
+            (progn
+              (setq result '())
+              (foreach idx (read (strcat "(" VDB-trkIdx ")"))
+                (if (nth idx layers) (setq result (append result (list (nth idx layers))))))
+              (setq VDB-TrackLayers result)
+              (setq result (list "list" result))
+            )
+            (setq result (list "manual" nil))
+          )
+        )
+      )
+    )
+    (princ "\nVIDDGPSTOBOX: could not open track dialog.")
+  )
+  (if (> dcl_id 0) (unload_dialog dcl_id))
+  (vl-catch-all-apply 'vl-file-delete (list dlgName))
+  result
+)
+
+;; All track curves on the chosen layers (any layer state). Returns ss or nil.
+(defun VDB-LayerTrackSS (layers / filt)
+  (setq filt "")
+  (foreach l layers
+    (setq filt (strcat filt (if (= filt "") "" ",") (VDB-EscLayer l))))
+  (ssget "_X"
+    (list '(0 . "LWPOLYLINE,POLYLINE,LINE,ARC,SPLINE")
+          (cons 8 filt)))
+)
+
+;; escape wildcard characters so a layer name matches only itself
+(defun VDB-EscLayer (s / i ch out)
+  (setq i 1 out "")
+  (while (<= i (strlen s))
+    (setq ch (substr s i 1))
+    (setq out
+      (strcat out
+        (if (member ch '("`" "#" "@" "." "*" "?" "~" "[" "]" ","))
+          (strcat "`" ch)
+          ch)))
+    (setq i (1+ i))
+  )
+  out
+)
+
+;; ===========================================================================
 ;; MAIN COMMAND
 ;; ===========================================================================
 (defun c:VIDDGPSTOBOX
   (/ csvFile fh headerLine headers idxC idxN idxE idxZ idxT
      line fields rowNo code north east elev tm allRev records
      groups codes labels selCodes targetLayer codeLayer
-     g res totMade totFail totSkip dataRows validRows skippedRows)
+     g res totMade totFail totSkip dataRows validRows skippedRows trkRes)
 
   (setq vdb-*old-error* *error*)
   (setq *error* VDB-Error)
   (setq vdb-*old-clayer*  (getvar "CLAYER"))
   (setq vdb-*old-cmdecho* (getvar "CMDECHO"))
   (setq vdb-*old-osmode*  (getvar "OSMODE"))
+  (setq vdb-*old-dynmode* (getvar "DYNMODE"))
   (setvar "CMDECHO" 0)
   (setvar "OSMODE"  0)
 
-  ;; 0. Select track polyline(s) (replaces the old 1-TRACK layer detection) ---
-  (setq VDB-TrackSS nil)
-  (princ "\nSelect TRACK polyline(s) for text rotation <Enter = none>: ")
-  (setq VDB-TrackSS
-    (ssget '((0 . "LWPOLYLINE,POLYLINE,LINE,ARC,SPLINE"))))
-
-  ;; 1. CSV file ---------------------------------------------------------------
+  ;; 0. CSV file - asked FIRST, DYNMODE = OFF ---------------------------------
+  (setvar "DYNMODE" 0)
   (setq csvFile
     (if (boundp 'LogicDWG:RequireCsv)
       (LogicDWG:RequireCsv)
       (getfiled "Select DGPS CSV File" "" "csv" 4)))
   (if (null csvFile)
     (progn (VDB-Error "No CSV file selected.") (exit))
+  )
+
+  ;; 1. Track polyline(s) - DYNMODE = ON, dialog: List Layers / Manually -----
+  (setvar "DYNMODE" 3)
+  (setq VDB-TrackSS nil)
+  (setq trkRes (VDB-TrackDialog))
+  (if (null trkRes)
+    (progn (VDB-Error "Cancelled by user.") (exit))
+  )
+  (if (= (car trkRes) "list")
+    (progn
+      (setq VDB-TrackSS (VDB-LayerTrackSS (cadr trkRes)))
+      (if VDB-TrackSS
+        (princ (strcat "\nTrack layer(s): " (itoa (sslength VDB-TrackSS))
+                       " curve(s) found."))
+        (princ "\nNo curves found on the selected layer(s) - text will follow the box direction.")
+      )
+    )
+    (progn
+      (princ "\nSelect TRACK polyline(s) for text rotation <Enter = none>: ")
+      (setq VDB-TrackSS
+        (ssget '((0 . "LWPOLYLINE,POLYLINE,LINE,ARC,SPLINE"))))
+    )
   )
 
   ;; 2. Read CSV --------------------------------------------------------------
@@ -925,6 +1092,7 @@
   (setvar "CLAYER"  vdb-*old-clayer*)
   (setvar "CMDECHO" vdb-*old-cmdecho*)
   (setvar "OSMODE"  vdb-*old-osmode*)
+  (if vdb-*old-dynmode* (setvar "DYNMODE" vdb-*old-dynmode*))
   (setq *error* vdb-*old-error*)
   (princ)
 )
