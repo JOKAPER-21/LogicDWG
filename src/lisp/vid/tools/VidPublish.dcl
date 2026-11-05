@@ -29,11 +29,11 @@ vid_publish_dlg : dialog {
             fixed_height = true;
             multiple_select = false;
         }
-        // Server version folder this publish will land in (set from VidPublish.lsp)
         : text {
             key = "target_preview";
-            value = "";
-            width = 70;
+            label = "";
+            width = 60;
+            fixed_width = false;
         }
         spacer;
     }

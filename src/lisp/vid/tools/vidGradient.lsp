@@ -5,10 +5,18 @@
 ;;;           (imported from vid_blocks_tools.dwg, searched in the same
 ;;;           folder as this LSP, then the vid/tools support folders)
 ;;; CSV     : vid_ch,rw_ch,railLevel,lineType,before,current,note
+;;; Flow    : 1. select the rail track   2. select the CSV
+;;;           3. window "Gradient":
+;;;                Symbol Name      [vid_gradient_001]
+;;;                Symbol Position  [LHS | RHS]  [80]
+;;;                (LHS / RHS = side of the track, seen along the track as
+;;;                 drawn; the number is the distance from the track)
 ;;; ======================================================================
 
 ;; ---- locate this LSP's folder at load time (used to find the DWG) ----
-(setq *vg-blk-name* "vid_gradient_001")   ;; default block name
+(setq *vg-blk-name* "vid_gradient_001")   ;; window default (stays as last used)
+(setq *vg-side*     "LHS")               ;; window default: LHS / RHS (stays as last used)
+(setq *vg-height*   80.0)                ;; window default: distance from track
 (setq *vg-tried* nil)
 (setq *vg-dwg-name* "vid_blocks_tools.dwg")
 
@@ -208,14 +216,92 @@
 )
 
 ;; ----------------------------------------------------------------------
+;; SETTINGS WINDOW  ->  (blockName side distance)  or nil if cancelled
+;; ----------------------------------------------------------------------
+(defun vg:num-str (x)
+  (if (equal x (fix x) 1e-9) (itoa (fix x)) (rtos x 2 3))
+)
+
+(defun vg:settings-dialog (/ dcl_id dlgName f dlgRet result)
+  (setq dlgName (vl-filename-mktemp "vidGradOpt" (getvar "TEMPPREFIX") ".dcl"))
+  (setq f (open dlgName "w"))
+  (write-line
+    (strcat
+      "vg_settings : dialog {\n"
+      "  label = \"Gradient\";\n"
+      "  : boxed_column {\n"
+      "    label = \"Settings\";\n"
+      "    : row {\n"
+      "      : text     { label = \"Symbol Name\"; width = 20; fixed_width = true; }\n"
+      "      : edit_box { key = \"edt_sym\"; label = \"\"; edit_width = 28; }\n"
+      "    }\n"
+      "    : row {\n"
+      "      : text       { label = \"Symbol Position\"; width = 20; fixed_width = true; }\n"
+      "      : popup_list { key = \"pop_side\"; edit_width = 10; fixed_width = true; }\n"
+      "      : edit_box   { key = \"edt_off\"; label = \"\"; edit_width = 8; fixed_width = true; }\n"
+      "      : text       { label = \"m\"; width = 2; fixed_width = true; }\n"
+      "    }\n"
+      "  }\n"
+      "  spacer_1;\n"
+      "  ok_cancel;\n"
+      "}\n")
+    f)
+  (close f)
+
+  (setq dcl_id (load_dialog dlgName))
+  (setq result nil)
+  (if (and (> dcl_id 0) (new_dialog "vg_settings" dcl_id))
+    (progn
+      (set_tile "edt_sym" *vg-blk-name*)
+      (start_list "pop_side")
+      (add_list "LHS")
+      (add_list "RHS")
+      (end_list)
+      (set_tile "pop_side" (if (= *vg-side* "RHS") "1" "0"))
+      (set_tile "edt_off" (vg:num-str *vg-height*))
+
+      ;; OK stays open while the name is blank or the number is not > 0
+      (action_tile "accept"
+        (strcat "(setq vg-tSym (vl-string-trim \" \" (get_tile \"edt_sym\")))"
+                "(setq vg-tSide (get_tile \"pop_side\"))"
+                "(setq vg-tOff (distof (vl-string-trim \" \" (get_tile \"edt_off\")) 2))"
+                "(cond"
+                "  ((= vg-tSym \"\") (alert \"Enter the Symbol Name (block name).\") (mode_tile \"edt_sym\" 2))"
+                "  ((or (null vg-tOff) (<= vg-tOff 0.0)) (alert \"Enter a number greater than 0 for the Symbol Position.\") (mode_tile \"edt_off\" 2))"
+                "  (T (done_dialog 1)))"))
+      (action_tile "cancel" "(done_dialog 0)")
+
+      (setq dlgRet (start_dialog))
+      (if (= dlgRet 1)
+        (progn
+          (setq *vg-blk-name* vg-tSym
+                *vg-side*     (if (= vg-tSide "1") "RHS" "LHS")
+                *vg-height*   vg-tOff)
+          (setq result (list *vg-blk-name* *vg-side* *vg-height*))))
+    )
+    (prompt "\nVIDGRADIENT: could not open the Gradient window.")
+  )
+  (if (> dcl_id 0) (unload_dialog dcl_id))
+  (vl-catch-all-apply 'vl-file-delete (list dlgName))
+  result
+)
+
+;; ----------------------------------------------------------------------
 ;; MAIN COMMAND
 ;; ----------------------------------------------------------------------
-(defun c:VIDGRADIENT (/ blk-name hdr delim bad dwg pl pl-length perp-offset file fp line
+(defun c:VIDGRADIENT (/ *error* setRes side-pos blk-name hdr delim bad dwg pl pl-length perp-offset file fp line
                         csv-data km-list offset-dist
                         doc mspace pt1 pt2 tang-angle pt-final obj atts att tag
                         tail-value head-value km-data g-pos pos-done count skipped d)
 
   (vl-load-com)
+
+  (defun *error* (msg)
+    (if (and msg (not (wcmatch (strcase msg) "*CANCEL*,*QUIT*,*EXIT*")))
+      (prompt (strcat "\nVIDGRADIENT ERROR: " msg))
+      (prompt "\nVIDGRADIENT cancelled."))
+    (princ)
+  )
 
   (setq doc    (vla-get-ActiveDocument (vlax-get-acad-object))
         mspace (vla-get-ModelSpace doc))
@@ -238,12 +324,12 @@
           (if (and *vg-last-csv* (/= *vg-last-csv* ""))
             (setq *vg-last-csv* (strcat *vg-last-csv* "/")))
 
-          (setq blk-name (getstring T (strcat "\nEnter Gradient Block name <" *vg-blk-name* ">: ")))
-          (if (= (vl-string-trim " " blk-name) "") (setq blk-name *vg-blk-name*))
-          (setq blk-name (vl-string-trim " " blk-name))
-
-          (setq perp-offset (getreal "\nEnter Gradient Height <80>: "))
-          (if (not perp-offset) (setq perp-offset 80.0))
+          ;; Gradient window: Symbol Name / Symbol Position (LHS|RHS) + distance
+          (if (not (setq setRes (vg:settings-dialog)))
+            (progn (prompt "\nCancelled.") (exit)))
+          (setq blk-name    (car setRes)
+                side-pos    (cadr setRes)
+                perp-offset (caddr setRes))
 
           ;; ---- 2. import block from the DWG (override if it exists) ----
           (if (not (setq dwg (vg:find-dwg)))
@@ -307,11 +393,13 @@
                                   pt1 (vlax-curve-getPointAtDist pl (max 0.0 (- offset-dist 0.01)))))
                           (setq tang-angle (angle pt1 pt2))
 
-                          ;; offset point (right of track)
+                          ;; offset point (LHS / RHS of track, per the window)
                           (setq pt-final
                                 (vlax-3d-point
                                   (polar (vlax-curve-getPointAtDist pl offset-dist)
-                                         (- tang-angle (/ pi 2.0))
+                                         (if (= side-pos "RHS")
+                                           (- tang-angle (/ pi 2.0))   ;; right of track
+                                           (+ tang-angle (/ pi 2.0)))  ;; left of track
                                          perp-offset)))
 
                           (setq obj (vla-InsertBlock mspace pt-final blk-name

@@ -8,39 +8,53 @@
 ;; Preserve the actual loader path, including APPLOAD/drag-and-drop locations.
 (setq LogicDWG:LoaderPath *load-truename*)
 
-;; Tool files, in load order.
+;; ============================================================
+;; LogicDWG - Tool Files
+;; Description: Tool files, loaded in alphabetical order.
+;; ============================================================
+
 (setq LogicDWG:Files
-  '("logicDwg.lsp"
+  '(
+    "logicDwg.lsp"
     "vidBankCutting.lsp"
     "vidBlockLayer.lsp"
+    "vidBoxText.lsp"
+    "vidBridge.lsp"
     "vidCadMergeLayers.lsp"
     "vidCadOptimize.lsp"
     "vidChainageRunner.lsp"
+    "vidCommanSettings.lsp"
+    "vidDimMToFt.lsp"
+    "vidDimSettings.lsp"
     "vidDgpsToBox.lsp"
-    "vidLineToExportLevel.lsp"
     "vidDgpsToLine.lsp"
     "vidDgpsToOhe.lsp"
     "vidDgpsToSp.lsp"
-    "vidDimMToFt.lsp"
-    "vidDimSettings.lsp"
     "vidGradient.lsp"
     "vidGradientAlign.lsp"
     "vidGradientCleanup.lsp"
     "vidIndexCurve.lsp"
     "vidIndexGradient.lsp"
-    "vidMapZone.lsp"
-    "vidRotText.lsp"
-    "vidRwBoundary.lsp"
-    "vidTr.lsp"
     "vidLC.lsp"
+    "vidLineToExportLevel.lsp"
     "vidLogicDwgGuide.lsp"
     "vidLogicDwgOnlineTools.lsp"
+    "vidMapZone.lsp"
+    "vidLayoutGen.lsp"
+    "vidPublish.lsp"
+    "vidRotText.lsp"
+    "vidRwBoundaryMarker.lsp"
+    "vidRwBoundaryText.lsp"
     "vidSurveySettings.lsp"
     "vidUnitSettings.lsp"
-    "vidPublish.lsp"
-    "vidCommanSettings.lsp"
   )
 )
+;; ============================================================
+;; Total Tool Files: 32
+;; Sorting: Ascending alphabetical order (A-Z)
+;; ============================================================
+
+
 
 ;; Find the tools folder. Works when this loader is on the Support File
 ;; Search Path, when it was loaded with APPLOAD / drag-and-drop from any

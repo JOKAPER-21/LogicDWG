@@ -1,0 +1,4329 @@
+PIAFILEVERSION_3.0,json
+{
+ "data" : 
+ {
+  "meta" : 
+  {
+   "canonical_family_name" : "Autodesk ePlot",
+   "canonical_model_name" : "pdf",
+   "default_system_cfg" : false,
+   "dm_driver_version" : 0,
+   "driver_pathname" : "C:\\Program Files\\Autodesk\\AutoCAD 2026\\drv\\pdfplot17.hdi",
+   "driver_tag_line" : "PDF ePlot - by Autodesk",
+   "driver_type" : 3,
+   "driver_version" : "1.1-17.1.164.0 [v018-1]",
+   "file_only" : true,
+   "friendly_net_name" : "",
+   "locale" : "4B00409",
+   "localized_family_name" : "Autodesk ePlot (PDF)",
+   "localized_model_name" : "DWG To PDF",
+   "model_abilities" : "000550055000",
+   "platform" : "2,10,0",
+   "short_net_name" : "",
+   "show_custom_first" : false,
+   "toolkit_version" : 1,
+   "truetype_as_text" : true,
+   "udm_description" : "",
+   "user_defined_model_basename" : "",
+   "user_defined_model_pathname" : "C:\\Users\\jokap\\AppData\\Roaming\\Autodesk\\C3D 2026\\enu\\plotters\\PMP Files\\DWG To PDF.pmp"
+  },
+  "mod" : 
+  {
+   "media" : 
+   {
+    "abilities" : "500005500500505555000005550000000550000500000500000",
+    "caps_state" : "000000000000000000000000000000000000000000000000000",
+    "size_max_x" : 5080.0,
+    "size_max_y" : 5080.0,
+    "ui_owner" : "11111111111111111111000"
+   }
+  },
+  "udm" : 
+  {
+   "calibration" : 
+   {
+    "_x" : 1.0,
+    "_y" : 1.0
+   },
+   "media" : 
+   {
+    "description" : 
+    {
+     "0" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 500.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (500x210MM)",
+      "printable_area" : 98000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 495.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "1" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1000.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1000x297MM)",
+      "printable_area" : 284130.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 995.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "10" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2600.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2600x297MM)",
+      "printable_area" : 743330.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2595.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "100" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2400.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2400x1189MM)",
+      "printable_area" : 2817810.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2395.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "101" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 500.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (500x1189MM)",
+      "printable_area" : 577710.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 495.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "102" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2300.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2300x594MM)",
+      "printable_area" : 1337360.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2295.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "103" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 500.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (500x297MM)",
+      "printable_area" : 140630.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 495.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "104" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2800.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2800x210MM)",
+      "printable_area" : 558000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2795.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "105" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2500.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2500x420MM)",
+      "printable_area" : 1020900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2495.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "106" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3200.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (3200x297MM)",
+      "printable_area" : 915530.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3195.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "107" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1500.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1500x420MM)",
+      "printable_area" : 610900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1495.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "108" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 700.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (700x420MM)",
+      "printable_area" : 282900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 695.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "109" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2400.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2400x841MM)",
+      "printable_area" : 1986090.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2395.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "11" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1300.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1300x420MM)",
+      "printable_area" : 528900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1295.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "110" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 600.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (600x594MM)",
+      "printable_area" : 344560.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 595.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "111" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1800.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1800x297MM)",
+      "printable_area" : 513730.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1795.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "112" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 600.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (600x420MM)",
+      "printable_area" : 241900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 595.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "113" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1900.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1900x297MM)",
+      "printable_area" : 542430.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1895.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "114" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3400.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (3400x297MM)",
+      "printable_area" : 972930.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3395.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "115" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2200.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2200x297MM)",
+      "printable_area" : 628530.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2195.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "116" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3400.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (3400x594MM)",
+      "printable_area" : 1979760.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3395.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "117" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2600.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2600x841MM)",
+      "printable_area" : 2152290.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2595.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "118" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2400.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2400x297MM)",
+      "printable_area" : 685930.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2395.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "119" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2700.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2700x297MM)",
+      "printable_area" : 772030.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2695.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "12" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2300.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2300x841MM)",
+      "printable_area" : 1902990.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2295.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "120" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1000.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1000x594MM)",
+      "printable_area" : 578160.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 995.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "121" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1700.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1700x594MM)",
+      "printable_area" : 986960.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1695.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "122" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2900.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2900x297MM)",
+      "printable_area" : 829430.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2895.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "123" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3400.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (3400x210MM)",
+      "printable_area" : 678000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3395.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "124" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2200.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2200x420MM)",
+      "printable_area" : 897900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2195.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "125" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1900.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1900x841MM)",
+      "printable_area" : 1570590.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1895.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "126" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 900.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (900x1189MM)",
+      "printable_area" : 1049310.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 895.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "127" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1900.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1900x420MM)",
+      "printable_area" : 774900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1895.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "128" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2300.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2300x420MM)",
+      "printable_area" : 938900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2295.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "129" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1000.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1000x210MM)",
+      "printable_area" : 198000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 995.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "13" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1400.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1400x210MM)",
+      "printable_area" : 278000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1395.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "130" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1800.0,
+      "media_bounds_ury" : 474.0,
+      "name" : "User-7",
+      "printable_area" : 794752.0,
+      "printable_bounds_llx" : 13.0,
+      "printable_bounds_lly" : 13.0,
+      "printable_bounds_urx" : 1787.0,
+      "printable_bounds_ury" : 461.0
+     },
+     "131" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1700.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1700x420MM)",
+      "printable_area" : 692900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1695.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "132" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 800.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (800x420MM)",
+      "printable_area" : 323900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 795.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "133" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1000.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1000x420MM)",
+      "printable_area" : 405900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 995.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "134" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1900.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1900x210MM)",
+      "printable_area" : 378000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1895.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "135" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2700.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2700x210MM)",
+      "printable_area" : 538000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2695.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "136" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1400.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1400x420MM)",
+      "printable_area" : 569900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1395.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "137" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3100.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (3100x297MM)",
+      "printable_area" : 886830.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3095.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "138" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1000.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1000x1189MM)",
+      "printable_area" : 1167210.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 995.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "139" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1700.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1700x210MM)",
+      "printable_area" : 338000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1695.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "14" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3300.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (3300x210MM)",
+      "printable_area" : 658000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3295.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "140" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2300.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2300x1189MM)",
+      "printable_area" : 2699910.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2295.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "141" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3000.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (3000x1189MM)",
+      "printable_area" : 3525210.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2995.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "142" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1100.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1100x420MM)",
+      "printable_area" : 446900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1095.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "143" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2000.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2000x420MM)",
+      "printable_area" : 815900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1995.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "144" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3200.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (3200x594MM)",
+      "printable_area" : 1862960.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3195.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "145" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3500.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (3500x594MM)",
+      "printable_area" : 2038160.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3495.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "146" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2100.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2100x420MM)",
+      "printable_area" : 856900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2095.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "147" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 600.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (600x841MM)",
+      "printable_area" : 490290.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 595.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "148" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1400.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1400x1189MM)",
+      "printable_area" : 1638810.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1395.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "149" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 500.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (500x841MM)",
+      "printable_area" : 407190.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 495.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "15" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1200.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1200x594MM)",
+      "printable_area" : 694960.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1195.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "150" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3000.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (3000x594MM)",
+      "printable_area" : 1746160.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2995.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "151" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1100.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1100x594MM)",
+      "printable_area" : 636560.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1095.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "152" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1400.0,
+      "media_bounds_ury" : 460.0,
+      "name" : "User-1",
+      "printable_area" : 625500.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1395.0,
+      "printable_bounds_ury" : 455.0
+     },
+     "153" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 700.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (700x594MM)",
+      "printable_area" : 402960.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 695.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "154" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1200.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1200x1189MM)",
+      "printable_area" : 1403010.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1195.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "155" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1800.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1800x210MM)",
+      "printable_area" : 358000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1795.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "156" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3100.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (3100x210MM)",
+      "printable_area" : 618000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3095.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "157" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3500.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (3500x420MM)",
+      "printable_area" : 1430900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3495.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "158" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3300.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (3300x420MM)",
+      "printable_area" : 1348900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3295.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "159" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2400.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2400x594MM)",
+      "printable_area" : 1395760.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2395.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "16" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2200.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2200x210MM)",
+      "printable_area" : 438000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2195.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "160" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3300.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (3300x297MM)",
+      "printable_area" : 944230.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3295.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "161" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 900.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (900x297MM)",
+      "printable_area" : 255430.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 895.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "162" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1400.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1400x594MM)",
+      "printable_area" : 811760.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1395.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "163" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1600.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1600x1189MM)",
+      "printable_area" : 1874610.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1595.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "164" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2600.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2600x594MM)",
+      "printable_area" : 1512560.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2595.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "165" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2100.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2100x297MM)",
+      "printable_area" : 599830.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2095.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "166" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2900.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2900x594MM)",
+      "printable_area" : 1687760.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2895.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "167" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2800.0,
+      "media_bounds_ury" : 900.0,
+      "name" : "User-5",
+      "printable_area" : 2424476.0,
+      "printable_bounds_llx" : 13.0,
+      "printable_bounds_lly" : 13.0,
+      "printable_bounds_urx" : 2787.0,
+      "printable_bounds_ury" : 887.0
+     },
+     "168" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2900.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2900x841MM)",
+      "printable_area" : 2401590.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2895.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "169" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3400.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (3400x420MM)",
+      "printable_area" : 1389900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3395.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "17" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1600.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1600x420MM)",
+      "printable_area" : 651900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1595.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "170" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3000.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (3000x297MM)",
+      "printable_area" : 858130.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2995.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "171" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1300.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1300x594MM)",
+      "printable_area" : 753360.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1295.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "172" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 600.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (600x297MM)",
+      "printable_area" : 169330.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 595.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "173" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1900.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1900x594MM)",
+      "printable_area" : 1103760.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1895.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "174" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3200.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (3200x210MM)",
+      "printable_area" : 638000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3195.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "175" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1900.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1900x1189MM)",
+      "printable_area" : 2228310.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1895.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "176" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 600.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (600x210MM)",
+      "printable_area" : 118000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 595.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "177" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2100.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2100x210MM)",
+      "printable_area" : 418000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2095.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "178" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2700.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2700x420MM)",
+      "printable_area" : 1102900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2695.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "179" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1300.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1300x297MM)",
+      "printable_area" : 370230.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1295.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "18" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1400.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1400x297MM)",
+      "printable_area" : 398930.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1395.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "180" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 900.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (900x594MM)",
+      "printable_area" : 519760.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 895.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "181" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2500.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2500x841MM)",
+      "printable_area" : 2069190.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2495.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "182" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3100.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (3100x594MM)",
+      "printable_area" : 1804560.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3095.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "183" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1400.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1400x841MM)",
+      "printable_area" : 1155090.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1395.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "184" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3500.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (3500x210MM)",
+      "printable_area" : 698000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3495.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "185" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3300.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (3300x594MM)",
+      "printable_area" : 1921360.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3295.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "186" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3400.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (3400x1189MM)",
+      "printable_area" : 3996810.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3395.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "187" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2000.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2000x210MM)",
+      "printable_area" : 398000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1995.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "188" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 600.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (600x1189MM)",
+      "printable_area" : 695610.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 595.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "189" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 800.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (800x841MM)",
+      "printable_area" : 656490.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 795.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "19" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3100.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (3100x841MM)",
+      "printable_area" : 2567790.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3095.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "190" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1600.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1600x297MM)",
+      "printable_area" : 456330.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1595.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "191" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1200.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1200x420MM)",
+      "printable_area" : 487900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1195.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "192" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2800.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2800x841MM)",
+      "printable_area" : 2318490.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2795.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "193" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2450.0,
+      "media_bounds_ury" : 560.0,
+      "name" : "UserDefinedMetric Landscape 2450.00W x 560.00H - (5, 5) x (2445, 555) =1342000 MM",
+      "printable_area" : 1342000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2445.0,
+      "printable_bounds_ury" : 555.0
+     },
+     "2" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2600.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2600x1189MM)",
+      "printable_area" : 3053610.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2595.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "20" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1800.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1800x841MM)",
+      "printable_area" : 1487490.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1795.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "21" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1000.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1000x841MM)",
+      "printable_area" : 822690.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 995.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "22" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1600.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1600x841MM)",
+      "printable_area" : 1321290.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1595.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "23" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 500.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (500x420MM)",
+      "printable_area" : 200900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 495.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "24" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1200.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1200x841MM)",
+      "printable_area" : 988890.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1195.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "25" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 900.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (900x210MM)",
+      "printable_area" : 178000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 895.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "26" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2900.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2900x210MM)",
+      "printable_area" : 578000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2895.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "27" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3200.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (3200x841MM)",
+      "printable_area" : 2650890.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3195.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "28" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 900.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (900x420MM)",
+      "printable_area" : 364900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 895.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "29" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1800.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (1800x420MM)",
+      "printable_area" : 733900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1795.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "3" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2100.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2100x841MM)",
+      "printable_area" : 1736790.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2095.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "30" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1300.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1300x1189MM)",
+      "printable_area" : 1520910.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1295.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "31" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3300.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (3300x841MM)",
+      "printable_area" : 2733990.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3295.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "32" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2600.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2600x420MM)",
+      "printable_area" : 1061900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2595.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "33" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2400.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2400x210MM)",
+      "printable_area" : 478000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2395.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "34" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 700.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (700x210MM)",
+      "printable_area" : 138000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 695.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "35" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3400.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (3400x841MM)",
+      "printable_area" : 2817090.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3395.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "36" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2500.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2500x297MM)",
+      "printable_area" : 714630.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2495.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "37" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3500.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (3500x297MM)",
+      "printable_area" : 1001630.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3495.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "38" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 700.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (700x1189MM)",
+      "printable_area" : 813510.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 695.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "39" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 800.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (800x1189MM)",
+      "printable_area" : 931410.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 795.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "4" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 229.0,
+      "media_bounds_ury" : 162.0,
+      "name" : "User-3",
+      "printable_area" : 26108.0,
+      "printable_bounds_llx" : 7.5,
+      "printable_bounds_lly" : 20.0,
+      "printable_bounds_urx" : 221.5,
+      "printable_bounds_ury" : 142.0
+     },
+     "40" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1700.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1700x297MM)",
+      "printable_area" : 485030.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1695.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "41" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3300.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (3300x1189MM)",
+      "printable_area" : 3878910.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3295.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "42" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 800.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (800x210MM)",
+      "printable_area" : 158000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 795.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "43" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1300.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1300x210MM)",
+      "printable_area" : 258000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1295.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "44" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2400.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2400x420MM)",
+      "printable_area" : 979900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2395.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "45" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1500.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1500x210MM)",
+      "printable_area" : 298000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1495.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "46" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1500.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1500x594MM)",
+      "printable_area" : 870160.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1495.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "47" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1200.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1200x210MM)",
+      "printable_area" : 238000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1195.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "48" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1100.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1100x210MM)",
+      "printable_area" : 218000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1095.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "49" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 900.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (900x841MM)",
+      "printable_area" : 739590.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 895.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "5" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2800.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2800x1189MM)",
+      "printable_area" : 3289410.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2795.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "50" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 700.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (700x841MM)",
+      "printable_area" : 573390.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 695.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "51" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2500.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2500x594MM)",
+      "printable_area" : 1454160.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2495.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "52" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2900.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2900x420MM)",
+      "printable_area" : 1184900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2895.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "53" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3100.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (3100x1189MM)",
+      "printable_area" : 3643110.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3095.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "54" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2900.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2900x1189MM)",
+      "printable_area" : 3407310.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2895.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "55" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2100.0,
+      "media_bounds_ury" : 700.0,
+      "name" : "User-6",
+      "printable_area" : 1397876.0,
+      "printable_bounds_llx" : 13.0,
+      "printable_bounds_lly" : 13.0,
+      "printable_bounds_urx" : 2087.0,
+      "printable_bounds_ury" : 687.0
+     },
+     "56" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2300.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2300x210MM)",
+      "printable_area" : 458000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2295.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "57" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1800.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1800x1189MM)",
+      "printable_area" : 2110410.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1795.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "58" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1300.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1300x841MM)",
+      "printable_area" : 1071990.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1295.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "59" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2700.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2700x1189MM)",
+      "printable_area" : 3171510.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2695.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "6" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2200.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2200x1189MM)",
+      "printable_area" : 2582010.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2195.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "60" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2200.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2200x594MM)",
+      "printable_area" : 1278960.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2195.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "61" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3500.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (3500x841MM)",
+      "printable_area" : 2900190.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3495.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "62" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2000.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2000x1189MM)",
+      "printable_area" : 2346210.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1995.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "63" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1500.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1500x1189MM)",
+      "printable_area" : 1756710.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1495.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "64" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2000.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2000x297MM)",
+      "printable_area" : 571130.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1995.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "65" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1100.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1100x1189MM)",
+      "printable_area" : 1285110.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1095.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "66" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2700.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2700x594MM)",
+      "printable_area" : 1570960.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2695.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "67" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2100.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2100x1189MM)",
+      "printable_area" : 2464110.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2095.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "68" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3200.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (3200x1189MM)",
+      "printable_area" : 3761010.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3195.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "69" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3000.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (3000x420MM)",
+      "printable_area" : 1225900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2995.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "7" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1600.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (1600x210MM)",
+      "printable_area" : 318000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1595.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "70" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2800.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2800x297MM)",
+      "printable_area" : 800730.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2795.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "71" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3500.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (3500x1189MM)",
+      "printable_area" : 4114710.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3495.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "72" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2800.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (2800x420MM)",
+      "printable_area" : 1143900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2795.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "73" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1600.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1600x594MM)",
+      "printable_area" : 928560.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1595.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "74" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2300.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (2300x297MM)",
+      "printable_area" : 657230.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2295.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "75" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2500.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2500x210MM)",
+      "printable_area" : 498000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2495.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "76" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3000.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (3000x210MM)",
+      "printable_area" : 598000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2995.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "77" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2100.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2100x594MM)",
+      "printable_area" : 1220560.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2095.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "78" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 500.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (500x594MM)",
+      "printable_area" : 286160.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 495.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "79" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 800.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (800x297MM)",
+      "printable_area" : 226730.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 795.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "8" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2700.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2700x841MM)",
+      "printable_area" : 2235390.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2695.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "80" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3000.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (3000x841MM)",
+      "printable_area" : 2484690.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2995.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "81" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2500.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (2500x1189MM)",
+      "printable_area" : 2935710.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2495.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "82" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1700.0,
+      "media_bounds_ury" : 1189.0,
+      "name" : "UserDefinedMetric (1700x1189MM)",
+      "printable_area" : 1992510.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1695.0,
+      "printable_bounds_ury" : 1184.0
+     },
+     "83" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1100.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1100x297MM)",
+      "printable_area" : 312830.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1095.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "84" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2000.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2000x594MM)",
+      "printable_area" : 1162160.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1995.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "85" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3100.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (3100x420MM)",
+      "printable_area" : 1266900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3095.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "86" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2700.0,
+      "media_bounds_ury" : 1340.0,
+      "name" : "User-4",
+      "printable_area" : 3513636.0,
+      "printable_bounds_llx" : 13.0,
+      "printable_bounds_lly" : 13.0,
+      "printable_bounds_urx" : 2687.0,
+      "printable_bounds_ury" : 1327.0
+     },
+     "87" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2800.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (2800x594MM)",
+      "printable_area" : 1629360.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2795.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "88" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1500.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1500x297MM)",
+      "printable_area" : 427630.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1495.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "89" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1200.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (1200x297MM)",
+      "printable_area" : 341530.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1195.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "9" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 700.0,
+      "media_bounds_ury" : 297.0,
+      "name" : "UserDefinedMetric (700x297MM)",
+      "printable_area" : 198030.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 695.0,
+      "printable_bounds_ury" : 292.0
+     },
+     "90" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1800.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (1800x594MM)",
+      "printable_area" : 1045360.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1795.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "91" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3200.0,
+      "media_bounds_ury" : 420.0,
+      "name" : "UserDefinedMetric (3200x420MM)",
+      "printable_area" : 1307900.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 3195.0,
+      "printable_bounds_ury" : 415.0
+     },
+     "92" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2600.0,
+      "media_bounds_ury" : 210.0,
+      "name" : "UserDefinedMetric (2600x210MM)",
+      "printable_area" : 518000.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2595.0,
+      "printable_bounds_ury" : 205.0
+     },
+     "93" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 3000.0,
+      "media_bounds_ury" : 640.0,
+      "name" : "User-2",
+      "printable_area" : 1883700.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2995.0,
+      "printable_bounds_ury" : 635.0
+     },
+     "94" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2200.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2200x841MM)",
+      "printable_area" : 1819890.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 2195.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "95" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1700.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1700x841MM)",
+      "printable_area" : 1404390.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1695.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "96" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 800.0,
+      "media_bounds_ury" : 594.0,
+      "name" : "UserDefinedMetric (800x594MM)",
+      "printable_area" : 461360.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 795.0,
+      "printable_bounds_ury" : 589.0
+     },
+     "97" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1100.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1100x841MM)",
+      "printable_area" : 905790.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1095.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "98" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 1500.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (1500x841MM)",
+      "printable_area" : 1238190.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1495.0,
+      "printable_bounds_ury" : 836.0
+     },
+     "99" : 
+     {
+      "caps_type" : 2,
+      "dimensional" : true,
+      "media_bounds_urx" : 2000.0,
+      "media_bounds_ury" : 841.0,
+      "name" : "UserDefinedMetric (2000x841MM)",
+      "printable_area" : 1653690.0,
+      "printable_bounds_llx" : 5.0,
+      "printable_bounds_lly" : 5.0,
+      "printable_bounds_urx" : 1995.0,
+      "printable_bounds_ury" : 836.0
+     }
+    },
+    "size" : 
+    {
+     "0" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1000 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1000x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1000x1189MM)"
+     },
+     "1" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1000 x 210)",
+      "media_description_name" : "UserDefinedMetric (1000x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1000x210MM)"
+     },
+     "10" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1100 x 594)",
+      "media_description_name" : "UserDefinedMetric (1100x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1100x594MM)"
+     },
+     "100" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2600 x 594)",
+      "media_description_name" : "UserDefinedMetric (2600x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2600x594MM)"
+     },
+     "101" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2600 x 841)",
+      "media_description_name" : "UserDefinedMetric (2600x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2600x841MM)"
+     },
+     "102" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2700 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2700x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2700x1189MM)"
+     },
+     "103" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2700 x 210)",
+      "media_description_name" : "UserDefinedMetric (2700x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2700x210MM)"
+     },
+     "104" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2700 x 297)",
+      "media_description_name" : "UserDefinedMetric (2700x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2700x297MM)"
+     },
+     "105" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2700 x 420)",
+      "media_description_name" : "UserDefinedMetric (2700x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2700x420MM)"
+     },
+     "106" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2700 x 594)",
+      "media_description_name" : "UserDefinedMetric (2700x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2700x594MM)"
+     },
+     "107" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2700 x 841)",
+      "media_description_name" : "UserDefinedMetric (2700x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2700x841MM)"
+     },
+     "108" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2800 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2800x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2800x1189MM)"
+     },
+     "109" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2800 x 210)",
+      "media_description_name" : "UserDefinedMetric (2800x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2800x210MM)"
+     },
+     "11" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1100 x 841)",
+      "media_description_name" : "UserDefinedMetric (1100x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1100x841MM)"
+     },
+     "110" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2800 x 297)",
+      "media_description_name" : "UserDefinedMetric (2800x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2800x297MM)"
+     },
+     "111" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2800 x 420)",
+      "media_description_name" : "UserDefinedMetric (2800x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2800x420MM)"
+     },
+     "112" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2800 x 594)",
+      "media_description_name" : "UserDefinedMetric (2800x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2800x594MM)"
+     },
+     "113" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2800 x 841)",
+      "media_description_name" : "UserDefinedMetric (2800x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2800x841MM)"
+     },
+     "114" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2900 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2900x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2900x1189MM)"
+     },
+     "115" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2900 x 210)",
+      "media_description_name" : "UserDefinedMetric (2900x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2900x210MM)"
+     },
+     "116" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2900 x 297)",
+      "media_description_name" : "UserDefinedMetric (2900x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2900x297MM)"
+     },
+     "117" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2900 x 420)",
+      "media_description_name" : "UserDefinedMetric (2900x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2900x420MM)"
+     },
+     "118" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2900 x 594)",
+      "media_description_name" : "UserDefinedMetric (2900x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2900x594MM)"
+     },
+     "119" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2900 x 841)",
+      "media_description_name" : "UserDefinedMetric (2900x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2900x841MM)"
+     },
+     "12" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1200 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1200x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1200x1189MM)"
+     },
+     "120" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3000 x 1189)",
+      "media_description_name" : "UserDefinedMetric (3000x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3000x1189MM)"
+     },
+     "121" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3000 x 210)",
+      "media_description_name" : "UserDefinedMetric (3000x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3000x210MM)"
+     },
+     "122" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3000 x 297)",
+      "media_description_name" : "UserDefinedMetric (3000x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3000x297MM)"
+     },
+     "123" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3000 x 420)",
+      "media_description_name" : "UserDefinedMetric (3000x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3000x420MM)"
+     },
+     "124" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3000 x 594)",
+      "media_description_name" : "UserDefinedMetric (3000x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3000x594MM)"
+     },
+     "125" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3000 x 841)",
+      "media_description_name" : "UserDefinedMetric (3000x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3000x841MM)"
+     },
+     "126" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3100 x 1189)",
+      "media_description_name" : "UserDefinedMetric (3100x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3100x1189MM)"
+     },
+     "127" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3100 x 210)",
+      "media_description_name" : "UserDefinedMetric (3100x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3100x210MM)"
+     },
+     "128" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3100 x 297)",
+      "media_description_name" : "UserDefinedMetric (3100x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3100x297MM)"
+     },
+     "129" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3100 x 420)",
+      "media_description_name" : "UserDefinedMetric (3100x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3100x420MM)"
+     },
+     "13" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1200 x 210)",
+      "media_description_name" : "UserDefinedMetric (1200x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1200x210MM)"
+     },
+     "130" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3100 x 594)",
+      "media_description_name" : "UserDefinedMetric (3100x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3100x594MM)"
+     },
+     "131" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3100 x 841)",
+      "media_description_name" : "UserDefinedMetric (3100x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3100x841MM)"
+     },
+     "132" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3200 x 1189)",
+      "media_description_name" : "UserDefinedMetric (3200x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3200x1189MM)"
+     },
+     "133" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3200 x 210)",
+      "media_description_name" : "UserDefinedMetric (3200x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3200x210MM)"
+     },
+     "134" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3200 x 297)",
+      "media_description_name" : "UserDefinedMetric (3200x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3200x297MM)"
+     },
+     "135" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3200 x 420)",
+      "media_description_name" : "UserDefinedMetric (3200x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3200x420MM)"
+     },
+     "136" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3200 x 594)",
+      "media_description_name" : "UserDefinedMetric (3200x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3200x594MM)"
+     },
+     "137" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3200 x 841)",
+      "media_description_name" : "UserDefinedMetric (3200x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3200x841MM)"
+     },
+     "138" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3300 x 1189)",
+      "media_description_name" : "UserDefinedMetric (3300x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3300x1189MM)"
+     },
+     "139" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3300 x 210)",
+      "media_description_name" : "UserDefinedMetric (3300x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3300x210MM)"
+     },
+     "14" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1200 x 297)",
+      "media_description_name" : "UserDefinedMetric (1200x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1200x297MM)"
+     },
+     "140" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3300 x 297)",
+      "media_description_name" : "UserDefinedMetric (3300x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3300x297MM)"
+     },
+     "141" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3300 x 420)",
+      "media_description_name" : "UserDefinedMetric (3300x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3300x420MM)"
+     },
+     "142" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3300 x 594)",
+      "media_description_name" : "UserDefinedMetric (3300x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3300x594MM)"
+     },
+     "143" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3300 x 841)",
+      "media_description_name" : "UserDefinedMetric (3300x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3300x841MM)"
+     },
+     "144" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3400 x 1189)",
+      "media_description_name" : "UserDefinedMetric (3400x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3400x1189MM)"
+     },
+     "145" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3400 x 210)",
+      "media_description_name" : "UserDefinedMetric (3400x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3400x210MM)"
+     },
+     "146" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3400 x 297)",
+      "media_description_name" : "UserDefinedMetric (3400x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3400x297MM)"
+     },
+     "147" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3400 x 420)",
+      "media_description_name" : "UserDefinedMetric (3400x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3400x420MM)"
+     },
+     "148" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3400 x 594)",
+      "media_description_name" : "UserDefinedMetric (3400x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3400x594MM)"
+     },
+     "149" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3400 x 841)",
+      "media_description_name" : "UserDefinedMetric (3400x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3400x841MM)"
+     },
+     "15" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1200 x 420)",
+      "media_description_name" : "UserDefinedMetric (1200x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1200x420MM)"
+     },
+     "150" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3500 x 1189)",
+      "media_description_name" : "UserDefinedMetric (3500x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3500x1189MM)"
+     },
+     "151" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3500 x 210)",
+      "media_description_name" : "UserDefinedMetric (3500x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3500x210MM)"
+     },
+     "152" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3500 x 297)",
+      "media_description_name" : "UserDefinedMetric (3500x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3500x297MM)"
+     },
+     "153" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3500 x 420)",
+      "media_description_name" : "UserDefinedMetric (3500x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3500x420MM)"
+     },
+     "154" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3500 x 594)",
+      "media_description_name" : "UserDefinedMetric (3500x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3500x594MM)"
+     },
+     "155" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (3500 x 841)",
+      "media_description_name" : "UserDefinedMetric (3500x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (3500x841MM)"
+     },
+     "156" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (500 x 1189)",
+      "media_description_name" : "UserDefinedMetric (500x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (500x1189MM)"
+     },
+     "157" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (500 x 210)",
+      "media_description_name" : "UserDefinedMetric (500x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (500x210MM)"
+     },
+     "158" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (500 x 297)",
+      "media_description_name" : "UserDefinedMetric (500x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (500x297MM)"
+     },
+     "159" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (500 x 420)",
+      "media_description_name" : "UserDefinedMetric (500x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (500x420MM)"
+     },
+     "16" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1200 x 594)",
+      "media_description_name" : "UserDefinedMetric (1200x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1200x594MM)"
+     },
+     "160" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (500 x 594)",
+      "media_description_name" : "UserDefinedMetric (500x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (500x594MM)"
+     },
+     "161" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (500 x 841)",
+      "media_description_name" : "UserDefinedMetric (500x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (500x841MM)"
+     },
+     "162" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (600 x 1189)",
+      "media_description_name" : "UserDefinedMetric (600x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (600x1189MM)"
+     },
+     "163" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (600 x 210)",
+      "media_description_name" : "UserDefinedMetric (600x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (600x210MM)"
+     },
+     "164" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (600 x 297)",
+      "media_description_name" : "UserDefinedMetric (600x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (600x297MM)"
+     },
+     "165" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (600 x 420)",
+      "media_description_name" : "UserDefinedMetric (600x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (600x420MM)"
+     },
+     "166" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (600 x 594)",
+      "media_description_name" : "UserDefinedMetric (600x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (600x594MM)"
+     },
+     "167" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (600 x 841)",
+      "media_description_name" : "UserDefinedMetric (600x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (600x841MM)"
+     },
+     "168" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (700 x 1189)",
+      "media_description_name" : "UserDefinedMetric (700x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (700x1189MM)"
+     },
+     "169" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (700 x 210)",
+      "media_description_name" : "UserDefinedMetric (700x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (700x210MM)"
+     },
+     "17" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1200 x 841)",
+      "media_description_name" : "UserDefinedMetric (1200x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1200x841MM)"
+     },
+     "170" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (700 x 297)",
+      "media_description_name" : "UserDefinedMetric (700x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (700x297MM)"
+     },
+     "171" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (700 x 420)",
+      "media_description_name" : "UserDefinedMetric (700x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (700x420MM)"
+     },
+     "172" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (700 x 594)",
+      "media_description_name" : "UserDefinedMetric (700x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (700x594MM)"
+     },
+     "173" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (700 x 841)",
+      "media_description_name" : "UserDefinedMetric (700x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (700x841MM)"
+     },
+     "174" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (800 x 1189)",
+      "media_description_name" : "UserDefinedMetric (800x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (800x1189MM)"
+     },
+     "175" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (800 x 210)",
+      "media_description_name" : "UserDefinedMetric (800x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (800x210MM)"
+     },
+     "176" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (800 x 297)",
+      "media_description_name" : "UserDefinedMetric (800x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (800x297MM)"
+     },
+     "177" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (800 x 420)",
+      "media_description_name" : "UserDefinedMetric (800x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (800x420MM)"
+     },
+     "178" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (800 x 594)",
+      "media_description_name" : "UserDefinedMetric (800x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (800x594MM)"
+     },
+     "179" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (800 x 841)",
+      "media_description_name" : "UserDefinedMetric (800x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (800x841MM)"
+     },
+     "18" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1300 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1300x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1300x1189MM)"
+     },
+     "180" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (900 x 1189)",
+      "media_description_name" : "UserDefinedMetric (900x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (900x1189MM)"
+     },
+     "181" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (900 x 210)",
+      "media_description_name" : "UserDefinedMetric (900x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (900x210MM)"
+     },
+     "182" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (900 x 297)",
+      "media_description_name" : "UserDefinedMetric (900x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (900x297MM)"
+     },
+     "183" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (900 x 420)",
+      "media_description_name" : "UserDefinedMetric (900x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (900x420MM)"
+     },
+     "184" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (900 x 594)",
+      "media_description_name" : "UserDefinedMetric (900x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (900x594MM)"
+     },
+     "185" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (900 x 841)",
+      "media_description_name" : "UserDefinedMetric (900x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (900x841MM)"
+     },
+     "186" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Previous paper size  (1400.00 x 460.00 mm)",
+      "media_description_name" : "User-1",
+      "media_group" : 15,
+      "name" : "User-1"
+     },
+     "187" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Previous paper size  (1800.00 x 474.00 mm)",
+      "media_description_name" : "User-7",
+      "media_group" : 15,
+      "name" : "User-7"
+     },
+     "188" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Previous paper size  (2100.00 x 700.00 mm)",
+      "media_description_name" : "User-6",
+      "media_group" : 15,
+      "name" : "User-6"
+     },
+     "189" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Previous paper size  (2700.00 x 1340.00 mm)",
+      "media_description_name" : "User-4",
+      "media_group" : 15,
+      "name" : "User-4"
+     },
+     "19" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1300 x 210)",
+      "media_description_name" : "UserDefinedMetric (1300x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1300x210MM)"
+     },
+     "190" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Previous paper size  (2800.00 x 900.00 mm)",
+      "media_description_name" : "User-5",
+      "media_group" : 15,
+      "name" : "User-5"
+     },
+     "191" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Previous paper size  (3000.00 x 640.00 mm)",
+      "media_description_name" : "User-2",
+      "media_group" : 15,
+      "name" : "User-2"
+     },
+     "192" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Previous paper size  (9.02 x 6.38 inches)",
+      "media_description_name" : "User-3",
+      "media_group" : 14,
+      "name" : "User-3"
+     },
+     "193" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2450.00 x 560.00 MM)",
+      "media_description_name" : "UserDefinedMetric Landscape 2450.00W x 560.00H - (5, 5) x (2445, 555) =1342000 MM",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2450.00 x 560.00MM)"
+     },
+     "2" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1000 x 297)",
+      "media_description_name" : "UserDefinedMetric (1000x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1000x297MM)"
+     },
+     "20" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1300 x 297)",
+      "media_description_name" : "UserDefinedMetric (1300x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1300x297MM)"
+     },
+     "21" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1300 x 420)",
+      "media_description_name" : "UserDefinedMetric (1300x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1300x420MM)"
+     },
+     "22" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1300 x 594)",
+      "media_description_name" : "UserDefinedMetric (1300x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1300x594MM)"
+     },
+     "23" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1300 x 841)",
+      "media_description_name" : "UserDefinedMetric (1300x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1300x841MM)"
+     },
+     "24" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1400 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1400x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1400x1189MM)"
+     },
+     "25" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1400 x 210)",
+      "media_description_name" : "UserDefinedMetric (1400x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1400x210MM)"
+     },
+     "26" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1400 x 297)",
+      "media_description_name" : "UserDefinedMetric (1400x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1400x297MM)"
+     },
+     "27" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1400 x 420)",
+      "media_description_name" : "UserDefinedMetric (1400x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1400x420MM)"
+     },
+     "28" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1400 x 594)",
+      "media_description_name" : "UserDefinedMetric (1400x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1400x594MM)"
+     },
+     "29" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1400 x 841)",
+      "media_description_name" : "UserDefinedMetric (1400x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1400x841MM)"
+     },
+     "3" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1000 x 420)",
+      "media_description_name" : "UserDefinedMetric (1000x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1000x420MM)"
+     },
+     "30" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1500 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1500x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1500x1189MM)"
+     },
+     "31" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1500 x 210)",
+      "media_description_name" : "UserDefinedMetric (1500x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1500x210MM)"
+     },
+     "32" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1500 x 297)",
+      "media_description_name" : "UserDefinedMetric (1500x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1500x297MM)"
+     },
+     "33" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1500 x 420)",
+      "media_description_name" : "UserDefinedMetric (1500x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1500x420MM)"
+     },
+     "34" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1500 x 594)",
+      "media_description_name" : "UserDefinedMetric (1500x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1500x594MM)"
+     },
+     "35" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1500 x 841)",
+      "media_description_name" : "UserDefinedMetric (1500x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1500x841MM)"
+     },
+     "36" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1600 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1600x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1600x1189MM)"
+     },
+     "37" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1600 x 210)",
+      "media_description_name" : "UserDefinedMetric (1600x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1600x210MM)"
+     },
+     "38" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1600 x 297)",
+      "media_description_name" : "UserDefinedMetric (1600x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1600x297MM)"
+     },
+     "39" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1600 x 420)",
+      "media_description_name" : "UserDefinedMetric (1600x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1600x420MM)"
+     },
+     "4" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1000 x 594)",
+      "media_description_name" : "UserDefinedMetric (1000x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1000x594MM)"
+     },
+     "40" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1600 x 594)",
+      "media_description_name" : "UserDefinedMetric (1600x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1600x594MM)"
+     },
+     "41" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1600 x 841)",
+      "media_description_name" : "UserDefinedMetric (1600x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1600x841MM)"
+     },
+     "42" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1700 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1700x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1700x1189MM)"
+     },
+     "43" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1700 x 210)",
+      "media_description_name" : "UserDefinedMetric (1700x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1700x210MM)"
+     },
+     "44" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1700 x 297)",
+      "media_description_name" : "UserDefinedMetric (1700x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1700x297MM)"
+     },
+     "45" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1700 x 420)",
+      "media_description_name" : "UserDefinedMetric (1700x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1700x420MM)"
+     },
+     "46" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1700 x 594)",
+      "media_description_name" : "UserDefinedMetric (1700x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1700x594MM)"
+     },
+     "47" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1700 x 841)",
+      "media_description_name" : "UserDefinedMetric (1700x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1700x841MM)"
+     },
+     "48" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1800 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1800x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1800x1189MM)"
+     },
+     "49" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1800 x 210)",
+      "media_description_name" : "UserDefinedMetric (1800x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1800x210MM)"
+     },
+     "5" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1000 x 841)",
+      "media_description_name" : "UserDefinedMetric (1000x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1000x841MM)"
+     },
+     "50" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1800 x 297)",
+      "media_description_name" : "UserDefinedMetric (1800x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1800x297MM)"
+     },
+     "51" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1800 x 420)",
+      "media_description_name" : "UserDefinedMetric (1800x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1800x420MM)"
+     },
+     "52" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1800 x 594)",
+      "media_description_name" : "UserDefinedMetric (1800x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1800x594MM)"
+     },
+     "53" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1800 x 841)",
+      "media_description_name" : "UserDefinedMetric (1800x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1800x841MM)"
+     },
+     "54" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1900 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1900x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1900x1189MM)"
+     },
+     "55" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1900 x 210)",
+      "media_description_name" : "UserDefinedMetric (1900x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1900x210MM)"
+     },
+     "56" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1900 x 297)",
+      "media_description_name" : "UserDefinedMetric (1900x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1900x297MM)"
+     },
+     "57" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1900 x 420)",
+      "media_description_name" : "UserDefinedMetric (1900x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1900x420MM)"
+     },
+     "58" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1900 x 594)",
+      "media_description_name" : "UserDefinedMetric (1900x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1900x594MM)"
+     },
+     "59" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1900 x 841)",
+      "media_description_name" : "UserDefinedMetric (1900x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1900x841MM)"
+     },
+     "6" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1100 x 1189)",
+      "media_description_name" : "UserDefinedMetric (1100x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1100x1189MM)"
+     },
+     "60" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2000 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2000x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2000x1189MM)"
+     },
+     "61" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2000 x 210)",
+      "media_description_name" : "UserDefinedMetric (2000x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2000x210MM)"
+     },
+     "62" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2000 x 297)",
+      "media_description_name" : "UserDefinedMetric (2000x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2000x297MM)"
+     },
+     "63" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2000 x 420)",
+      "media_description_name" : "UserDefinedMetric (2000x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2000x420MM)"
+     },
+     "64" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2000 x 594)",
+      "media_description_name" : "UserDefinedMetric (2000x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2000x594MM)"
+     },
+     "65" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2000 x 841)",
+      "media_description_name" : "UserDefinedMetric (2000x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2000x841MM)"
+     },
+     "66" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2100 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2100x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2100x1189MM)"
+     },
+     "67" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2100 x 210)",
+      "media_description_name" : "UserDefinedMetric (2100x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2100x210MM)"
+     },
+     "68" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2100 x 297)",
+      "media_description_name" : "UserDefinedMetric (2100x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2100x297MM)"
+     },
+     "69" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2100 x 420)",
+      "media_description_name" : "UserDefinedMetric (2100x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2100x420MM)"
+     },
+     "7" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1100 x 210)",
+      "media_description_name" : "UserDefinedMetric (1100x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1100x210MM)"
+     },
+     "70" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2100 x 594)",
+      "media_description_name" : "UserDefinedMetric (2100x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2100x594MM)"
+     },
+     "71" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2100 x 841)",
+      "media_description_name" : "UserDefinedMetric (2100x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2100x841MM)"
+     },
+     "72" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2200 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2200x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2200x1189MM)"
+     },
+     "73" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2200 x 210)",
+      "media_description_name" : "UserDefinedMetric (2200x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2200x210MM)"
+     },
+     "74" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2200 x 297)",
+      "media_description_name" : "UserDefinedMetric (2200x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2200x297MM)"
+     },
+     "75" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2200 x 420)",
+      "media_description_name" : "UserDefinedMetric (2200x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2200x420MM)"
+     },
+     "76" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2200 x 594)",
+      "media_description_name" : "UserDefinedMetric (2200x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2200x594MM)"
+     },
+     "77" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2200 x 841)",
+      "media_description_name" : "UserDefinedMetric (2200x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2200x841MM)"
+     },
+     "78" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2300 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2300x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2300x1189MM)"
+     },
+     "79" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2300 x 210)",
+      "media_description_name" : "UserDefinedMetric (2300x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2300x210MM)"
+     },
+     "8" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1100 x 297)",
+      "media_description_name" : "UserDefinedMetric (1100x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1100x297MM)"
+     },
+     "80" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2300 x 297)",
+      "media_description_name" : "UserDefinedMetric (2300x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2300x297MM)"
+     },
+     "81" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2300 x 420)",
+      "media_description_name" : "UserDefinedMetric (2300x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2300x420MM)"
+     },
+     "82" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2300 x 594)",
+      "media_description_name" : "UserDefinedMetric (2300x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2300x594MM)"
+     },
+     "83" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2300 x 841)",
+      "media_description_name" : "UserDefinedMetric (2300x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2300x841MM)"
+     },
+     "84" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2400 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2400x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2400x1189MM)"
+     },
+     "85" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2400 x 210)",
+      "media_description_name" : "UserDefinedMetric (2400x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2400x210MM)"
+     },
+     "86" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2400 x 297)",
+      "media_description_name" : "UserDefinedMetric (2400x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2400x297MM)"
+     },
+     "87" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2400 x 420)",
+      "media_description_name" : "UserDefinedMetric (2400x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2400x420MM)"
+     },
+     "88" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2400 x 594)",
+      "media_description_name" : "UserDefinedMetric (2400x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2400x594MM)"
+     },
+     "89" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2400 x 841)",
+      "media_description_name" : "UserDefinedMetric (2400x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2400x841MM)"
+     },
+     "9" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (1100 x 420)",
+      "media_description_name" : "UserDefinedMetric (1100x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (1100x420MM)"
+     },
+     "90" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2500 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2500x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2500x1189MM)"
+     },
+     "91" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2500 x 210)",
+      "media_description_name" : "UserDefinedMetric (2500x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2500x210MM)"
+     },
+     "92" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2500 x 297)",
+      "media_description_name" : "UserDefinedMetric (2500x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2500x297MM)"
+     },
+     "93" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2500 x 420)",
+      "media_description_name" : "UserDefinedMetric (2500x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2500x420MM)"
+     },
+     "94" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2500 x 594)",
+      "media_description_name" : "UserDefinedMetric (2500x594MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2500x594MM)"
+     },
+     "95" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2500 x 841)",
+      "media_description_name" : "UserDefinedMetric (2500x841MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2500x841MM)"
+     },
+     "96" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2600 x 1189)",
+      "media_description_name" : "UserDefinedMetric (2600x1189MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2600x1189MM)"
+     },
+     "97" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2600 x 210)",
+      "media_description_name" : "UserDefinedMetric (2600x210MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2600x210MM)"
+     },
+     "98" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2600 x 297)",
+      "media_description_name" : "UserDefinedMetric (2600x297MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2600x297MM)"
+     },
+     "99" : 
+     {
+      "caps_type" : 2,
+      "landscape_mode" : true,
+      "localized_name" : "Final (2600 x 420)",
+      "media_description_name" : "UserDefinedMetric (2600x420MM)",
+      "media_group" : 15,
+      "name" : "UserDefinedMetric (2600x420MM)"
+     }
+    }
+   }
+  }
+ },
+ "subver" : "json",
+ "version" : 0.01
+}

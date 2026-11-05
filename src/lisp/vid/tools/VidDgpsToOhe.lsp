@@ -1,27 +1,28 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Ohe
-;;; Release: 1.1.5 | Civil 3D 2026
-;;; Version: 05
-;;;   v05: CSV reading rebuilt with the reader used in vidDgpsToLine.lsp:
-;;;        * file is read in BINARY mode (char by char) - a stray Ctrl-Z (0x1A),
-;;;          NUL byte or odd character no longer stops the read half-way.
-;;;        * UTF-8 / UTF-16 byte-order-mark is stripped (first header cell was
-;;;          unreadable before, so the Code / Northing / Easting header failed).
-;;;        * LF, CRLF and old CR-only line endings are all accepted.
-;;;        * quoted fields that contain commas, doubled quotes ("") or line
-;;;          breaks are handled (one logical record at a time).
-;;;        * delimiter auto-detected from the header: comma, semicolon or tab.
-;;;        * header may be on any line (title / blank lines above it are
-;;;          ignored); alternative names accepted: Code / Point Code / Feature
-;;;          Code, Northing / North / N / Y, Easting / East / E / X.
-;;;        * numbers are validated strictly (no more silent 0.0 from text);
-;;;          "1234,56" is accepted as 1234.56 when the delimiter is not comma.
-;;;        * read summary printed: data rows, OH/OM/OHE/PORTAL rows, valid,
-;;;          invalid (first few listed with their record number).
-;;;        * file handle is always closed, even on error / Esc.
-;;;   v04: rectangle V3/V4 always point AWAY from the nearest track
-;;;        (LHS point -> box on the left, RHS point -> box on the right).
-;;;        Nearest track is chosen by 2D distance among all track polylines.
+;;; Release: 1.1.6 | Civil 3D 2026
+;;; Version: 10
+;;;   v10: empty-name text (000/0 + distance) is placed on layer 1-OHE_RED
+;;;        (auto-created when needed). Only the 000/0 part is red.
+;;;   v09: Dialog restyled with group boxes (Layers / Distance / Track
+;;;        polylines). Auto/Select track choice moved into the dialog (radio
+;;;        buttons). Empty pole name -> "000/0", that stacked text in RED.
+;;;   v08: CSV is asked first, then a compact dialog: one LAYER box (type or
+;;;        pick with the "v" button, starts at the current layer, used for
+;;;        rectangles AND text) + DISTANCE tick; the prefix box (default
+;;;        "i-") appears only when DISTANCE is ticked.
+;;;   v07: Options dialog added (opens when the command starts):
+;;;        * Layers: Rectangle layer / Text layer edit boxes (name preview)
+;;;          + drop-down of existing drawing layers to pick from.
+;;;        * Distance: tick box "Distance venum". When ticked the prefix box
+;;;          is enabled and the distance is written after the pole number.
+;;;        * Distance prefix is editable (default "i-").
+;;;        * Distance = perpendicular (closest point) distance from the DGPS
+;;;          midpoint (V1-V2 midpoint, the point the rectangle is drawn on)
+;;;          to the nearest track polyline.
+;;;   v06: PERPDIM merged in. Text carries "i-4.50" after the stacked pole no.
+;;;   v05: CSV reading rebuilt (binary mode, BOM, quotes, delimiter detect).
+;;;   v04: rectangle V3/V4 always point AWAY from the nearest track.
 ;;; ============================================================================
 
 (vl-load-com)
@@ -31,6 +32,12 @@
 (setq *DGO-TRACK-LAYER* "1-track")
 (setq *DGO-RECT-LAYER* "1-OHE-CSV")
 (setq *DGO-TEXT-LAYER* "1-OHE-CSV")
+(setq *DGO-RED-LAYER*  "1-OHE_RED")   ; text of poles with no name (000/0)
+
+;; Dialog options (remembered between runs in the same session)
+(setq *DGO-USEDIST* T)      ; add distance to text?
+(setq *DGO-PREFIX*  "i-")   ; distance prefix (editable in dialog)
+(setq *DGO-LAYLIST* nil)    ; layer names shown in the drop-downs
 
 ;; CSV reader state
 (setq *DGO-FH* nil)         ; open file handle (closed by the error handler)
@@ -54,7 +61,6 @@
 
 (defun DGO-RemoveBadChars (s / i c n out)
   ;; Keep normal printable characters and TAB (tab can be the CSV delimiter).
-  ;; Remove other control/unreadable characters.
   (if (null s) (setq s ""))
   (setq i 1
         n (strlen s)
@@ -75,8 +81,6 @@
 
 ;;; ------------------------------------------------
 ;;; CSV splitter
-;;; Handles quoted fields, delimiters inside quotes and doubled quotes.
-;;; delim = "," | ";" | "\t"   (nil = comma)
 ;;; ------------------------------------------------
 
 (defun DGO-SplitCSV (s delim / i n c field result quoted)
@@ -129,7 +133,6 @@
 
 (defun DGO-NormalHeader (s)
   (setq s (DGO-Lower (DGO-CleanField s)))
-  ;; remove spaces, underscore and hyphen for flexible matching
   (while (vl-string-search " " s)
     (setq s (vl-string-subst "" " " s))
   )
@@ -143,8 +146,6 @@
 )
 
 (defun DGO-HeaderIndex (fields wanted / w f i result)
-  ;; wanted = one normalised name ("code") or a list of alternatives in
-  ;; priority order ("code" "pointcode").  Returns the column index or nil.
   (if (= (type wanted) 'STR) (setq wanted (list wanted)))
   (setq result nil)
   (foreach w wanted
@@ -175,7 +176,6 @@
 ;;; ------------------------------------------------
 
 (defun DGO-NumericP (s / n i ch seenDot seenDigit seenExp ok)
-  ;; Strict check: [+-]digits[.digits][e[+-]digits]   (".5" and "5." accepted)
   (setq s (DGO-CleanField s)
         n (strlen s))
   (if (= n 0)
@@ -263,9 +263,7 @@
       (setq s (vl-string-subst "/" "-" s))
       (setq s (vl-string-subst "/" "." s))
 
-      ;; If identifier contains a space between two parts,
-      ;; convert the separating space to /
-      ;; Example: 40 22A -> 40/22A
+      ;; Space between two parts -> /   (40 22A -> 40/22A)
       (if (and (vl-string-search " " s)
                (not (vl-string-search "/" s)))
         (setq s (vl-string-subst "/" " " s))
@@ -297,6 +295,17 @@
     (setq obj (vla-Add layers name))
   )
   name
+)
+
+;; All layer names in the drawing, sorted.
+(defun DGO-LayerList (/ r lst)
+  (setq lst '())
+  (setq r (tblnext "LAYER" T))
+  (while r
+    (setq lst (cons (cdr (assoc 2 r)) lst))
+    (setq r (tblnext "LAYER"))
+  )
+  (if lst (acad_strlsort lst) nil)
 )
 
 ;;; ------------------------------------------------
@@ -363,7 +372,6 @@
 )
 
 (defun DGO-TrackDirection (e cp / param der p1 p2 d)
-  ;; First try exact tangent.
   (setq param
     (vl-catch-all-apply
       'vlax-curve-getParamAtPoint
@@ -382,6 +390,8 @@
   )
 )
 
+;; Returns (track-entity distance) of the nearest track (2D), or nil.
+;; distance = perpendicular (closest point) distance from p to that track.
 (defun DGO-BestTrack (p tracks / best bestd e cp r d)
   (setq best nil
         bestd nil)
@@ -406,6 +416,28 @@
     (list best bestd)
     nil
   )
+)
+
+;;; ------------------------------------------------
+;;; Perpendicular distance
+;;; Distance from point pt to the nearest point of track e (2D).
+;;; Returns a real or nil.
+;;; ------------------------------------------------
+
+(defun DGO-PerpDist (e pt / cp)
+  (setq cp (DGO-ClosestPoint e pt))
+  (if (and cp
+           (not (vl-catch-all-error-p cp))
+           (= (type cp) 'LIST))
+    (distance (list (car pt) (cadr pt) 0.0)
+              (list (car cp) (cadr cp) 0.0))
+    nil
+  )
+)
+
+;; prefix (from the dialog) + 2 decimals: "i-4.50"
+(defun DGO-DistString (d)
+  (strcat *DGO-PREFIX* (rtos d 2 2))
 )
 
 ;;; ------------------------------------------------
@@ -508,11 +540,195 @@
 )
 
 ;;; ------------------------------------------------
-;;; CSV low-level reader  (binary mode, same method as vidDgpsToLine.lsp)
+;;; Options dialog (DCL file is written to a temp file at run time)
+;;;   LAYER  [ type here      ][v]   <- edit box + "v" button (pick existing)
+;;;   DISTANCE [x]
+;;;   distance prefix [i-]           <- only visible when DISTANCE is ticked
 ;;; ------------------------------------------------
 
-;; Next byte of the file.  NUL bytes are skipped, which also lets UTF-16 text
-;; (Excel "Unicode Text") read correctly for ordinary ASCII content.
+(setq *DGO-LAYER*  "0")
+(setq *DGO-POS*    nil)   ; dialog position (kept when it is re-shown)
+(setq *DGO-PICKED* nil)
+(setq *DGO-DCLID*  nil)
+(setq *DGO-TRACKMODE* "Auto")   ; "Auto" or "Select" (track polylines)
+
+;; read the tiles of the main dialog into the globals
+(defun DGO-Grab ()
+  (setq *DGO-LAYER* (get_tile "layer"))
+  (setq *DGO-TRACKMODE* (if (= (get_tile "tr_sel") "1") "Select" "Auto"))
+  (if *DGO-USEDIST*                       ; prefix tile exists only then
+    (setq *DGO-PREFIX* (get_tile "prefix"))
+  )
+)
+
+;; DISTANCE tick changed: close and re-show the dialog with / without
+;; the prefix box (DCL cannot hide a tile, so the dialog is re-opened
+;; at the same position).
+(defun DGO-Toggle (val)
+  (DGO-Grab)
+  (setq *DGO-USEDIST* (= val "1"))
+  (setq *DGO-POS* (done_dialog 2))
+)
+
+;; "v" button: small list of existing layers -> fills the LAYER box.
+(defun DGO-PickOK (/ s)
+  (setq s (get_tile "laylist"))
+  (if (/= s "")
+    (setq *DGO-PICKED* (nth (atoi s) *DGO-LAYLIST*))
+  )
+  (done_dialog 1)
+)
+
+(defun DGO-PickLayer (/ cur i idx l)
+  (setq cur (strcase (DGO-Trim (get_tile "layer"))))   ; read BEFORE nested dialog
+  (setq *DGO-PICKED* nil)
+  (if (new_dialog "dgo_pick" *DGO-DCLID*)
+    (progn
+      (start_list "laylist")
+      (foreach l *DGO-LAYLIST* (add_list l))
+      (end_list)
+      ;; pre-select the layer currently typed in the box
+      (setq i 0 idx nil)
+      (foreach l *DGO-LAYLIST*
+        (if (and (null idx) (= (strcase l) cur)) (setq idx i))
+        (setq i (1+ i))
+      )
+      (if idx (set_tile "laylist" (itoa idx)))
+      (action_tile "accept" "(DGO-PickOK)")
+      (action_tile "cancel" "(done_dialog 0)")
+      (start_dialog)
+      (if *DGO-PICKED* (set_tile "layer" *DGO-PICKED*))
+    )
+  )
+)
+
+(defun DGO-Accept (/ rl)
+  (setq rl (DGO-Trim (get_tile "layer")))
+  (cond
+    ((= rl "")
+     (set_tile "error" "Layer name type pannunga."))
+    ((not (snvalid rl))
+     (set_tile "error" "Layer name la thappu character irukku."))
+    (T
+     (DGO-Grab)
+     (setq *DGO-LAYER* rl
+           *DGO-RECT-LAYER* rl
+           *DGO-TEXT-LAYER* rl)
+     (done_dialog 1))
+  )
+)
+
+(defun DGO-DclDialog (name withPrefix)
+  (append
+    (list
+      (strcat name " : dialog {")
+      "  label = \"DgpsToOhe - Options\";"
+      "  : boxed_column {"
+      "    label = \"Layers\";"
+      "    : row {"
+      "      children_alignment = centered;"
+      "      : text { label = \"Layer\"; width = 16; fixed_width = true; }"
+      "      : edit_box { key = \"layer\"; edit_width = 26; fixed_width = true; }"
+      "      : button { key = \"pick\"; label = \"v\"; width = 4; fixed_width = true; }"
+      "    }"
+      "  }"
+      "  : boxed_column {"
+      "    label = \"Distance\";"
+      "    : toggle { key = \"usedist\"; label = \"Distance\"; }"
+    )
+    (if withPrefix
+      (list
+        "    : row {"
+        "      children_alignment = centered;"
+        "      : text { label = \"Distance prefix\"; width = 16; fixed_width = true; }"
+        "      : edit_box { key = \"prefix\"; edit_width = 12; fixed_width = true; }"
+        "      : spacer { width = 18; }"
+        "    }"
+      )
+      nil
+    )
+    (list
+      "  }"
+      "  : boxed_radio_column {"
+      "    label = \"Track polylines\";"
+      (strcat "    : radio_button { key = \"tr_auto\"; label = \"Auto (all polylines on layer "
+              *DGO-TRACK-LAYER* ")\"; }")
+      "    : radio_button { key = \"tr_sel\"; label = \"Select (pick on screen)\"; }"
+      "  }"
+      "  spacer_1;"
+      "  ok_cancel_err;"
+      "}"
+    )
+  )
+)
+
+;; Returns T if OK pressed, nil if cancelled.
+(defun DGO-ShowDialog (/ fn f id res again l)
+  (setq *DGO-LAYLIST* (DGO-LayerList))
+  (setq *DGO-LAYER* "1-OHE")                ; default layer name (editable)
+  (setq *DGO-POS* nil)
+
+  (setq fn (vl-filename-mktemp "dgo" nil ".dcl"))
+  (setq f (open fn "w"))
+  (if (null f)
+    (progn
+      (princ "\nDialog file create aagala.")
+      nil
+    )
+    (progn
+      (foreach l
+        (append
+          (DGO-DclDialog "dgo_a" nil)
+          (DGO-DclDialog "dgo_b" T)
+          (list
+            "dgo_pick : dialog {"
+            "  label = \"Select Layer\";"
+            "  : list_box { key = \"laylist\"; width = 34; height = 14; allow_accept = true; }"
+            "  ok_cancel;"
+            "}"
+          )
+        )
+        (write-line l f)
+      )
+      (close f)
+
+      (setq id (load_dialog fn))
+      (setq *DGO-DCLID* id)
+      (setq again T res 0)
+
+      (while again
+        (if (new_dialog (if *DGO-USEDIST* "dgo_b" "dgo_a")
+                        id "" (if *DGO-POS* *DGO-POS* '(-1 -1)))
+          (progn
+            (set_tile "layer" *DGO-LAYER*)
+            (set_tile "usedist" (if *DGO-USEDIST* "1" "0"))
+            (set_tile (if (= *DGO-TRACKMODE* "Select") "tr_sel" "tr_auto") "1")
+            (if *DGO-USEDIST* (set_tile "prefix" *DGO-PREFIX*))
+            (action_tile "pick" "(DGO-PickLayer)")
+            (action_tile "usedist" "(DGO-Toggle $value)")
+            (action_tile "accept" "(DGO-Accept)")
+            (action_tile "cancel" "(done_dialog 0)")
+            (setq res (start_dialog))
+            (if (/= res 2) (setq again nil))   ; 2 = re-show (toggle changed)
+          )
+          (progn
+            (princ "\nDialog open aagala.")
+            (setq res 0 again nil)
+          )
+        )
+      )
+
+      (unload_dialog id)
+      (vl-file-delete fn)
+      (= res 1)
+    )
+  )
+)
+
+;;; ------------------------------------------------
+;;; CSV low-level reader  (binary mode)
+;;; ------------------------------------------------
+
 (defun DGO-ReadByte (fh / b)
   (if *DGO-PUSHBACK*
     (setq b *DGO-PUSHBACK*
@@ -527,7 +743,6 @@
   b
 )
 
-;; One physical line.  Safe against Ctrl-Z (0x1A); accepts LF, CRLF, CR.
 (defun DGO-ReadPhysicalLine (fh / b s gotLine)
   (if *DGO-PENDING*
     (progn
@@ -562,9 +777,6 @@
   count
 )
 
-;; One logical CSV record: a quoted field may continue on the next line(s).
-;; A stray, never-closed quote cannot swallow the file: after 8 extra lines the
-;; record is cut back to its first line and the extra lines are given back.
 (defun DGO-ReadRecord (fh / ln1 s extras next k)
   (setq ln1 (DGO-ReadPhysicalLine fh))
   (if (null ln1)
@@ -590,7 +802,6 @@
   )
 )
 
-;; Remove UTF-8 (EF BB BF) / UTF-16 (FF FE, FE FF) byte-order mark.
 (defun DGO-StripBOM (s / a b c)
   (if (and s (>= (strlen s) 2))
     (progn
@@ -611,8 +822,6 @@
   )
 )
 
-;; Looks for the Code / Northing / Easting header in one record, trying
-;; comma, semicolon and tab.  Returns (delimiter codeIdx northIdx eastIdx) or nil.
 (defun DGO-FindHeader (line / d f ci ni ei result)
   (setq result nil)
   (foreach d '("," ";" "\t")
@@ -691,7 +900,7 @@
               ((= (DGO-Trim (DGO-RemoveBadChars rec)) "")
                nil)
 
-              ;; still looking for the header (title lines above it are ignored)
+              ;; still looking for the header
               ((null hdr)
                (if (null firstLine) (setq firstLine rec))
                (if (setq hdr (DGO-FindHeader rec))
@@ -801,7 +1010,8 @@
 (defun c:vidDgpsToOhe (/ *error* oldcmdecho oldosmode rows tracks
                        mode ss i e item p best cp tangent rect
                        v1 v2 v3 v4 textpt ident textstr ent1 ent2
-                       madeRect madeText failCount tooFar sideSign trackAng)
+                       madeRect madeText failCount tooFar sideSign trackAng
+                       dist distCount emptyName emptyCount)
 
   (vl-load-com)
 
@@ -827,8 +1037,9 @@
 
   (setvar "CMDECHO" 0)
 
-  (princ "\n=== DgpsToOhe : DGPS CSV -> OHE rectangles + stacked text ===")
+  (princ "\n=== DgpsToOhe : DGPS CSV -> OHE rectangles + stacked text + distance ===")
 
+  ;; ---- 1) CSV first ----
   (setq rows (DGO-ReadCSV))
 
   (if (null rows)
@@ -836,187 +1047,225 @@
       (princ "\nNo valid OH/OM/OHE/PORTAL rows found.")
       (*error* nil)
     )
-    (progn
-
-      (DGO-MakeLayer *DGO-RECT-LAYER*)
-      (DGO-MakeLayer *DGO-TEXT-LAYER*)
-
-      (initget "Auto Select")
-      (setq mode
-        (getkword
-          "\nTrack polylines [Auto/Select] <Auto>: "
-        )
+    ;; ---- 2) then the options dialog; Cancel = stop ----
+    (if (not (DGO-ShowDialog))
+      (progn
+        (princ "\nCancelled.")
+        (*error* nil)
       )
+      (progn
 
-      (if (or (null mode) (= mode "Auto"))
-        (setq tracks (DGO-TrackObjects))
-        (progn
-          (princ "\nSelect track polylines on layer 1-track: ")
-          (setq ss
-            (ssget
-              '((0 . "LWPOLYLINE,POLYLINE"))
-            )
-          )
-          (setq tracks '())
-          (if ss
+          (DGO-MakeLayer *DGO-RECT-LAYER*)
+          (DGO-MakeLayer *DGO-TEXT-LAYER*)
+
+          ;; Auto / Select comes from the dialog
+          (if (/= *DGO-TRACKMODE* "Select")
+            (setq tracks (DGO-TrackObjects))
             (progn
-              (setq i 0)
-              (while (< i (sslength ss))
-                (setq e (ssname ss i))
-                (if (= (strcase (cdr (assoc 8 (entget e))))
-                       (strcase *DGO-TRACK-LAYER*))
-                  (setq tracks (cons e tracks))
+              (princ "\nSelect track polylines on layer 1-track: ")
+              (setq ss
+                (ssget
+                  '((0 . "LWPOLYLINE,POLYLINE"))
                 )
-                (setq i (1+ i))
+              )
+              (setq tracks '())
+              (if ss
+                (progn
+                  (setq i 0)
+                  (while (< i (sslength ss))
+                    (setq e (ssname ss i))
+                    (if (= (strcase (cdr (assoc 8 (entget e))))
+                           (strcase *DGO-TRACK-LAYER*))
+                      (setq tracks (cons e tracks))
+                    )
+                    (setq i (1+ i))
+                  )
+                )
+              )
+              (setq tracks (reverse tracks))
+            )
+          )
+
+          (if (null tracks)
+            (progn
+              (princ
+                (strcat
+                  "\nNo track polylines found on layer "
+                  *DGO-TRACK-LAYER*
+                  "."
+                )
               )
             )
-          )
-          (setq tracks (reverse tracks))
-        )
-      )
+            (progn
 
-      (if (null tracks)
-        (progn
-          (princ
-            (strcat
-              "\nNo track polylines found on layer "
-              *DGO-TRACK-LAYER*
-              "."
-            )
-          )
-        )
-        (progn
-
-          (princ
-            (strcat
-              "\nUsing "
-              (itoa (length tracks))
-              " track polyline(s). Processing..."
-            )
-          )
-
-          (setq madeRect 0
-                madeText 0
-                failCount 0
-                tooFar 0)
-
-          (foreach item rows
-
-            ;; item = (prefix identifier Easting Northing)
-            (setq ident (cadr item))
-            (setq p
-              (list
-                (nth 2 item) ; Easting = X
-                (nth 3 item) ; Northing = Y
-                0.0
+              (princ
+                (strcat
+                  "\nUsing "
+                  (itoa (length tracks))
+                  " track polyline(s). Processing..."
+                )
               )
-            )
 
-            (setq best (DGO-BestTrack p tracks))
+              (setq madeRect 0
+                    madeText 0
+                    failCount 0
+                    tooFar 0
+                    distCount 0
+                    emptyCount 0)
 
-            (if best
-              (progn
-                (setq e (car best))
-                (setq cp
-                  (DGO-ClosestPoint e p)
-                )
+              (foreach item rows
 
-                (setq tangent
-                  (DGO-TrackDirection e cp)
-                )
-
-                ;; If tangent unavailable, use a safe default.
-                (if (null tangent)
-                  (setq tangent (list 1.0 0.0 0.0))
-                )
-
-                ;; Which side of the track is the point on?
-                ;; cross(tangent, cp->p) > 0 = LHS (left), < 0 = RHS (right).
-                ;; Box always extends away from the track.
-                (setq sideSign
-                  (if (< (- (* (car tangent)  (- (cadr p) (cadr cp)))
-                            (* (cadr tangent) (- (car p)  (car cp))))
-                         -1e-9)
-                    -1.0
-                    1.0))
-
-                (setq rect (DGO-MakeRectangle p tangent sideSign))
-
-                (setq v1 (nth 0 rect))
-                (setq v2 (nth 1 rect))
-                (setq v3 (nth 2 rect))
-                (setq v4 (nth 3 rect))
-
-                ;; Create 0.3m square.
-                (setq ent1
-                  (DGO-AddLWPoly
-                    (list v1 v2 v3 v4)
-                    *DGO-RECT-LAYER*
+                ;; item = (prefix identifier Easting Northing)
+                (setq ident (cadr item))
+                ;; no pole name -> "000/0" (that text is made red below)
+                (setq emptyName (= (vl-string-trim "/ " ident) ""))
+                (if emptyName (setq ident "000/0"))
+                (setq p
+                  (list
+                    (nth 2 item) ; Easting = X
+                    (nth 3 item) ; Northing = Y
+                    0.0
                   )
                 )
 
-                (if ent1
-                  (setq madeRect (1+ madeRect))
-                  (setq failCount (1+ failCount))
-                )
+                (setq best (DGO-BestTrack p tracks))
 
-                ;; Text = midpoint(V2,V3)
-                (setq textpt (DGO-Mid v2 v3))
-
-                ;; MText stacked format.
-                (setq textstr
-                  (strcat "\\A1;\\S" ident ";")
-                )
-
-                ;; Track angle.
-                (setq trackAng
-                  (atan (cadr tangent) (car tangent))
-                )
-
-                ;; Keep text readable.
-                (if (and (> trackAng (/ pi 2.0))
-                         (< trackAng (* 1.5 pi)))
+                (if best
                   (progn
-                    (setq trackAng (+ trackAng pi))
-                    ;; Text now runs the opposite way, so anchor it on the
-                    ;; V1-V4 edge (keeps it outside the rectangle).
-                    (setq textpt (DGO-Mid v1 v4))
-                  )
-                )
+                    (setq e (car best))
+                    (setq cp
+                      (DGO-ClosestPoint e p)
+                    )
 
-                (setq ent2
-                  (DGO-AddMText
-                    textpt
-                    textstr
-                    trackAng
-                    *DGO-TEXT-LAYER*
-                  )
-                )
+                    (setq tangent
+                      (DGO-TrackDirection e cp)
+                    )
 
-                (if ent2
-                  (setq madeText (1+ madeText))
+                    ;; If tangent unavailable, use a safe default.
+                    (if (null tangent)
+                      (setq tangent (list 1.0 0.0 0.0))
+                    )
+
+                    ;; Which side of the track is the point on?
+                    ;; cross(tangent, cp->p) > 0 = LHS (left), < 0 = RHS (right).
+                    ;; Box always extends away from the track.
+                    (setq sideSign
+                      (if (< (- (* (car tangent)  (- (cadr p) (cadr cp)))
+                                (* (cadr tangent) (- (car p)  (car cp))))
+                             -1e-9)
+                        -1.0
+                        1.0))
+
+                    (setq rect (DGO-MakeRectangle p tangent sideSign))
+
+                    (setq v1 (nth 0 rect))
+                    (setq v2 (nth 1 rect))
+                    (setq v3 (nth 2 rect))
+                    (setq v4 (nth 3 rect))
+
+                    ;; Create 0.3m square.
+                    (setq ent1
+                      (DGO-AddLWPoly
+                        (list v1 v2 v3 v4)
+                        *DGO-RECT-LAYER*
+                      )
+                    )
+
+                    (if ent1
+                      (setq madeRect (1+ madeRect))
+                      (setq failCount (1+ failCount))
+                    )
+
+                    ;; Distance: from the DGPS midpoint p (midpoint V1-V2, the
+                    ;; point the rectangle is drawn on) perpendicular to the
+                    ;; nearest track. (cadr best) is exactly that distance.
+                    ;; Only when "Distance venum" is ticked in the dialog.
+                    (setq dist (if *DGO-USEDIST* (cadr best) nil))
+
+                    ;; Text = midpoint(V2,V3)
+                    (setq textpt (DGO-Mid v2 v3))
+
+                    ;; MText: stacked pole number + " <prefix>4.50"
+                    (setq textstr
+                      (strcat
+                              (if emptyName
+                                (progn
+                                  (setq emptyCount (1+ emptyCount))
+                                  (strcat "\\A1;{\\C1;\\S" ident ";}")   ; red
+                                )
+                                (strcat "\\A1;\\S" ident ";")
+                              )
+                              (if (and dist (> dist 0.001))
+                                (progn
+                                  (setq distCount (1+ distCount))
+                                  (strcat " " (DGO-DistString dist))
+                                )
+                                ""
+                              )
+                      )
+                    )
+
+                    ;; Track angle.
+                    (setq trackAng
+                      (atan (cadr tangent) (car tangent))
+                    )
+
+                    ;; Keep text readable.
+                    (if (and (> trackAng (/ pi 2.0))
+                             (< trackAng (* 1.5 pi)))
+                      (progn
+                        (setq trackAng (+ trackAng pi))
+                        ;; Text now runs the opposite way, so anchor it on the
+                        ;; V1-V4 edge (keeps it outside the rectangle).
+                        (setq textpt (DGO-Mid v1 v4))
+                      )
+                    )
+
+                    ;; Empty-name text (000/0 + distance) goes to its own layer,
+                    ;; created automatically the first time it is needed.
+                    (if emptyName (DGO-MakeLayer *DGO-RED-LAYER*))
+
+                    (setq ent2
+                      (DGO-AddMText
+                        textpt
+                        textstr
+                        trackAng
+                        (if emptyName *DGO-RED-LAYER* *DGO-TEXT-LAYER*)
+                      )
+                    )
+
+                    (if ent2
+                      (setq madeText (1+ madeText))
+                      (setq failCount (1+ failCount))
+                    )
+                  )
                   (setq failCount (1+ failCount))
                 )
               )
-              (setq failCount (1+ failCount))
+
+              (princ "\n")
+              (princ "\n=== DgpsToOhe completed ===")
+              (princ (strcat "\nValid OHE rows:      " (itoa (length rows))))
+              (princ (strcat "\nRectangle layer:     " *DGO-RECT-LAYER*))
+              (princ (strcat "\nText layer:          " *DGO-TEXT-LAYER*))
+              (princ (strcat "\nRectangles created:  " (itoa madeRect)))
+              (princ (strcat "\nTexts created:       " (itoa madeText)))
+              (princ (strcat "\nWith distance:       " (itoa distCount)))
+              (princ (strcat "\nEmpty names (000/0): " (itoa emptyCount)
+                             (if (> emptyCount 0)
+                               (strcat "  -> layer " *DGO-RED-LAYER*)
+                               "")))
+              (princ (strcat "\nFailed/skipped:      " (itoa failCount)))
             )
           )
 
-          (princ "\n")
-          (princ "\n=== DgpsToOhe completed ===")
-          (princ (strcat "\nValid OHE rows:      " (itoa (length rows))))
-          (princ (strcat "\nRectangles created:  " (itoa madeRect)))
-          (princ (strcat "\nTexts created:       " (itoa madeText)))
-          (princ (strcat "\nFailed/skipped:      " (itoa failCount)))
-        )
+          (setvar "CMDECHO" oldcmdecho)
+          (setvar "OSMODE" oldosmode)
+          (princ)
       )
-
-      (setvar "CMDECHO" oldcmdecho)
-      (setvar "OSMODE" oldosmode)
-      (princ)
     )
   )
 )
 
-(princ "\nDgpsToOhe.lsp v05 loaded. Type vidDgpsToOhe to run.")
+(princ "\nDgpsToOhe.lsp v10 (options dialog) loaded. Type vidDgpsToOhe to run.")
 (princ)

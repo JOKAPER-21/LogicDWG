@@ -5,17 +5,15 @@
 ;; WHAT THIS DOES:
 ;;   1) Run command VIDPUBLISH (alias PUBLISH) in any open drawing.
 ;;   2) A dialog shows:
-;;        - Artist Name dropdown (Ananthan, Divya, Rishi --
+;;        - Artist Name dropdown (Ananthan, Dinesh, Divya, Rishi --
 ;;          edit *VP-ARTIST-LIST* near the top of this file to change
 ;;          the list)
-;;        - Yard Names list, grouped by section (MEJ_TEN, TEN_TCN, ...);
-;;          a "Target:" line under it previews the server version folder
-;;          the publish will land in. The yard is pre-selected from the
-;;          drawing's file name when it can be detected unambiguously.
+;;        - Yard Names list (press Enter or double-click to accept,
+;;          same as clicking OK)
 ;;        - Commands text box (written into the drawing's DWGPROPS
 ;;          Comments field before saving)
 ;;        - "Generate PDF" checkbox (checked by default)
-;;        - Publish / Cancel
+;;        - OK / Cancel
 ;;   3) On OK, for the selected yard:
 ;;        a) The Commands text is written into DWGPROPS -> Comments.
 ;;        b) The current drawing is SAVED (QSAVE) in place first.
@@ -23,19 +21,15 @@
 ;;           filename ("..._v02" -> version 2; no "_vNN" tag at all
 ;;           is treated as an implicit version 1). NO folder scan is
 ;;           done -- the filename is the single source of truth.
-;;        d) FIRST the server is checked: if that version's DWG is ALREADY
-;;           on the server, a warning is shown and NOTHING happens (no
-;;           save, no PDF, no copy, no log, no new version).
-;;           Otherwise (PDF in e) is made first, then) the DWG is copied
-;;           to the SERVER, straight into that
+;;        d) The DWG is copied to the SERVER, straight into that
 ;;           version's folder (a sibling of "dwg\yard\yd_<code>",
 ;;           NOT a "publish" subfolder -- that subfolder concept is
 ;;           gone):
 ;;             yd_<code>\v<NN>\yd_<code>_v<NN>.dwg
 ;;           (the filename in the version folder always carries the
 ;;           matching "_vNN" tag, even if the local file being
-;;           published didn't have one yet.) An existing server version
-;;           is never overwritten.
+;;           published didn't have one yet.) Publishing again later
+;;           re-publishes/overwrites that SAME version's server folder.
 ;;        e) If "Generate PDF" is checked, the drawing's SINGLE
 ;;           paper-space layout (besides Model) is plotted to PDF
 ;;           using whatever plot device that layout already has, into
@@ -58,34 +52,22 @@
 ;;           only happens AFTER the server copy in (d) succeeds, so a
 ;;           failed local save-as can never affect what already
 ;;           reached the server.
-;;        h) A line is appended to the publish log (*VP-LOG-PATH*), recording
+;;        h) A line is appended to <ROOT>\dev\publish_log.csv, recording
 ;;           the SERVER-published version (curver) -- NOT the new local
 ;;           bumped version from (g). See CSV header note below.
-;;        i) LAST STEP: once everything above has finished (PDF, server
-;;        copy, local PDF copy, local version bump, log row written),
-;;        vid_publish_pipeline.py is launched in the background (hidden
-;;        window, AutoCAD is NOT blocked) so the new log row is uploaded
-;;        to Telegram. It is only launched after the log row was written
-;;        successfully; if the publish stopped earlier (version already on
-;;        server, copy failed, ...) the pipeline is NOT triggered.
+;;        i) If the CSV write in (h) succeeded, the Telegram uploader
+;;           script (*VP-TELEGRAM-SCRIPT*) is launched in the background
+;;           (pythonw.exe, no console window) to push the DWG/PDF to
+;;           Telegram. This does NOT block AutoCAD -- see the "TELEGRAM
+;;           UPLOAD LAUNCH" section below for exactly what it does and
+;;           doesn't do on failure.
 ;;
 ;;   CSV COLUMNS (in order):
 ;;     timestamp, computer_name, artistname, code, filename, srcpath,
-;;     destdwg, destpdf, commands, latestversion, publishedtelebot, remarks
-;;   Header row (written automatically when publish_log.csv does not exist yet):
-;;     DATE TIME,PC NAME,ARTIST NAME,YARD CODE NAME,FILE NAME,LOCAL DWG,
-;;     SERVER DWG,SERVER PDF,COMMANDS,VERSION,TELEGRAM,REMARKS
-;;   Column letters: A=DATE TIME ... J=VERSION, K=TELEGRAM, L=REMARKS.
-;;   COLUMN K (TELEGRAM) is the telegram status of THAT row: this script writes
-;;   "teleNotPublished" there; the Python pipeline/bot must change K -- and
-;;   only K -- to "telePublished" on the SAME row once it has uploaded it.
-;;   "remarks" is the 12th and LAST column. This script NEVER fills it: every
-;;   row it writes ends with a trailing comma and an EMPTY remarks field
-;;   (reserved for manual / bot use). Older 11-column rows are left as they
-;;   are; readers must tolerate rows with or without the 12th field.
+;;     destdwg, destpdf, commands, latestversion, publishedtelebot
 ;;   "artistname" is whatever was selected in the Artist dropdown.
 ;;   "publishedtelebot" starts as "teleNotPublished" on every row this
-;;   script writes; the separate Telegram bot script watches for that exact
+;;   script writes; the telegram bot script watches for that exact
 ;;   value, uploads the row, then rewrites it to "telePublished" so it
 ;;   is never re-uploaded.
 ;;
@@ -102,38 +84,46 @@
 ;;               ...\yd_TDN_tiruparankundram\v02\yd_TDN_tiruparankundram_v02.pdf
 ;;
 ;; INSTALL:
-;;   1) Put VidPublish.lsp and VidPublish.dcl in the SAME folder.
+;;   1) Put VidPublish.lsp and VidPublish.dcl in the SAME folder
+;;      (e.g. ...\Roaming\Autodesk\C3D 2026\enu\Support\vid\tools).
 ;;   2) In AutoCAD:  APPLOAD  ->  add VidPublish.lsp  -> Load
 ;;      (or drag-and-drop the .lsp onto the AutoCAD window)
 ;;   3) Type:  VIDPUBLISH   (alias: PUBLISH)
 ;;
-;; ======================================================================
-;; SETTINGS  (edit here only)
-;; In AutoLISP strings every backslash must be doubled ( \\ ).
-;; No trailing slash at the end of a path.
-;; ======================================================================
+;; ----------------------------------------------------------------------
+;; >>>>>>>>>>>>>>>>>>>  EDIT THIS SECTION PER MACHINE  <<<<<<<<<<<<<<<<<<<
+;; ----------------------------------------------------------------------
+;; Root path is the ONLY thing that should change between users/machines.
+;; Examples:
+;;   Local drive :  "J:\\VID_autocad_publish_test"
+;;   UNC server  :  "\\\\FILESERVER\\Projects\\VID_autocad_publish_test"
+;;   Mapped drive:  "Z:\\VID_autocad_publish_test"
+;; NOTE: In AutoLISP strings, every backslash must be doubled ( \\ ).
+;; Do NOT put a trailing slash at the end.
+;; ----------------------------------------------------------------------
+(setq *VP-ROOT-PATH* "\\\\Desktop-igi8ekn\\vid_20d\\railway\\madurai_Railway\\section")                                                  
+;; ----------------------------------------------------------------------
+;; >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-;; ---------------------------- PATHS -----------------------------------
-;; All paths for this tool are set right here -- nothing is read from any
-;; other file (no JSON, no config).
-
-;; Yard root: where the yard folders (w1\..., w2\...) are published to.
-(setq *VP-ROOT-PATH*   "\\\\Desktop-igi8ekn\\vid_20d\\share\\madurai_Railway\\section")
-
-;; Telegram upload pipeline, launched as the very last step of a publish.
-;; *VP-PYTHON-EXE* is the command used to start Python: "python" if it is
-;; on PATH, "py" for the Windows launcher, or a full path such as
-;; "C:\\Python314\\python.exe" (doubled backslashes, as in any LISP string).
-;; Set *VP-PIPELINE-SHOW-WINDOW* to T to see the console window (useful
-;; while debugging); nil runs it hidden in the background.
-(setq *VP-PIPELINE-PATH*
-  "\\\\Desktop-igi8ekn\\vid_20d\\share\\asset_Library\\dev\\vidPublish\\vid_publish_cad_pipeline.py")
-(setq *VP-PYTHON-EXE* "python")
-(setq *VP-PIPELINE-SHOW-WINDOW* nil)
-
-;; Publish log (CSV) written after every publish.
-(setq *VP-LOG-FOLDER*  "\\\\Desktop-igi8ekn\\vid_20d\\share\\asset_Library\\dev\\vidPublish\\db")
-(setq *VP-LOG-PATH*    (strcat *VP-LOG-FOLDER* "\\publish_log.csv"))
+;;--------------------------------------------------------------------------
+;; TELEGRAM UPLOAD LAUNCH SETTINGS
+;; After every successful publish + CSV log write, VIDPUBLISH fires this
+;; script so the DWG/PDF get pushed to Telegram without you having to run
+;; it by hand. This points at vid_publish_pipeline.py, which compresses
+;; any PDF over 49 MB (via compress_notpublished_pdf.py) BEFORE handing
+;; off to vid_publish_telegram_bot.py for the actual upload -- so this
+;; one launch covers the full compress-then-publish flow.
+;;
+;; This now opens a VISIBLE console window (via cmd.exe /k) running
+;; python.exe -u, so you can watch every step -- CSV scan, each PDF
+;; being compressed, each Telegram upload -- print live as it happens.
+;; The window stays open (/k) after the script finishes so you can read
+;; the final summary; just close it manually when done. Edit the paths
+;; below if you move the script or python.exe isn't on PATH.
+;;--------------------------------------------------------------------------
+(setq *VP-TELEGRAM-SCRIPT* "\\\\Desktop-igi8ekn\\vid_20d\\railway\\madurai_Railway\\section\\dev\\py\\vid_publish_pipeline.py")
+(setq *VP-PYTHON-EXE* "python.exe")
+(setq *VP-CONSOLE-EXE* "cmd.exe")
 
 ;;--------------------------------------------------------------------------
 ;; ARTIST LIST
@@ -141,30 +131,53 @@
 ;; Add/remove names here to change what shows up in the dialog -- order
 ;; here is the order they appear in the dropdown.
 ;;--------------------------------------------------------------------------
-(setq *VP-ARTIST-LIST* (list "Ananthan" "Divya" "Rishi" ))
+(setq *VP-ARTIST-LIST* (list "Ananthan" "Dinesh" "Divya" "Rishi"))
 
 ;; Ensure Visual LISP ActiveX extensions (vla-*, vlax-*) are loaded.
 ;; Modern AutoCAD auto-loads these, but this is cheap, standard
 ;; insurance across different install/profile configurations.
 (vl-load-com)
 
-;; Shared install folder of VidPublish.lsp / VidPublish.dcl, used only as a
-;; last-resort place to look for the .dcl (see vp-show-dialog).
-(setq *VP-DCL-FALLBACK-DIR*
-  "\\\\Desktop-igi8ekn\\vid_20d\\share\\asset_Library\\dev\\vidPublish\\software\\autocad")
-
-;; Full path to this LSP's own folder, resolved at load time, so the
-;; .dcl file is found regardless of where the user's support paths point.
-(setq *VP-LSP-DIR* (if (findfile "VidPublish.lsp")
-                       (vl-filename-directory (findfile "VidPublish.lsp"))
-                       "."))
+;; Folder that holds VidPublish.lsp / VidPublish.dcl.
+;; The tools live in  ...\Support\vid\tools , which is NOT on the AutoCAD
+;; support path, so (findfile "VidPublish.dcl") alone cannot see them.
+;; This searches the tools folder directly, then falls back to the normal
+;; support path. Returns the folder (no trailing slash) or nil.
+(defun vp-find-lsp-dir ( / dirs root app d f result)
+  (setq dirs '())
+  (if (and (boundp '*VP-LSP-DIR*) *VP-LSP-DIR* (/= *VP-LSP-DIR* "."))
+    (setq dirs (append dirs (list *VP-LSP-DIR*))))
+  (if (setq root (getvar "ROAMABLEROOTPREFIX"))
+    (setq dirs (append dirs (list (strcat root "Support\\vid\\tools")))))
+  (if (setq app (getenv "APPDATA"))
+    (setq dirs (append dirs (list (strcat app "\\Autodesk\\C3D 2026\\enu\\Support\\vid\\tools")))))
+  (setq result nil)
+  (foreach d dirs
+    (if (and (not result)
+             (findfile (strcat (vl-string-right-trim "\\/" d) "\\VidPublish.dcl")))
+      (setq result (vl-string-right-trim "\\/" d))
+    )
+  )
+  (if (not result)
+    (if (setq f (findfile "VidPublish.dcl"))
+      (setq result (vl-filename-directory f))
+    )
+  )
+  (if (not result)
+    (if (setq f (findfile "VidPublish.lsp"))
+      (setq result (vl-filename-directory f))
+    )
+  )
+  result
+)
+(setq *VP-LSP-DIR* (vp-find-lsp-dir))
 
 ;;--------------------------------------------------------------------------
 ;; YARD MAP
 ;; Each entry: (CODE . SEGMENT-SUBPATH)
-;; SEGMENT-SUBPATH is everything between ROOT and "\dwg\yard\yd_<code>"
+;; SEGMENT-SUBPATH is everything between ROOT and "\dwg\yard\yd_<code>\publish"
 ;; The full target folder is built as:
-;;   ROOT \ SEGMENT \ dwg \ yard \ yd_<CODE> \ v<NN>   (version folder)
+;;   ROOT \ SEGMENT \ dwg \ yard \ yd_<CODE> \ publish
 ;;--------------------------------------------------------------------------
 (setq *VP-YARD-MAP*
   (list
@@ -639,10 +652,8 @@
 )
 
 ;; Make a free-text string safe to store as ONE CSV field: strip commas
-;; and newlines (replace with space) and turn double quotes into single
-;; quotes, since the log format here is plain comma-separated with no
-;; quoting (one stray " would make a CSV reader swallow the following
-;; commas/lines and merge several log rows into one). Keeps the publish_log.csv simple and
+;; and newlines (replace with space) since the log format here is plain
+;; comma-separated with no quoting. Keeps the publish_log.csv simple and
 ;; readable in any text editor or Excel without needing quoted-field
 ;; parsing for this column.
 (defun vp-csv-safe (s / out i ch)
@@ -655,11 +666,71 @@
       (cond ((= ch ",") " ")
             ((= ch "\n") " ")
             ((= ch "\r") "")
-            ((= ch "\"") "'")
             (T ch))))
     (setq i (1+ i))
   )
   out
+)
+
+;;==========================================================================
+;; TELEGRAM UPLOAD LAUNCH
+;; Fires the pipeline script (compress + Telegram publish) right after a
+;; successful publish + CSV log write.
+;;
+;;   - Runs in a VISIBLE console window via "cmd.exe /k python.exe -u ...",
+;;     through (startapp), which is ASYNCHRONOUS -- AutoCAD returns control
+;;     immediately and is never blocked waiting for the upload. That
+;;     matters because the python script itself now retries network/
+;;     timeout failures indefinitely (with backoff) until the upload
+;;     actually goes through. The -u flag plus the script's own line-
+;;     buffering forces every log line to print live, in order, instead
+;;     of appearing all at once at the end. The /k keeps the window open
+;;     after the script finishes so you can read the final summary --
+;;     close it yourself when you're done with it.
+;;   - If the upload ultimately fails for a non-network reason (bad bot
+;;     token/chat ID, missing server file, Telegram rejecting the request,
+;;     etc.), the python script pops up its OWN native Windows error
+;;     dialog IN ADDITION to printing the failure in the console -- and
+;;     writes to its own log file (pipeline.log) -- VidPublish.lsp can't
+;;     see or wait for that outcome since the process is detached.
+;;   - This function only alerts you here if it can't even START the
+;;     console window in the first place (script file missing, or
+;;     cmd.exe/python.exe not found) -- a launch failure, not an upload
+;;     failure.
+;;==========================================================================
+(defun vp-launch-telegram-upload ( / result cmdargs)
+  (cond
+    ((not (findfile *VP-TELEGRAM-SCRIPT*))
+     (alert (strcat "VIDPUBLISH: Pipeline script not found, skipping upload:\n"
+                     *VP-TELEGRAM-SCRIPT*
+                     "\n\nThe DWG/PDF were still published successfully -- "
+                     "only the Telegram push was skipped."))
+    )
+    (T
+     ;; Build: /k title "VID Publish Pipeline" & python.exe -u "script"
+     ;; The extra "title" call just labels the console window so it's
+     ;; obvious which window is which if you have several open.
+     (setq cmdargs
+       (strcat "/k title VID Publish Pipeline & "
+               *VP-PYTHON-EXE* " -u \"" *VP-TELEGRAM-SCRIPT* "\"")
+     )
+     (setq result
+       (vl-catch-all-apply
+         'startapp
+         (list *VP-CONSOLE-EXE* cmdargs)
+       )
+     )
+     (if (vl-catch-all-error-p result)
+       (alert (strcat "VIDPUBLISH: Could not launch the publish pipeline.\n"
+                       "Error: " (vl-catch-all-error-message result)
+                       "\n\nThe DWG/PDF were still published successfully. "
+                       "Run this manually to upload:\n"
+                       *VP-PYTHON-EXE* " -u \"" *VP-TELEGRAM-SCRIPT* "\""))
+       (princ "\nVIDPUBLISH: Publish pipeline started in a console window (will keep retrying on its own until it succeeds).")
+     )
+    )
+  )
+  (princ)
 )
 
 ;;==========================================================================
@@ -861,47 +932,6 @@
 
 
 ;;==========================================================================
-;; TELEGRAM PIPELINE TRIGGER
-;; Starts vid_publish_pipeline.py via the Windows Script Host, NOT
-;; waiting for it to finish (bWaitOnReturn = false), so AutoCAD stays
-;; responsive while the upload runs. Window style 0 = hidden, 1 = normal
-;; (see *VP-PIPELINE-SHOW-WINDOW*).
-;; Returns T if the process was launched, nil otherwise. Never raises:
-;; a failure here must not affect the already-completed publish.
-;;==========================================================================
-(defun vp-run-pipeline ( / cmd sh result)
-  (cond
-    ((not (findfile *VP-PIPELINE-PATH*))
-     (princ (strcat "\nVIDPUBLISH WARNING: Telegram pipeline script not found, upload NOT triggered:\n  "
-                    *VP-PIPELINE-PATH*))
-     nil
-    )
-    (T
-     (setq cmd (strcat "\"" *VP-PYTHON-EXE* "\" \"" *VP-PIPELINE-PATH* "\""))
-     (setq result (vl-catch-all-apply
-       '(lambda ()
-          (setq sh (vlax-create-object "WScript.Shell"))
-          (vlax-invoke-method sh "Run" cmd (if *VP-PIPELINE-SHOW-WINDOW* 1 0) :vlax-false)
-          (vlax-release-object sh)
-        )
-       '()
-     ))
-     (if (vl-catch-all-error-p result)
-       (progn
-         (princ (strcat "\nVIDPUBLISH WARNING: Could not start Telegram pipeline - "
-                        (vl-catch-all-error-message result)))
-         nil
-       )
-       (progn
-         (princ "\nVIDPUBLISH: Telegram pipeline started in background (vid_publish_pipeline.py).")
-         T
-       )
-     )
-    )
-  )
-)
-
-;;==========================================================================
 ;; DIALOG
 ;; Returns a list (CODE ARTISTNAME CMDTEXT PDFFLAG) on OK, or nil if
 ;; cancelled.
@@ -932,22 +962,14 @@
 (defun vp-show-dialog (currentfilename / dcl_id result sel dclfile
                                           firstyardrow detectedcode
                                           detectedrow initialrow)
-  (setq dclfile (vp-pathjoin (list *VP-LSP-DIR* "VidPublish.dcl")))
-  ;; If the LSP was loaded from a folder that is not on AutoCAD's support
-  ;; path, *VP-LSP-DIR* is "." and the line above misses. Try the support
-  ;; path, then the shared install folder, before giving up.
-  (if (not (findfile dclfile))
-    (cond
-      ((findfile "VidPublish.dcl")
-       (setq dclfile (findfile "VidPublish.dcl")))
-      ((findfile (vp-pathjoin (list *VP-DCL-FALLBACK-DIR* "VidPublish.dcl")))
-       (setq dclfile (findfile (vp-pathjoin (list *VP-DCL-FALLBACK-DIR* "VidPublish.dcl")))))
-    )
-  )
+  (setq *VP-LSP-DIR* (vp-find-lsp-dir))
+  (setq dclfile (if *VP-LSP-DIR*
+                  (vp-pathjoin (list *VP-LSP-DIR* "VidPublish.dcl"))
+                  "VidPublish.dcl"))
   (if (not (findfile dclfile))
     (progn
       (princ (strcat "\nERROR: Cannot find VidPublish.dcl at: " dclfile))
-      (princ "\nMake sure VidPublish.dcl is in the same folder as VidPublish.lsp.")
+      (princ "\nMake sure VidPublish.dcl is in ...\\Support\\vid\\tools (next to VidPublish.lsp).")
       nil
     )
     (progn
@@ -969,7 +991,7 @@
       (setq initialrow (if detectedrow detectedrow firstyardrow))
 
       (setq dcl_id (load_dialog dclfile))
-      (if (not (new_dialog "vid_publish_dlg" dcl_id))
+      (if (not (and (numberp dcl_id) (> dcl_id 0) (new_dialog "vid_publish_dlg" dcl_id)))
         (progn
           (princ "\nERROR: Could not load dialog vid_publish_dlg.")
           (unload_dialog dcl_id)
@@ -1262,80 +1284,65 @@
   (setq srcpath
     (if (vl-catch-all-error-p fnresult) "" fnresult))
 
-  (cond
-    ((or (= srcpath "") (not srcpath))
-     (princ "\nVIDPUBLISH: Current drawing has never been saved. Save it first with a real file name, then run VIDPUBLISH again.")
+  (if (or (= srcpath "") (not srcpath))
+    (progn
+      (princ "\nVIDPUBLISH: Current drawing has never been saved. Save it first with a real file name, then run VIDPUBLISH again.")
+      (princ)
     )
-    (T
-     (setq dlgresult (vp-show-dialog (vp-filename-only srcpath)))
-     (cond
-       ((not dlgresult)
-        (princ "\nVIDPUBLISH: Cancelled.")
-       )
-       (T
-        (setq code (nth 0 dlgresult))
-        (setq artistname (nth 1 dlgresult))
-        (setq cmdtext (nth 2 dlgresult))
-        (setq pdfflag (nth 3 dlgresult))
-        (setq seg (cdr (assoc code *VP-YARD-MAP*)))
+    (progn
+      (setq dlgresult (vp-show-dialog (vp-filename-only srcpath)))
+      (if (not dlgresult)
+        (progn (princ "\nVIDPUBLISH: Cancelled.") (princ))
+        (progn
+          (setq code (nth 0 dlgresult))
+          (setq artistname (nth 1 dlgresult))
+          (setq cmdtext (nth 2 dlgresult))
+          (setq pdfflag (nth 3 dlgresult))
+          (setq seg (cdr (assoc code *VP-YARD-MAP*)))
 
-        (cond
-          ((not seg)
-           (princ (strcat "\nVIDPUBLISH: No folder mapping found for code: " code))
-          )
-          (T
-           ;; ---- 1) Work out the SERVER target FIRST (nothing is changed
-           ;; yet): yard folder + the drawing's CURRENT version, read
-           ;; straight from the filename (no "_vNN" tag = implicit v01).
-           (setq srcname (vp-filename-only srcpath))
-           (setq srcext  (vp-fileext-only srcpath))
-           (if (not srcext) (setq srcext ".dwg"))
-
-           (setq rootnorm (vp-normpath *VP-ROOT-PATH*))
-           (setq yardfolder
-             (vp-pathjoin (list rootnorm seg "dwg" "yard" (strcat "yd_" code))))
-
-           (setq curparts (vp-effective-version srcname))
-           (setq curprefix (nth 0 curparts))
-           (setq curver (nth 1 curparts))
-           (setq cursuffix (nth 2 curparts))
-           (setq curverfoldername (vp-format-version curver))
-           (setq verfolderpath (vp-pathjoin (list yardfolder curverfoldername)))
-
-           ;; Server-side name ALWAYS carries the matching "_vNN" tag,
-           ;; even if the local file doesn't have one yet (implicit v01).
-           (setq destdwg
-             (vp-pathjoin (list verfolderpath
-               (strcat curprefix "_" curverfoldername cursuffix srcext))))
-           (setq destpdf
-             (vp-pathjoin (list verfolderpath
-               (strcat curprefix "_" curverfoldername cursuffix ".pdf"))))
-
-           (cond
-             ;; ---- 2) Version already on the server? Warn and STOP.
-             ;; Nothing is saved, plotted, copied, logged or versioned.
-             ((findfile destdwg)
-              (princ (strcat "\nVIDPUBLISH WARNING: Already version available in server (" curverfoldername ").\n  " destdwg "\n  Nothing was published."))
-              (alert (strcat "WARNING: Already version available in server.\n\nVersion: " curverfoldername
-                             "\nFile: " destdwg
-                             "\n\nNothing was published and no new version was created."))
-             )
-             (T
-              ;; ---- 3) Write Commands text into DWGPROPS Comments ----
+          (if (not seg)
+            (progn
+              (princ (strcat "\nVIDPUBLISH: No folder mapping found for code: " code))
+              (princ)
+            )
+            (progn
+              ;; ---- 1) Write Commands text into DWGPROPS Comments ----
               (if (and cmdtext (/= cmdtext ""))
-                (if (vp-set-dwgprops-comments docobj cmdtext)
-                  (princ "\nVIDPUBLISH: Drawing properties (Comments) updated.")
-                  (princ "\nVIDPUBLISH: Note - could not update drawing properties (non-fatal).")
+                (progn
+                  (if (vp-set-dwgprops-comments docobj cmdtext)
+                    (princ "\nVIDPUBLISH: Drawing properties (Comments) updated.")
+                    (princ "\nVIDPUBLISH: Note - could not update drawing properties (non-fatal).")
+                  )
                 )
               )
 
-              ;; ---- 4) Save current drawing (current file stays open) ----
+              ;; ---- 2) Save current drawing (current file stays open) ----
               (princ "\nVIDPUBLISH: Saving current drawing...")
               (command "_.QSAVE")
+
+              ;; Re-read path/name AFTER save in case it changed (safety only)
               (setq fnresult (vl-catch-all-apply 'vla-get-FullName (list docobj)))
               (setq srcpath (if (vl-catch-all-error-p fnresult) srcpath fnresult))
+              (setq srcname (vp-filename-only srcpath))
+              (setq srcext  (vp-fileext-only srcpath))
+              (if (not srcext) (setq srcext ".dwg"))
 
-              ;; ---- 5) Auto-create the version folder on the server ----
+              ;; ---- 3) Yard folder + CURRENT version, read straight from
+              ;; the filename (no "_vNN" tag = implicit version 1). This
+              ;; is the single source of truth for WHERE this publish
+              ;; goes -- no folder scanning involved.
+              (setq rootnorm (vp-normpath *VP-ROOT-PATH*))
+              (setq yardfolder
+                (vp-pathjoin (list rootnorm seg "dwg" "yard" (strcat "yd_" code))))
+
+              (setq curparts (vp-effective-version srcname))
+              (setq curprefix (nth 0 curparts))
+              (setq curver (nth 1 curparts))
+              (setq cursuffix (nth 2 curparts))
+              (setq curverfoldername (vp-format-version curver))
+              (setq verfolderpath (vp-pathjoin (list yardfolder curverfoldername)))
+
+              ;; ---- 4) Auto-create that version folder on the server ----
               (if (not (vl-file-directory-p verfolderpath))
                 (progn
                   (princ (strcat "\nVIDPUBLISH: Creating folder: " verfolderpath))
@@ -1343,161 +1350,173 @@
                 )
               )
 
-              (cond
-                ((not (vl-file-directory-p verfolderpath))
-                 (princ (strcat "\nVIDPUBLISH ERROR: Could not create or access target folder:\n  "
-                                verfolderpath
-                                "\nCheck that the root path is correct and the drive/server is connected."))
+              (if (not (vl-file-directory-p verfolderpath))
+                (progn
+                  (princ (strcat "\nVIDPUBLISH ERROR: Could not create or access target folder:\n  "
+                                  verfolderpath
+                                  "\nCheck that the root path is correct and the drive/server is connected."))
+                  (princ)
                 )
-                (T
-                 ;; ---- 6) Generate PDF (directly into the server version
-                 ;; folder) if requested ----
-                 (setq pdfresult "skipped")
-                 (if pdfflag
-                   (progn
-                     (setq layoutcount (vp-count-paper-layouts docobj))
-                     (setq targetlayoutname (vp-find-single-paper-layout docobj))
-                     (cond
-                       ((not targetlayoutname)
-                        (setq pdfresult "skipped")
-                        (princ (strcat "\nVIDPUBLISH WARNING: Expected exactly 1 paper-space layout "
-                                       "(besides Model) to plot, found " (itoa layoutcount)
-                                       ". Skipping PDF."))
-                       )
-                       (T
-                        (princ (strcat "\nVIDPUBLISH: Generating PDF for layout: " targetlayoutname "..."))
-                        (if (vp-plot-current-to-pdf destpdf targetlayoutname)
-                          (progn
-                            (setq pdfresult "ok")
-                            (princ (strcat "\nVIDPUBLISH: PDF created: " destpdf))
+                (progn
+                  ;; Server-side name ALWAYS carries the matching "_vNN"
+                  ;; tag, even if the local file being published doesn't
+                  ;; have one yet (implicit version 1 case).
+                  (setq destdwg
+                    (vp-pathjoin (list verfolderpath
+                      (strcat curprefix "_" curverfoldername cursuffix srcext))))
+                  (setq destpdf
+                    (vp-pathjoin (list verfolderpath
+                      (strcat curprefix "_" curverfoldername cursuffix ".pdf"))))
+
+                  ;; ---- 5) Copy DWG to server (re-publish/overwrite if
+                  ;; this exact version folder was already published) ----
+                  (if (vl-file-copy srcpath destdwg)
+                    (progn
+                      (princ (strcat "\nVIDPUBLISH: DWG published.\n  From: "
+                                      srcpath "\n  To:   " destdwg))
+
+                      ;; ---- 6) Generate PDF if requested ----
+                      (setq pdfresult "skipped")
+                      (if pdfflag
+                        (progn
+                          (setq layoutcount (vp-count-paper-layouts docobj))
+                          (setq targetlayoutname (vp-find-single-paper-layout docobj))
+                          (cond
+                            ((not targetlayoutname)
+                             (setq pdfresult "skipped")
+                             (princ (strcat "\nVIDPUBLISH WARNING: Expected exactly 1 paper-space layout "
+                                             "(besides Model) to plot, found " (itoa layoutcount)
+                                             ". Skipping PDF.\n  (DWG was still published successfully.)"))
+                            )
+                            (T
+                             (princ (strcat "\nVIDPUBLISH: Generating PDF for layout: " targetlayoutname "..."))
+                             (if (vp-plot-current-to-pdf destpdf targetlayoutname)
+                               (progn
+                                 (setq pdfresult "ok")
+                                 (princ (strcat "\nVIDPUBLISH: PDF created: " destpdf))
+                               )
+                               (progn
+                                 (setq pdfresult "failed")
+                                 (princ (strcat "\nVIDPUBLISH: (DWG was still published successfully despite the PDF issue above.)"))
+                               )
+                             )
+                            )
                           )
-                          (progn
-                            (setq pdfresult "failed")
-                            (princ "\nVIDPUBLISH: PDF failed (the DWG will still be published).")
-                          )
-                        )
-                       )
-                     )
-                   )
-                 )
-
-                 ;; ---- 7) Copy DWG to server ----
-                 (cond
-                   ((not (vl-file-copy srcpath destdwg))
-                    (princ (strcat "\nVIDPUBLISH ERROR: File copy failed.\n  From: "
-                                   srcpath "\n  To:   " destdwg))
-                   )
-                   (T
-                    (princ (strcat "\nVIDPUBLISH: DWG published.\n  From: "
-                                   srcpath "\n  To:   " destdwg))
-
-                    ;; ---- 8) Local DWG stays exactly where it is --
-                    ;; publishing does not rename or move it. It was
-                    ;; already re-saved in place via QSAVE above.
-                    (setq finalsrcpath srcpath)
-                    (setq finalfilename (strcat srcname srcext))
-                    (setq latestversion curver)
-
-                    ;; ---- 8b) If a PDF was generated, also save a copy of
-                    ;; it LOCALLY, next to the local DWG (same base name). ----
-                    (if (= pdfresult "ok")
-                      (progn
-                        (setq localpdfpath
-                          (vp-pathjoin (list (vl-filename-directory srcpath) (strcat srcname ".pdf"))))
-                        (if (vl-file-copy destpdf localpdfpath)
-                          (princ (strcat "\nVIDPUBLISH: Local PDF copy saved: " localpdfpath))
-                          (princ (strcat "\nVIDPUBLISH WARNING: Could not save local PDF copy to: "
-                                         localpdfpath
-                                         "\n  (Server publish already completed successfully.)"))
                         )
                       )
-                    )
 
-                    ;; ---- 8c) Create the NEXT local version folder and
-                    ;; switch the open drawing to a bumped copy saved
-                    ;; there (v02 -> v03). Only reached AFTER a successful
-                    ;; server publish of a NEW version, so a version that
-                    ;; already exists on the server never creates one. The
-                    ;; old local DWG/PDF are left untouched. ----
-                    (setq fnresult (vp-bump-filename-version srcname))
-                    (setq newbasename (nth 0 fnresult))
-                    (setq newver (nth 1 fnresult))
-                    (setq newverfoldername (vp-format-version newver))
+                      ;; ---- 7) Local DWG stays exactly where it is --
+                      ;; publishing no longer renames, moves, or bumps
+                      ;; the version of the local drawing. It was
+                      ;; already re-saved in place via QSAVE above, so
+                      ;; the old local file simply IS the current file;
+                      ;; nothing further to do here except record it.
+                      (setq finalsrcpath srcpath)
+                      (setq finalfilename (strcat srcname srcext))
+                      (setq latestversion curver)
 
-                    (setq curlocaldir (vl-filename-directory srcpath))
-                    (setq locbase (vp-local-version-parent curlocaldir))
-                    (setq newlocaldir (vp-pathjoin (list locbase newverfoldername)))
-                    (vp-mkdir-p newlocaldir)
-
-                    (setq renamedpath (vp-pathjoin (list newlocaldir (strcat newbasename srcext))))
-
-                    (if (not (vl-file-directory-p newlocaldir))
-                      (princ (strcat "\nVIDPUBLISH WARNING: Could not create local version folder: "
-                                     newlocaldir
-                                     "\n  (Server publish already completed successfully; old local file untouched.)"))
-                      (progn
-                        (princ (strcat "\nVIDPUBLISH: Saving new local version: " renamedpath))
-                        (setq rensuccess (vl-catch-all-apply
-                          '(lambda ()
-                             (vla-SaveAs docobj renamedpath)
-                           )
-                          '()
-                        ))
-                        (if (vl-catch-all-error-p rensuccess)
-                          (princ (strcat "\nVIDPUBLISH WARNING: Could not save new local version - "
-                                         (vl-catch-all-error-message rensuccess)
-                                         "\n  (Server publish already completed successfully; old local file untouched.)"))
-                          (princ (strcat "\nVIDPUBLISH: Local drawing is now: " renamedpath))
+                      ;; ---- 7b) If a PDF was generated, also save a
+                      ;; copy of it LOCALLY, right next to the local
+                      ;; DWG (same folder, same base name), so this
+                      ;; local version folder ends up holding both the
+                      ;; DWG and its PDF, not just the DWG. ----
+                      (if (= pdfresult "ok")
+                        (progn
+                          (setq localpdfpath
+                            (vp-pathjoin (list (vl-filename-directory srcpath) (strcat srcname ".pdf"))))
+                          (if (vl-file-copy destpdf localpdfpath)
+                            (princ (strcat "\nVIDPUBLISH: Local PDF copy saved: " localpdfpath))
+                            (princ (strcat "\nVIDPUBLISH WARNING: Could not save local PDF copy to: "
+                                            localpdfpath
+                                            "\n  (Server publish already completed successfully.)"))
+                          )
                         )
                       )
-                    )
 
-                    ;; ---- 9) Append to log CSV (best effort, never blocks).
-                    ;; Always records the SERVER-published version (curver),
-                    ;; not the new local-only bumped version. ----
-                    (setq logfolder (vp-normpath *VP-LOG-FOLDER*))
-                    (vp-mkdir-p logfolder)
-                    (setq logpath (vp-normpath *VP-LOG-PATH*))
-                    ;; First ever publish: create the CSV with its header row.
-                    (if (not (findfile logpath))
-                      (vp-log-line logpath
-                        "DATE TIME,PC NAME,ARTIST NAME,YARD CODE NAME,FILE NAME,LOCAL DWG,SERVER DWG,SERVER PDF,COMMANDS,VERSION,TELEGRAM,REMARKS")
-                    )
-                    (setq logline
-                      (strcat (vp-timestamp) ","
-                              (vp-csv-safe (vp-computer-name)) ","
-                              (vp-csv-safe artistname) ","
-                              code ","
-                              (vp-csv-safe finalfilename) ","
-                              (vp-csv-safe finalsrcpath) ","
-                              (vp-csv-safe destdwg) ","
-                              (vp-csv-safe (if (= pdfresult "ok") destpdf "")) ","
-                              (vp-csv-safe cmdtext) ","
-                              (itoa latestversion) ","
-                              "teleNotPublished" "," ))  ;; publishedtelebot, then the empty remarks column (trailing comma, nothing after it) -- the separate telegram bot watches for this exact value, then rewrites it to "telePublished" once uploaded
-                    (setq ok (vp-log-line logpath logline))
-                    (if ok
-                      (princ (strcat "\nVIDPUBLISH: Logged to " logpath))
-                      (princ "\nVIDPUBLISH: Note - could not write to publish_log.csv (non-fatal).")
-                    )
+                      ;; ---- 7c) Create the NEXT local version folder and
+                      ;; switch the open drawing to a bumped copy saved
+                      ;; there (v02 -> v03). The OLD local DWG (and its
+                      ;; PDF copy, saved above) are left exactly where
+                      ;; they are -- untouched -- so both versions exist
+                      ;; locally side by side; nothing is deleted. This
+                      ;; only runs AFTER the server copy above succeeded,
+                      ;; so a failed save here can never affect what
+                      ;; already reached the server. The publish_log.csv
+                      ;; row below always records the SERVER-published
+                      ;; version (curver), not this new local-only bumped
+                      ;; version -- this step is local bookkeeping only,
+                      ;; it doesn't change what was actually published. ----
+                      (setq fnresult (vp-bump-filename-version srcname))
+                      (setq newbasename (nth 0 fnresult))
+                      (setq newver (nth 1 fnresult))
+                      (setq newverfoldername (vp-format-version newver))
 
-                    ;; ---- 10) LAST STEP: everything is done -- trigger the
-                    ;; Telegram upload pipeline in the background. Only if
-                    ;; the log row was written, since the pipeline reads it.
-                    (if ok
-                      (vp-run-pipeline)
-                      (princ "\nVIDPUBLISH: Telegram pipeline NOT triggered (log row was not written).")
+                      (setq curlocaldir (vl-filename-directory srcpath))
+                      (setq locbase (vp-local-version-parent curlocaldir))
+                      (setq newlocaldir (vp-pathjoin (list locbase newverfoldername)))
+                      (vp-mkdir-p newlocaldir)
+
+                      (setq renamedpath (vp-pathjoin (list newlocaldir (strcat newbasename srcext))))
+
+                      (if (not (vl-file-directory-p newlocaldir))
+                        (princ (strcat "\nVIDPUBLISH WARNING: Could not create local version folder: "
+                                        newlocaldir
+                                        "\n  (Server publish already completed successfully; old local file untouched.)"))
+                        (progn
+                          (princ (strcat "\nVIDPUBLISH: Saving new local version: " renamedpath))
+                          (setq rensuccess (vl-catch-all-apply
+                            '(lambda ()
+                               (vla-SaveAs docobj renamedpath)
+                             )
+                            '()
+                          ))
+                          (if (vl-catch-all-error-p rensuccess)
+                            (princ (strcat "\nVIDPUBLISH WARNING: Could not save new local version - "
+                                            (vl-catch-all-error-message rensuccess)
+                                            "\n  (Server publish already completed successfully; old local file untouched.)"))
+                            (princ (strcat "\nVIDPUBLISH: Local drawing is now: " renamedpath))
+                            ;; NOTE: finalsrcpath/finalfilename/latestversion are
+                            ;; deliberately NOT updated here -- the log below
+                            ;; always records the SERVER-published version
+                            ;; (curver, set in step 7), not this new local-only
+                            ;; bumped version.
+                          )
+                        )
+                      )
+
+                      ;; ---- 8) Append to log CSV (best effort, never blocks) ----
+                      (setq logfolder (vp-pathjoin (list rootnorm "dev")))
+                      (vp-mkdir-p logfolder)
+                      (setq logpath (vp-pathjoin (list logfolder "publish_log.csv")))
+                      (setq logline
+                        (strcat (vp-timestamp) ","
+                                (vp-csv-safe (vp-computer-name)) ","
+                                (vp-csv-safe artistname) ","
+                                code ","
+                                (vp-csv-safe finalfilename) ","
+                                (vp-csv-safe finalsrcpath) ","
+                                (vp-csv-safe destdwg) ","
+                                (vp-csv-safe (if (= pdfresult "ok") destpdf "")) ","
+                                (vp-csv-safe cmdtext) ","
+                                (itoa latestversion) ","
+                                "teleNotPublished" ))  ;; publishedtelebot -- the telegram bot watches for this exact value, then rewrites it to "telePublished" once uploaded
+                      (setq ok (vp-log-line logpath logline))
+                      (if (not ok)
+                        (princ "\nVIDPUBLISH: Note - could not write to publish_log.csv (non-fatal).")
+                        (vp-launch-telegram-upload)
+                      )
                     )
-                   )
-                 )
+                    (progn
+                      (princ (strcat "\nVIDPUBLISH ERROR: File copy failed.\n  From: "
+                                      srcpath "\n  To:   " destdwg))
+                    )
+                  )
                 )
               )
-             )
-           )
+            )
           )
         )
-       )
-     )
+      )
     )
   )
   (princ)

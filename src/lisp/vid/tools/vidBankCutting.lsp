@@ -1,17 +1,20 @@
 ;; ============================================
-;; BANK CUTTING TOOL v26
+;; BANK CUTTING TOOL v30
+;; v30d: spacers so buttons are truly centred. v30c: Cancel button centered below Down/Up. v30: Symbol 01-04 editable block names, Down/Up at bottom, preview box removed
+;; v27: direction dialog shows preview of the 4 blocks, active one highlighted
 ;; v26: DYNMODE OFF only while the file is selected (ON afterwards, original
 ;;      value restored at the end); UP / DN chosen with [Down] [Up] buttons
 ;; Blocks are imported from vid_blocks_tools.dwg
 ;; (support/vid/tools - same folder as vidGradient.lsp)
-;;   bank_cutting_up / bank_cutting_dn
-;;   bank_cutting_up_lg / bank_cutting_dn_lg
+;;   Symbol 01..04 (editable in the dialog):
+;;   bank_cutting_up_001 / bank_cutting_dn_001
+;;   bank_cutting_up_lg_001 / bank_cutting_dn_lg_001
 ;; ============================================
 
 (vl-load-com)
 
 (setq *BC-BLOCK-NAMES*
-  '("bank_cutting_up" "bank_cutting_dn" "bank_cutting_up_lg" "bank_cutting_dn_lg"))
+  '("bank_cutting_up_001" "bank_cutting_dn_001" "bank_cutting_up_lg_001" "bank_cutting_dn_lg_001"))
 
 (setq *BC-REG-KEY* "HKEY_CURRENT_USER\\Software\\VID\\Tools")
 
@@ -129,27 +132,55 @@
 )
 
 ;; --------------------------------------------------------------------------
-;; Direction dialog:  [Down] [Up]  /  [Cancel] (centered)
-;; Returns "UP", "DN" or nil (cancel)
+;; Direction dialog:
+;;   Symbol 01 [bank_cutting_up_001    ]
+;;   Symbol 02 [bank_cutting_dn_001    ]
+;;   Symbol 03 [bank_cutting_up_lg_001 ]
+;;   Symbol 04 [bank_cutting_dn_lg_001 ]
+;;            [Down] [Up]
+;; The block names are editable and remembered for the next run.
+;; Closing with the x on the title bar = cancel (returns nil)
+;; Returns "UP", "DN" or nil
 ;; --------------------------------------------------------------------------
 (setq *BC-LastDir* "UP")
 
-(defun BC-direction-dialog (/ dlgName f dcl_id dlgRet result)
+;; read the 4 edit boxes back into *BC-BLOCK-NAMES* (empty box = keep old name)
+(defun BC-grab-names (/ i v new)
+  (setq i 1 new nil)
+  (foreach old *BC-BLOCK-NAMES*
+    (setq v (vl-string-trim " " (get_tile (strcat "s" (itoa i)))))
+    (setq new (append new (list (if (= v "") old v))))
+    (setq i (1+ i))
+  )
+  (setq *BC-BLOCK-NAMES* new)
+)
+
+(defun BC-direction-dialog (/ dlgName f dcl_id dlgRet result dnDef i)
+  (setq dnDef (= *BC-LastDir* "DN"))
+
   (setq dlgName (vl-filename-mktemp "bcDir" (getvar "TEMPPREFIX") ".dcl"))
   (setq f (open dlgName "w"))
   (write-line
     (strcat
       "bc_dir : dialog {\n"
       "  label = \"Bank Cutting - Direction\";\n"
-      "  : row {\n"
-      "    alignment = centered;\n"
-      "    : button { key = \"btn_dn\"; label = \"Down\"; width = 12; fixed_width = true; }\n"
-      "    : button { key = \"btn_up\"; label = \"Up\";   width = 12; fixed_width = true; }\n"
-      "  }\n"
+      "  : edit_box { key = \"s1\"; label = \"Symbol 01\"; edit_width = 28; }\n"
+      "  : edit_box { key = \"s2\"; label = \"Symbol 02\"; edit_width = 28; }\n"
+      "  : edit_box { key = \"s3\"; label = \"Symbol 03\"; edit_width = 28; }\n"
+      "  : edit_box { key = \"s4\"; label = \"Symbol 04\"; edit_width = 28; }\n"
       "  spacer_1;\n"
       "  : row {\n"
-      "    alignment = centered;\n"
-      "    : button { key = \"cancel\"; label = \"Cancel\"; width = 12; fixed_width = true; is_cancel = true; }\n"
+      "    : spacer { }\n"
+      "    : button { key = \"btn_dn\"; label = \"Down\"; width = 14; fixed_width = true;"
+      (if dnDef " is_default = true;" "") " }\n"
+      "    : button { key = \"btn_up\"; label = \"Up\";   width = 14; fixed_width = true;"
+      (if dnDef "" " is_default = true;") " }\n"
+      "    : spacer { }\n"
+      "  }\n"
+      "  : row {\n"
+      "    : spacer { }\n"
+      "    : button { key = \"cancel\"; label = \"Cancel\"; width = 14; fixed_width = true; is_cancel = true; }\n"
+      "    : spacer { }\n"
       "  }\n"
       "}\n")
     f)
@@ -160,12 +191,15 @@
   (if (and (> dcl_id 0) (new_dialog "bc_dir" dcl_id))
     (progn
       (setq *BC-DirSel* nil)
-      ;; click a button = choose that direction and close
-      (action_tile "btn_dn" "(setq *BC-DirSel* \"DN\") (done_dialog 1)")
-      (action_tile "btn_up" "(setq *BC-DirSel* \"UP\") (done_dialog 1)")
+      (setq i 1)
+      (foreach n *BC-BLOCK-NAMES*
+        (set_tile (strcat "s" (itoa i)) n)
+        (setq i (1+ i)))
+      ;; click a button = take the names + choose that direction and close
+      (action_tile "btn_dn" "(BC-grab-names) (setq *BC-DirSel* \"DN\") (done_dialog 1)")
+      (action_tile "btn_up" "(BC-grab-names) (setq *BC-DirSel* \"UP\") (done_dialog 1)")
       (action_tile "cancel" "(done_dialog 0)")
-      ;; keyboard focus on the last used direction
-      (mode_tile (if (= *BC-LastDir* "DN") "btn_dn" "btn_up") 2)
+      (mode_tile (if dnDef "btn_dn" "btn_up") 2)
       (setq dlgRet (start_dialog))
       (if (= dlgRet 1)
         (setq result *BC-DirSel* *BC-LastDir* *BC-DirSel*)
@@ -269,7 +303,7 @@
   ;; 4. DIRECTION
   (setq dir (BC-direction-dialog))
   (if (null dir)
-    (progn (alert "Direction not selected!") (exit))
+    (progn (prompt "\nDialog closed - cancelled.") (exit))
   )
   (if rev
     (setq dir (if (= dir "UP") "DN" "UP"))
@@ -278,11 +312,16 @@
   ;; BLOCK NAME
   (setq blk
     (cond
-      ((and (= dir "UP") (not (= h "LG"))) "bank_cutting_up")
-      ((and (= dir "DN") (not (= h "LG"))) "bank_cutting_dn")
-      ((and (= dir "UP") (= h "LG"))       "bank_cutting_up_lg")
-      ((and (= dir "DN") (= h "LG"))       "bank_cutting_dn_lg")
+      ((and (= dir "UP") (not (= h "LG"))) (nth 0 *BC-BLOCK-NAMES*))
+      ((and (= dir "DN") (not (= h "LG"))) (nth 1 *BC-BLOCK-NAMES*))
+      ((and (= dir "UP") (= h "LG"))       (nth 2 *BC-BLOCK-NAMES*))
+      ((and (= dir "DN") (= h "LG"))       (nth 3 *BC-BLOCK-NAMES*))
     )
+  )
+
+  ;; name edited in the dialog? -> import it now if it is not in the drawing yet
+  (if (not (tblsearch "BLOCK" blk))
+    (BC-import-blocks dwg (list blk))
   )
 
   ;; BLOCK MUST EXIST (imported from vid_blocks_tools.dwg)

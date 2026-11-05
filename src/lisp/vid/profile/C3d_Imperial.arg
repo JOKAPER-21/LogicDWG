@@ -1,0 +1,3552 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>]
+"IsPureAcadProfile"=dword:00000000
+"DisableObjExplodeFlattening"=dword:00000001
+"BrandingResource"="C3DBrandRes.dll"
+"DefaultWorkspace"="Civil 3D"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Application Menu]
+"BaseFile"="acAppMenu.xaml"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs]
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\3dDwf]
+"DefaultDwfFormat"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AcPublishDlg]
+"DefaultDwfFormat"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpAlignmentEntity]
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpAlignmentEntity\CriteriaBasedColumnSettings]
+"Number"=dword:0000004B
+"Design Speed"=dword:0000005B
+"Minimum Radius"=dword:0000006E
+"Minimum Radius Table"=dword:00000096
+"Transition Length Table"=dword:00000099
+"Attainment Method"=dword:00000078
+"Curve Group Index"=dword:00000079
+"Curve Group Sub-Entity Index"=dword:000000BF
+"Type"=dword:0000004B
+"Constraint1"=dword:0000004B
+"Constraint2"=dword:0000004B
+"Tangency Constraint"=dword:000000AF
+"Parameter Constraint Lock"=dword:0000006C
+"Parameter Constraint"=dword:0000004B
+"Length"=dword:0000004B
+"Radius"=dword:0000004B
+"Delta angle"=dword:0000004B
+"Start Station"=dword:0000004F
+"End Station"=dword:0000004B
+"Start Direction"=dword:0000005C
+"End Direction"=dword:00000057
+"Start Point"=dword:0000004B
+"End Point"=dword:0000004B
+"Center Point"=dword:0000004F
+"Pass Through Point1"=dword:00000087
+"Pass Through Point2"=dword:00000087
+"Pass Through Point3"=dword:00000087
+"Direction at Through Point1"=dword:000000B0
+"Direction at Through Point2"=dword:000000B0
+"Chord length"=dword:00000052
+"Chord Direction"=dword:00000064
+"Mid-Ordinate"=dword:00000053
+"External Tangent"=dword:0000006E
+"External Secant"=dword:00000066
+"PI Included Angle"=dword:00000070
+"Greater than 180"=dword:0000006C
+"PI Station"=dword:0000004B
+"Direction"=dword:0000004B
+"Minimum Spiral Length"=dword:000000B4
+"Spiral type"=dword:00000055
+"A"=dword:0000004B
+"Incurve"=dword:0000004B
+"Compound"=dword:00000056
+"Radius in"=dword:0000004B
+"Radius out"=dword:00000055
+"Total X"=dword:0000004B
+"Total Y"=dword:0000004B
+"Short tan"=dword:0000004B
+"Long tan"=dword:0000004B
+"P"=dword:0000004B
+"K"=dword:0000004B
+"Spiral Definition"=dword:00000007
+"SPI Station"=dword:00000058
+"SPI Northing"=dword:00000064
+"SPI Easting"=dword:0000005B
+"SPI Included Angle"=dword:00000095
+"Radial Point Northing"=dword:000000A8
+"Radial Point Easting"=dword:0000009F
+"PI Point"=dword:000000A5
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpAlignmentEntity\DefaultColumnSettings]
+"Number"=dword:0000004B
+"Design Speed"=dword:0000005B
+"Minimum Radius"=dword:0000006E
+"Minimum Radius Table"=dword:00000096
+"Transition Length Table"=dword:00000099
+"Attainment Method"=dword:00000078
+"Curve Group Index"=dword:00000079
+"Curve Group Sub-Entity Index"=dword:000000BF
+"Type"=dword:0000004B
+"Constraint1"=dword:0000004B
+"Constraint2"=dword:0000004B
+"Tangency Constraint"=dword:000000AF
+"Parameter Constraint Lock"=dword:0000006C
+"Parameter Constraint"=dword:0000004B
+"Length"=dword:0000004B
+"Radius"=dword:0000004B
+"Delta angle"=dword:0000004B
+"Start Station"=dword:0000004F
+"End Station"=dword:0000004B
+"Start Direction"=dword:0000005C
+"End Direction"=dword:00000057
+"Start Point"=dword:0000004B
+"End Point"=dword:0000004B
+"Center Point"=dword:0000004F
+"Pass Through Point1"=dword:00000087
+"Pass Through Point2"=dword:00000087
+"Pass Through Point3"=dword:00000087
+"Direction at Through Point1"=dword:000000B0
+"Direction at Through Point2"=dword:000000B0
+"Chord length"=dword:00000052
+"Chord Direction"=dword:00000064
+"Mid-Ordinate"=dword:00000053
+"External Tangent"=dword:0000006E
+"External Secant"=dword:00000066
+"PI Included Angle"=dword:00000070
+"Greater than 180"=dword:0000006C
+"PI Station"=dword:0000004B
+"Direction"=dword:0000004B
+"Minimum Spiral Length"=dword:000000B4
+"Spiral type"=dword:00000055
+"A"=dword:0000004B
+"Incurve"=dword:0000004B
+"Compound"=dword:00000056
+"Radius in"=dword:0000004B
+"Radius out"=dword:00000055
+"Total X"=dword:0000004B
+"Total Y"=dword:0000004B
+"Short tan"=dword:0000004B
+"Long tan"=dword:0000004B
+"P"=dword:0000004B
+"K"=dword:0000004B
+"Spiral Definition"=dword:00000007
+"SPI Station"=dword:00000058
+"SPI Northing"=dword:00000064
+"SPI Easting"=dword:0000005B
+"SPI Included Angle"=dword:00000095
+"Radial Point Northing"=dword:000000A8
+"Radial Point Easting"=dword:0000009F
+"PI Point"=dword:000000A5
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpProfileSubEntity]
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpProfileSubEntity\CriteriaBasedColumnSettings]
+"Type"=dword:0000004B
+"Tangency Constraint"=dword:000000AF
+"Constraint Type Desc"=dword:000000AB
+"Length"=dword:0000004B
+"Total Curve Length"=dword:0000004B
+"Grade"=dword:0000004B
+"K Value"=dword:0000004B
+"Profile Curve Radius"=dword:000000A3
+"Profile Curve Type"=dword:00000093
+"High/Low Point Station"=dword:000000B4
+"High/Low Point Elevation"=dword:000000C5
+"Through point 1 Station"=dword:000000B9
+"Through point 1 Elevation"=dword:000000CA
+"Through point 2 Station"=dword:000000B9
+"Through point 2 Elevation"=dword:000000CA
+"Through Point 3 Station"=dword:000000BA
+"Through Point 3 Elevation"=dword:000000CB
+"Grade at Through Point1"=dword:000000C3
+"Grade at Through Point2"=dword:000000C3
+"Start Station"=dword:00000065
+"Start Elevation"=dword:00000076
+"End Station"=dword:0000005C
+"End Elevation"=dword:0000006D
+"Grade In"=dword:0000004B
+"Grade Out"=dword:00000053
+"Grade Change"=dword:00000074
+"PVI Station"=dword:00000058
+"PVI Elevation"=dword:00000069
+"M Value"=dword:0000004B
+"Tangent Offset at PVI"=dword:000000AB
+"Asymmetric Length 1"=dword:000000A7
+"Asymmetric Length 2"=dword:000000A7
+"Vertical Curve Table"=dword:000000A1
+"Design Speed"=dword:0000006E
+"Minimum K for Stopping Sight Distance"=dword:00000132
+"Minimum K for Passing Sight Distance"=dword:0000012A
+"Minimum K for Headlight Sight Distance"=dword:00000137
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpProfileSubEntity\DefaultColumnSettings]
+"Type"=dword:0000004B
+"Tangency Constraint"=dword:000000AF
+"Constraint Type Desc"=dword:000000AB
+"Length"=dword:0000004B
+"Total Curve Length"=dword:0000004B
+"Grade"=dword:0000004B
+"K Value"=dword:0000004B
+"Profile Curve Radius"=dword:000000A3
+"Profile Curve Type"=dword:00000093
+"High/Low Point Station"=dword:000000B4
+"High/Low Point Elevation"=dword:000000C5
+"Through point 1 Station"=dword:000000B9
+"Through point 1 Elevation"=dword:000000CA
+"Through point 2 Station"=dword:000000B9
+"Through point 2 Elevation"=dword:000000CA
+"Through Point 3 Station"=dword:000000BA
+"Through Point 3 Elevation"=dword:000000CB
+"Grade at Through Point1"=dword:000000C3
+"Grade at Through Point2"=dword:000000C3
+"Start Station"=dword:00000065
+"Start Elevation"=dword:00000076
+"End Station"=dword:0000005C
+"End Elevation"=dword:0000006D
+"Grade In"=dword:0000004B
+"Grade Out"=dword:00000053
+"Grade Change"=dword:00000074
+"PVI Station"=dword:00000058
+"PVI Elevation"=dword:00000069
+"M Value"=dword:0000004B
+"Tangent Offset at PVI"=dword:000000AB
+"Asymmetric Length 1"=dword:000000A7
+"Asymmetric Length 2"=dword:000000A7
+"Vertical Curve Table"=dword:000000A1
+"Design Speed"=dword:0000006E
+"Minimum K for Stopping Sight Distance"=dword:00000132
+"Minimum K for Passing Sight Distance"=dword:0000012A
+"Minimum K for Headlight Sight Distance"=dword:00000137
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpVAlignmentEntity]
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpVAlignmentEntity\CriteriaBasedColumnSettings]
+"PVI Station"=dword:00000058
+"PVI Elevation"=dword:00000069
+"Grade In"=dword:0000004B
+"Grade Out"=dword:00000053
+"A (Grade Change)"=dword:0000008E
+"Profile Curve Type"=dword:00000093
+"K Value"=dword:0000004B
+"Sub-Entity Type"=dword:0000007D
+"Profile Curve Length"=dword:000000A4
+"Curve Radius"=dword:0000006B
+"Asymmetric Length 1"=dword:000000A7
+"Asymmetric Length 2"=dword:000000A7
+"Vertical Curve Table"=dword:000000A1
+"Design Speed"=dword:0000006E
+"Minimum K for Stopping Sight Distance"=dword:00000132
+"Minimum K for Passing Sight Distance"=dword:0000012A
+"Minimum K for Headlight Sight Distance"=dword:00000137
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\AeccUiPpVAlignmentEntity\DefaultColumnSettings]
+"PVI Station"=dword:00000058
+"PVI Elevation"=dword:00000069
+"Grade In"=dword:0000004B
+"Grade Out"=dword:00000053
+"A (Grade Change)"=dword:0000008E
+"Profile Curve Type"=dword:00000093
+"K Value"=dword:0000004B
+"Sub-Entity Type"=dword:0000007D
+"Profile Curve Length"=dword:000000A4
+"Curve Radius"=dword:0000006B
+"Asymmetric Length 1"=dword:000000A7
+"Asymmetric Length 2"=dword:000000A7
+"Vertical Curve Table"=dword:000000A1
+"Design Speed"=dword:0000006E
+"Minimum K for Stopping Sight Distance"=dword:00000132
+"Minimum K for Passing Sight Distance"=dword:0000012A
+"Minimum K for Headlight Sight Distance"=dword:00000137
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\Export Data]
+"InitialFilterIndex"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Dialogs\InsertHyperlinkDialog]
+"MaxRecentFolders"=dword:00000064
+"MaxRecentFiles"=dword:00000064
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Editor Configuration]
+"EmergencyFont"="simplex.shx"
+"CustomDictionary"="%RoamableRootFolder%\\support\\sample.cus"
+"FontMappingFile"="%RoamableRootFolder%\\support\\acad.fmp"
+"XrefLoadPath"="%TempFolder%\\"
+"SaveFilePath"="%TempFolder%\\"
+"LogFilePath"="%LocalRootFolder%\\"
+"ACADLspAsDoc"=dword:00000000
+"LayoutRegenControl"=dword:00000000
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\General]
+"UseAcadHelpFile"=dword:00000001
+"CodesFileName"="%AllUserFolder%\\C3DStockSubassemblyScripts.codes"
+"PrinterConfigDir"="%RoamableRootFolder%\\plotters"
+"PrinterDescDir"="%RoamableRootFolder%\\plotters\\PMP Files"
+"TemplatePath"="%LocalRootFolder%\\Template"
+"ACAD"="%RoamableRootFolder%\\support;%InstallFolder%\\support;%InstallFolder%\\support\\en-US;%InstallFolder%\\fonts;%InstallFolder%\\help;%InstallFolder%\\Express;%InstallFolder%\\C3D;%InstallFolder%\\ACA;%InstallFolder%\\Map\\bin\\FDO;%InstallFolder%\\Map\\support\\en-US;%InstallFolder%\\Map\\support;%InstallFolder%\\Map;%InstallFolder%\\Map\\bin\\Gisplatform;%InstallFolder%\\Map\\en-US;%AllUserFolder%\\Data\\Symbols\\MVBlocks;%AllUserFolder%\\Data\\Symbols\\MVBlocks\\3D MV Blocks Textures;C:\\Program Files\\Common Files\\Autodesk Shared\\Civil Engineering 138"
+"AlternativePageSetUpsTemplate"="%LocalRootFolder%\\Template\\SheetSets\\Architectural Imperial.dwt"
+"PrinterStyleSheetDir"="%RoamableRootFolder%\\plotters\\Plot Styles"
+"QnewTemplate"="%LocalRootFolder%\\Template\\_Autodesk Civil 3D (Imperial) NCS.dwt"
+"SheetSetTemplatePath"="%LocalRootFolder%\\Template\\AutoCAD Template"
+"ToolPalettePath"="%RoamableRootFolder%\\support\\ToolPalette"
+"PlotLogPath"="%LocalRootFolder%\\"
+"DGNMAPPINGPATH"="%RoamableRootFolder%\\support"
+"AVEMAPS"="C:\\Program Files\\Common Files\\Autodesk Shared\\Materials\\Textures\\1\\Mats;%AllUserFolder%\\Data\\Symbols\\MVBlocks\\3D MV Blocks Textures"
+"ACTPATH"=""
+"ColorBookLocation"="%InstallFolder%\\support\\color;%RoamableRootFolder%\\support\\color"
+"DatabaseWorkSpacePath"="%RoamableRootFolder%\\Data Links"
+"ACTRECPATH"="%RoamableRootFolder%\\support\\Actions"
+"IESWEB"="C:\\ProgramData\\Autodesk\\C3D 2026\\R25.1\\enu\\WebFiles\\"
+"DwfxFormat"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\General Configuration]
+"EnterpriseMenuFile"="."
+"MenuFile"="%RoamableRootFolder%\\Support\\C3D"
+"TempDirectory"="%TempFolder%\\"
+"QPMODE"=dword:00000000
+"GRIPSUBOBJMODE"=dword:00000000
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Preferences]
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Preferences\AeccPressurePipes130]
+"ADD6EA33-AED3-4EBF-B382-D99688E5BC72"="%AllUserFolder%\\Pressure Pipes Catalog\\Metric\\Metric_AWWA_PushOn.sqlite"
+"611746E2-B19E-4F8E-ACF7-F12491879819"="%AllUserFolder%\\Pressure Pipes Catalog\\Imperial\\Imperial_AWWA_PushOn.sqlite"
+"07D0A142-F28D-42E7-838D-51A24EDCD41B"="%AllUserFolder%\\Pressure Pipes Catalog\\Imperial\\Imperial_AWWA_Flanged.sqlite"
+"07D0A142-F28D-42E7-838D-51A24EDCD41C"="%AllUserFolder%\\Pressure Pipes Catalog\\Imperial\\Imperial_AWWA_Mechanical.sqlite"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Preferences\AeccUiNetwork130]
+"16C49365-B844-484b-92CE-9A8ACE681B57"="%AllUserFolder%\\Pipes Catalog\\US Imperial Pipes\\US Imperial Pipes.apc"
+"DCE203A2-D381-466f-A23E-08A9D9F8FDBD"="%AllUserFolder%\\Pipes Catalog\\US Imperial Structures\\US Imperial Structures.apc"
+"F670B5B9-DA12-476d-B461-4FB5C5650A82"="%AllUserFolder%\\Pipes Catalog\\Metric Pipes\\Metric Pipes.apc"
+"F1FEBE2D-D589-4f85-BF8E-650ED06A5EA5"="%AllUserFolder%\\Pipes Catalog\\Metric Structures\\Metric Structures.apc"
+"EBB33ACE-062C-467F-80A4-51E1F7903201"="%AllUserFolder%\\Pipes Catalog\\Generic Drainage Catalog - Imperial\\Generic Drainage Catalog - Imperial.apc"
+"9DF473BA-07C4-41FE-937B-6090FBF03736"="%AllUserFolder%\\Pipes Catalog\\Generic Drainage Catalog - Metric\\Generic Drainage Catalog - Metric.apc"
+"425ef8b2-dc55-40ad-bbd8-16028441b375"="%AllUserFolder%\\Pipes Catalog\\Generic Drainage with Pipe Connections - Imperial\\Generic Drainage with Pipe Connections - Imperial.apc"
+"21ce3e89-6a38-41a9-bc2b-3bebd88a5e63"="%AllUserFolder%\\Pipes Catalog\\Generic Drainage with Pipe Connections - Metric\\Generic Drainage with Pipe Connections - Metric.apc"
+"SharedContentPath"="%AllUserFolder%\\Pipes Catalog\\Aecc Shared Content\\"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Preferences\AeccUiSurvey130]
+"EquipmentDbPath"="%AllUserFolder%\\Survey\\"
+"FigurePrefixDbPath"="%AllUserFolder%\\Survey\\"
+"SdbSettingsPath"="%AllUserFolder%\\Survey\\"
+"SdxDefaultsPath"="%AllUserFolder%\\Survey\\"
+"F2FDefinitionPath"="%AllUserFolder%\\Survey\\"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\StatusBar]
+"DocumentStatusBar"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\StatusBar\Application]
+"UnitsPane"=dword:00000000
+"ShowPercentage"=dword:00000000
+"CursorCoordinatesPane"=dword:00000000
+"LineWeight"=dword:00000000
+"3DOSnapPane"=dword:00000000
+"DynamicUCSPane"=dword:00000000
+"SelectionFilterPane"=dword:00000000
+"GizmoPane"=dword:00000000
+"InferRelationshipPane"=dword:00000000
+"Paper/ModelPane"=dword:00000001
+"HardwareAccelerationPane"=dword:00000000
+"TransparencyPane"=dword:00000000
+"DynInputPane"=dword:00000000
+"QuickProperties"=dword:00000000
+"SelectionCycling"=dword:00000000
+"LockUIPane"=dword:00000000
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\SysvarMonitor]
+"CMDDIA"="1"
+"FILEDIA"="1"
+"HIGHLIGHT"="1"
+"MIRRTEXT"="0"
+"PICKADD"="2"
+"PICKAUTO"="5"
+"PICKFIRST"="1"
+"SDI"="0"
+"SELECTIONPREVIEW"="3"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Variables]
+"TRUSTEDDOMAINS"="*.autodesk.com;*.autocad.com"
+"SECURELOAD"="1"
+"TRUSTEDPATHS"="%RoamableRootFolder%\\Support\\;%AllUserFolder%\\Data\\Reports\\Net;"
+"APPFRAMERESOURCES"="pack://application:,,,/AeccUiWindows;component/AppFrame/C3D.xaml"
+"NAVBARDISPLAY"="1"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Vault]
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Vault\API]
+"UseVaacVerticals"="true"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\Profiles\<<C3D_Imperial>>\Vault\UI]
+"ShowMenu"="false"
+"ShowToolbar"="false"
+"ShowAppMenu"="true"
+"ShowRibbon"="true"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile]
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Application Window]
+"Show"=dword:00000003
+"Position"="-8 -8 1928 1040"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Command Line Windows]
+"TextWindow.Show"=dword:00000001
+"TextWindow.Position"="672 297 1248 734"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands]
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-ARCHIVE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-ATTDEF]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-ATTEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-BLOCK]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-COLOR]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-ETRANSMIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-GROUP]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-HATCHEDIT]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-IMAGE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-INSERT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-LAYER]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-STYLE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-TABLE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-TEXT]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-VIEW]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-VPORTS]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\-WBLOCK]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\3DCONFIG]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\3DMOVE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\3DOSNAP]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\3DROTATE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ABOUT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ARCHIVE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ARRAY]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ARRAYEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ARRAYPATH]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ARRAYPOLAR]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ARRAYRECT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ARX]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ATTDEF]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ATTEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ATTEXT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BCLOSE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BHATCH]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BLOCK]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BOUNDARY]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BOX]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BPARAMETER]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BPOLY]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BSAVEAS]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BVSTATE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\BWBLOCKAS]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CHAMFER]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CHAMFEREDGE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CLASSICIMAGE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CLASSICXREF]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\COLOR]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CONVERT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CONVERTCTB]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CONVERTPSTYLES]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CONVTOMESH]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CONVTOSOLID]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CONVTOSURFACE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\COPY]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\COPYTOLAYER]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CUILOAD]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\CUIUNLOAD]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DDEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DIM]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DIM1]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DIMEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DIMSTYLE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DTEXT]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DWGCONVERT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DXFIN]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\DXFOUT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\EDITTABLECELL]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ETRANSMIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\EXECUTETOOL]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\EXPLODE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\EXTEND]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\EXTRUDE]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\FILLET]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\GEOMARKLATLONG]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\GEOMARKME]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\GEOMARKPOINT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\GEOMARKPOSITION]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\GRADIENT]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\GROUP]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\HATCH]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\HATCHEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\HELIX]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\HIDE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\IMAGE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\IMAGEADJUST]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\INSERT]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\JOIN]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LAYDEL]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LAYER]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LAYISO]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LAYMCH]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LAYMRG]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LAYOUT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LINETYPE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LOFT]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\LWEIGHT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MASSPROP]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MENULOAD]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MENUUNLOAD]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MESHSMOOTH]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MLEADER]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MLEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MOVE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MTEXT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\MVIEW]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\OPENDWFMARKUP]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\OSNAP]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\PAN]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\PLANESURF]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\PLOTSTAMP]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\PLOTSTYLE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\PSETUPIN]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\PSOUT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\PURGE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\PYRAMID]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\QUICKCALC]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\RENAME]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\RENDER]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\REVCLOUD]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\REVOLVE]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\ROTATE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SCALE]
+"DefaultVersion"=dword:00000004
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SELECT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SHADE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SHADEMODE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SKETCH]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SOLIDEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SPLINE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SPLINEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\STRETCH]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\STYLE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\SWEEP]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\TABLE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\TABLEDIT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\TABLESTYLE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\TEXT]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\TOOLBAR]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\TRIM]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\UCS]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\UNITS]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\VBALOAD]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\VBARUN]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\VIEW]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\VIEWBASE]
+"DefaultVersion"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\VIEWPORTS]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\VPLAYER]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\VPOINT]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\VPORTS]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\WBLOCK]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\WSSAVE]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\XBIND]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Commands\XREF]
+"DefaultVersion"=dword:00000002
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Drawing Window]
+"Show"=dword:00000003
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\Editor Configuration]
+"SDF_AttributeExtractTemplateFile"=""
+"AutoSnapPolarDistance"="0"
+"AutoSnapPolarAddAng"=""
+"Model AutoSnap Color"=dword:00019801
+"Layout AutoSnap Color"=dword:0001CC01
+"Parallel AutoSnap Color"=dword:00019801
+"Perspective AutoSnap Color"=dword:00019801
+"BEdit AutoSnap Color"=dword:0001CC01
+"Model 3d AutoSnap Color"=dword:00FF7F00
+"Layout 3d AutoSnap Color"=dword:00FF7F00
+"Parallel 3d AutoSnap Color"=dword:00FF7F00
+"Perspective 3d AutoSnap Color"=dword:00FF7F00
+"BEdit 3d AutoSnap Color"=dword:00FF7F00
+"2D Model viewport control color"=dword:00000000
+"Parallel viewport control color"=dword:00FFFFFF
+"Perspective viewport control color"=dword:00FFFFFF
+"AutoSnapControl"=dword:00000027
+"UCSDetect"=dword:00000000
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\General]
+"FavoriteMaterialLibrary"="%RoamableRootFolder%\\Materials\\FavoriteMaterials.adsklib"
+"ToolTipInitialDelay"="1000"
+"CMLInternetSearchURL"="http://www.google.com/search?q={0}"
+"CMLInternetSearchPrefix"="AutoCAD"
+"LastTemplate"="%LocalRootFolder%\\Template\\_Autodesk Civil 3D (Metric) NCS.dwt"
+"InsertUnitsDefTarget"=dword:00000006
+"InsertUnitsDefSource"=dword:00000006
+"ActUI"=dword:00000006
+"ANSIHatch"="acad.pat"
+"ANSILinetype"="acad.lin"
+"ISOHatch"="acadiso.pat"
+"ISOLinetype"="acadiso.lin"
+"PATH"="C:\\Program Files\\Common Files\\Autodesk Shared\\Components\\2026\\1.7.0;%InstallFolder%\\en-US;%InstallFolder%\\C3D\\;%InstallFolder%\\ACA\\;%InstallFolder%\\Map;%InstallFolder%\\Map\\bin;%InstallFolder%\\Map\\bin\\FDO;%InstallFolder%\\Map\\bin\\GisPlatform;%InstallFolder%\\Map\\Plugins\\Workflow\\Activities;C:\\Program Files\\Common Files\\Autodesk Shared\\GIS\\ImportExport\\18\\loader\\;%InstallFolder%\\C3D\\\\en-US;%InstallFolder%\\ACA\\\\en-US;%InstallFolder%\\Map\\en-US;%InstallFolder%\\Map\\bin\\en-US;%InstallFolder%\\Map\\bin\\FDO\\en-US;%InstallFolder%\\Map\\bin\\GisPlatform\\en-US;%InstallFolder%\\Map\\Plugins\\Workflow\\Activities\\en-US;C:\\Program Files\\Common Files\\Autodesk Shared\\GIS\\ImportExport\\18\\loader\\\\en-US;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\dotnet\\;C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\;%UserProfileFolder%\\AppData\\Local\\Microsoft\\WindowsApps;%RoamableRootFolder%\\support;%InstallFolder%\\support;%InstallFolder%\\support\\en-US;%InstallFolder%\\fonts;%InstallFolder%\\help;%InstallFolder%\\Express;%InstallFolder%\\C3D;%InstallFolder%\\ACA;%InstallFolder%\\Map\\support\\en-US;%InstallFolder%\\Map\\support;%AllUserFolder%\\Data\\Symbols\\MVBlocks;%AllUserFolder%\\Data\\Symbols\\MVBlocks\\3D MV Blocks Textures;C:\\Program Files\\Common Files\\Autodesk Shared\\Civil Engineering 138;%InstallFolder%;%InstallFolder%\\drv;C:\\Program Files (x86)\\Autodesk\\ApplicationPlugins\\Autodesk AppManager.bundle\\Contents\\Windows;C:\\Program Files (x86)\\Autodesk\\ApplicationPlugins\\Autodesk AppManager.bundle\\Contents\\Windows\\2026;C:\\Program Files (x86)\\Autodesk\\ApplicationPlugins\\Autodesk AppManager.bundle\\Contents\\Windows\\2026;C:\\Program Files\\Autodesk\\ApplicationPlugins\\Civil 3D Drainage Design 2026.2.bundle\\Contents\\Resources;"
+"MeshMaxFaceValue"=dword:00000001
+"MapIgnoreSplitMergeRules"="0"
+"MapTaskPane"="0"
+"MapAsCivil"="0"
+"MapNoAttachedDb"="1"
+"MapNoConnectedDb"="1"
+"MapWorkOffline"="0"
+"MapNoDataSource"="1"
+"MapNoLayerSource"="1"
+"DisplayLicenseUIAtLaunchTime"=dword:00000000
+"Measureinit"=dword:00000001
+"ProfileStorage"="%RoamableRootFolder%\\support\\profiles\\fixedprofile.aws"
+"TaskBar"=dword:00000001
+"MapNoAttachedDwg"="1"
+"MapNoActivatedDwg"="1"
+"acedChangeCmdEchoWithoutUndo"="0"
+
+[HKEY_CURRENT_USER\Software\Autodesk\AutoCAD\R25.1\ACAD-9100:409\FixedProfile\General Configuration]
+"FileDialog"=dword:00000001
+
+__BEGIN_FIXED_PROFILE_STORAGE_R16__
+
+<Profile><StorageRoot><AcApData><HideableDialogs><HideableDialog id="MText.WarningAboutPasting" title="Multiline Text - Copy and Paste" category="Multiline Text" application="" result="8"><Preview><TaskDialog Source="/AcTaskDialogs;component/TaskDialogs.xaml" Id="MText.WarningAboutPasting" xmlns="clr-namespace:Autodesk.Windows;assembly=AdWindows"/></Preview></HideableDialog><HideableDialog id="Plot.BatchPlotFromPlot" title="Batch Plot" category="Plot" application="" result="1001"><Preview><TaskDialog Source="/AcTaskDialogs;component/TaskDialogs.xaml" Id="Plot.BatchPlotFromPlot" xmlns="clr-namespace:Autodesk.Windows;assembly=AdWindows"></TaskDialog></Preview></HideableDialog><HideableDialog id="Plot.ProcessingBackgroundJob" title="Plot - Processing Background Job" category="Plot" application="" result="8"><Preview><TaskDialog Source="/AcTaskDialogs;component/TaskDialogs.xaml" Id="Plot.ProcessingBackgroundJob" xmlns="clr-namespace:Autodesk.Windows;assembly=AdWindows"/></Preview></HideableDialog><HideableDialog id="Acad.UnresolvedFontFiles" title="Missing SHX Files" category="SHX Font" application="" result="0"/><HideableDialog id="Acad.UnresolvedReferenceFiles" title="References - Not Found Files" category="Unresolved Xrefs" application="" result="0"/><HideableDialog id="TempId" title="Xref Reload - Compare Changes" category="DWG Compare" application="" result="6"><Preview><TaskDialog Source="/AcTaskDialogs;component/TaskDialogs.xaml" Id="TempId" xmlns="clr-namespace:Autodesk.Windows;assembly=AdWindows"/></Preview></HideableDialog><HideableDialog id="AcPlotGui.PlotFileExists" title="Plot - Plot File Exists" category="Plot" application="" result="6"><Preview><TaskDialog Source="/AcTaskDialogs;component/TaskDialogs.xaml" Id="AcPlotGui.PlotFileExists" xmlns="clr-namespace:Autodesk.Windows;assembly=AdWindows"/></Preview></HideableDialog></HideableDialogs></AcApData></StorageRoot><Name>*Fixed_Profile</Name><Description></Description></Profile>
+
+__END_FIXED_PROFILE_STORAGE_R16__
+
+__BEGIN_PROFILE_STORAGE_R16__
+
+<Profile>
+	<StorageRoot>
+		<AcApData>
+			<AdUiTools>
+				<ToolsInfo>
+					<Tool CLSID="{D5CF410D-3E11-4D0C-AE69-A75C9B788C47}">
+						<CAdUiDockControlBar Orientation="59422" AllowDocking="1">
+							<FloatInfo Left="31" Top="65" Width="640" Height="107"/>
+							<DockInfo Left="247" Top="1085" Width="1673" Height="59" MRUDockID="59422"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="0" TitleBarLocation="0" AutoRollup="0" Name="Command Line" Style="46" Opacity="100" RolloverOpacity="100" Visible="1"/>
+					</Tool>
+					<Tool CLSID="{473FFEDE-E20B-45F1-8A18-9F1A48526E29}">
+						<CAdUiDockControlBar Orientation="59420" AllowDocking="1">
+							<FloatInfo Left="50" Top="50" Width="244" Height="244"/>
+							<DockInfo Left="0" Top="149" Width="243" Height="993" MRUDockID="59420"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="0" TitleBarLocation="0" AutoRollup="0" Name="Toolspace" Style="110" Opacity="100" RolloverOpacity="100" Visible="1"/>
+					</Tool>
+					<Tool CLSID="{4612CD15-6E0A-494C-9AF1-61B4880B8B5E}">
+						<CAdUiDockControlBar Orientation="-1" AllowDocking="1">
+							<FloatInfo Left="0" Top="0" Width="720" Height="244"/>
+							<DockInfo Left="0" Top="0" Width="200" Height="300" MRUDockID="0"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="0" TitleBarLocation="0" AutoRollup="0" Name="Panorama" Style="110" Opacity="100" RolloverOpacity="100" Visible="0"/>
+					</Tool>
+					<Tool CLSID="{E2832146-26D3-4D51-9EC3-FEDE8BD7BEBF}">
+						<CAdUiDockControlBar Orientation="-1" AllowDocking="1">
+							<FloatInfo Left="0" Top="0" Width="450" Height="650"/>
+							<DockInfo Left="0" Top="0" Width="200" Height="300" MRUDockID="0"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="0" TitleBarLocation="0" AutoRollup="0" Name="" Style="46" Opacity="100" RolloverOpacity="100" Visible="0"/>
+					</Tool>
+					<Tool CLSID="{1B4FD8CD-6FDA-4971-99E7-55A464ECDC11}">
+						<CAdUiDockControlBar Orientation="-1" AllowDocking="1">
+							<FloatInfo Left="0" Top="0" Width="256" Height="480"/>
+							<DockInfo Left="0" Top="0" Width="200" Height="300" MRUDockID="0"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="0" TitleBarLocation="0" AutoRollup="0" Name="Coordinate Tracker" Style="46" Opacity="100" RolloverOpacity="100" Visible="0"/>
+					</Tool>
+					<Tool CLSID="{6D32A2D9-832E-11D2-A83C-0060B0872C0B}">
+						<CAdUiDockControlBar Orientation="-1" AllowDocking="1">
+							<FloatInfo Left="2" Top="49" Width="256" Height="512"/>
+							<DockInfo Left="0" Top="0" Width="200" Height="300" MRUDockID="0"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="0" TitleBarLocation="0" AutoRollup="0" Name="Properties" Style="46" Opacity="100" RolloverOpacity="100" Visible="0"/>
+						<PROP_STATE>
+							<PALETTE PALETTE_NAME="Design">
+								<STYLE FLAGS="1375797431" COLUMNWIDTH="0.490196078431373"/>
+								<OBJECT NAME="{ABBE3F83-D585-4A50-9B69-198B0F566F2E}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BF4CC07E-E9BB-40D6-873F-855B211033B9}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{E9340038-0046-4186-8DF9-3D5372B7DC57}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Information3103" STATE="-1"/>
+									<CATEGORY NAME="General3073" STATE="-1"/>
+									<CATEGORY NAME="Data3105" STATE="-1"/>
+									<CATEGORY NAME="BASIC10031" STATE="-1"/>
+									<CATEGORY NAME="ADVANCED10032" STATE="-1"/>
+									<CATEGORY NAME="Parameters10017" STATE="-1"/>
+								</OBJECT>
+								<OBJECT NAME="{2C74F89E-7421-46B4-BA54-F86F1BD9F237}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{FE718E8F-C3AA-4F30-9103-432450CF1DA1}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Pattern-14" STATE="-1"/>
+									<CATEGORY NAME="Geometry-25" STATE="0"/>
+									<CATEGORY NAME="3D Visualization-31" STATE="-1"/>
+								</OBJECT>
+								<OBJECT NAME="{85452F88-5071-492E-B850-2E3C586DCBD8}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BBF6A206-CB04-479D-96AE-349E1E83319A}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{44A52280-AE56-490D-890C-89FB7279ED6B}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="ZeroSelect">
+									<CATEGORY NAME="General0" STATE="-1"/>
+									<CATEGORY NAME="3D Visualization0" STATE="-1"/>
+									<CATEGORY NAME="Layout0" STATE="-1"/>
+									<CATEGORY NAME="Plot style0" STATE="-1"/>
+									<CATEGORY NAME="View0" STATE="-1"/>
+									<CATEGORY NAME="Misc0" STATE="-1"/>
+								</OBJECT>
+								<OBJECT NAME="{D86B6C47-11F2-4D95-B635-EA575F0892FC}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BC71DEA1-D6FB-48B8-AB06-D151C81BBCDD}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+							</PALETTE>
+							<PALETTE PALETTE_NAME="Display">
+								<STYLE FLAGS="1375797431" COLUMNWIDTH="0.568181818181818"/>
+								<OBJECT NAME="{ABBE3F83-D585-4A50-9B69-198B0F566F2E}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BF4CC07E-E9BB-40D6-873F-855B211033B9}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{2C74F89E-7421-46B4-BA54-F86F1BD9F237}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{FE718E8F-C3AA-4F30-9103-432450CF1DA1}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Pattern-14" STATE="-1"/>
+									<CATEGORY NAME="Geometry-25" STATE="0"/>
+									<CATEGORY NAME="3D Visualization-31" STATE="-1"/>
+								</OBJECT>
+								<OBJECT NAME="{85452F88-5071-492E-B850-2E3C586DCBD8}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BBF6A206-CB04-479D-96AE-349E1E83319A}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{44A52280-AE56-490D-890C-89FB7279ED6B}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{D86B6C47-11F2-4D95-B635-EA575F0892FC}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BC71DEA1-D6FB-48B8-AB06-D151C81BBCDD}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+							</PALETTE>
+							<PALETTE PALETTE_NAME="Extended Data">
+								<STYLE FLAGS="1375797431" COLUMNWIDTH="0.490196078431373"/>
+								<OBJECT NAME="{ABBE3F83-D585-4A50-9B69-198B0F566F2E}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BF4CC07E-E9BB-40D6-873F-855B211033B9}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{2C74F89E-7421-46B4-BA54-F86F1BD9F237}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{FE718E8F-C3AA-4F30-9103-432450CF1DA1}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Pattern-14" STATE="-1"/>
+									<CATEGORY NAME="Geometry-25" STATE="0"/>
+									<CATEGORY NAME="3D Visualization-31" STATE="-1"/>
+								</OBJECT>
+								<OBJECT NAME="{85452F88-5071-492E-B850-2E3C586DCBD8}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BBF6A206-CB04-479D-96AE-349E1E83319A}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{44A52280-AE56-490D-890C-89FB7279ED6B}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{D86B6C47-11F2-4D95-B635-EA575F0892FC}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Alternate Units-20" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+								<OBJECT NAME="{BC71DEA1-D6FB-48B8-AB06-D151C81BBCDD}">
+									<CATEGORY NAME="General-12" STATE="-1"/>
+									<CATEGORY NAME="Misc-2" STATE="0"/>
+									<CATEGORY NAME="Lines &amp; Arrows-22" STATE="0"/>
+									<CATEGORY NAME="Text-9" STATE="0"/>
+									<CATEGORY NAME="Fit-21" STATE="0"/>
+									<CATEGORY NAME="Primary Units-19" STATE="0"/>
+									<CATEGORY NAME="Tolerances-23" STATE="0"/>
+								</OBJECT>
+							</PALETTE>
+						</PROP_STATE>
+					</Tool>
+					<Tool CLSID="{BEBBB318-2898-4C03-ADA2-360DC6B7AA69}">
+						<CAdUiDockControlBar Orientation="-1" AllowDocking="1">
+							<FloatInfo Left="265" Top="79" Width="256" Height="512"/>
+							<DockInfo Left="0" Top="0" Width="200" Height="300" MRUDockID="0"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="0" TitleBarLocation="0" AutoRollup="0" Name="Sheet Set Manager" Style="46" Opacity="100" RolloverOpacity="100" Visible="0"/>
+						<MRU_FILES>
+							<MRU_FILE fileName="C:\Civil 3D Projects\VFG - A3 - (1).dst"/>
+						</MRU_FILES>
+						<SSM_PALETTESET>
+							<SSM_PALETTE paletteName="Sheet List" topToWholeRatio="0.4">
+								<CAdUiPalette PaletteStyle="0"/>
+								<GROUPCTRL_TOP btnSelIndex="0" minimized="0" style="1"/>
+								<GROUPCTRL_BOTTOM btnSelIndex="0" minimized="0" style="1"/>
+								<TooltipSettings TooltipStyle="3" TooltipSize="1" ShowDetail="0"/>
+							</SSM_PALETTE>
+							<SSM_PALETTE paletteName="Sheet Views" topToWholeRatio="0.4">
+								<CAdUiPalette PaletteStyle="0"/>
+								<GROUPCTRL_TOP btnSelIndex="1" minimized="0" style="1"/>
+								<GROUPCTRL_BOTTOM btnSelIndex="0" minimized="0" style="1"/>
+								<TooltipSettings TooltipStyle="3" TooltipSize="1" ShowDetail="0"/>
+							</SSM_PALETTE>
+							<SSM_PALETTE paletteName="Model Views" topToWholeRatio="0.4">
+								<CAdUiPalette PaletteStyle="0"/>
+								<GROUPCTRL_TOP btnSelIndex="0" minimized="0" style="1"/>
+								<GROUPCTRL_BOTTOM btnSelIndex="0" minimized="0" style="1"/>
+								<TooltipSettings TooltipStyle="3" TooltipSize="1" ShowDetail="0"/>
+							</SSM_PALETTE>
+						</SSM_PALETTESET>
+					</Tool>
+					<Tool CLSID="{B17B40A6-2761-4BCC-BC48-2B8A465AA5EB}">
+						<CAdUiDockControlBar Orientation="-1" AllowDocking="1">
+							<FloatInfo Left="75" Top="79" Width="175" Height="350"/>
+							<DockInfo Left="0" Top="0" Width="200" Height="300" MRUDockID="0"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="16" TitleBarLocation="0" AutoRollup="0" Name="Tool Palettes - All Palettes" Style="126" Opacity="100" RolloverOpacity="100" Visible="0"/>
+						<CAcTcUiToolPaletteSet ID="{B17B40A6-2761-4BCC-BC48-2B8A465AA5EB}">
+							<ToolPalettes>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="1"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{A0CCA60A-AB56-4EFD-83A5-8764BC08CDA8}">
+											<ToolSource>
+												<Palette ID="{A0CCA60A-AB56-4EFD-83A5-8764BC08CDA8}">Annotation</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>493570</Style>
+											<ToolOrder>
+												<Tool ID="{6342C1CC-6FB0-4660-824C-6EA0CE3B536C}"/>
+												<Tool ID="{185E1386-15B1-4984-91A8-17EC6FB79758}"/>
+												<Tool ID="{B839E309-DA08-4E95-8967-F94EBF3956D7}"/>
+												<Tool ID="{B4C884DC-948F-40B4-BA34-DA069ABB4728}"/>
+												<Tool ID="{3AF3C153-7987-41EC-9C98-D7DA5FC8084B}"/>
+												<Tool ID="{2F0BC441-C79D-4662-9110-3CCE3581ED0C}"/>
+												<Tool ID="{91C0C11C-B491-4F46-BAA1-CCEDA254169A}"/>
+												<Tool ID="{DF05FC38-674B-46EF-A2AB-9628D8F8521C}"/>
+												<Tool ID="{D674704D-4926-4080-BFDF-0176A6B83EB5}"/>
+												<Tool ID="{DA899EF1-762A-495D-875A-5DF38E758F0B}"/>
+												<Tool ID="{1B4BBEE4-D091-45F1-A057-6899BA74F41F}"/>
+												<Tool ID="{BB17C126-4A89-40D4-820F-2BD60F3788C8}"/>
+												<Tool ID="{89259F3D-E52D-4D93-95CB-F9F14E928E72}"/>
+												<Tool ID="{7253D0C8-BA83-42F0-9A15-E70DBACD1D1E}"/>
+												<Tool ID="{1E751C55-B0FB-4BC0-9AEB-212BACE4A59B}"/>
+												<Tool ID="{96959186-5B61-424E-8B5B-3B108C371BFE}"/>
+												<Tool ID="{B7AED20A-4B10-4D3A-BC06-42C8578CD34C}"/>
+												<Tool ID="{1D22E231-DF22-4D48-B459-8DFBB49A2D91}"/>
+												<Tool ID="{22F7D0F5-9081-4094-AB7E-82033E31EC1C}"/>
+												<Tool ID="{9D658EE7-EFD2-43F5-A11D-998737AFAF00}"/>
+												<Tool ID="{A448AE17-C942-42F7-893A-F60B573B4CF0}"/>
+												<Tool ID="{CB2752A4-A293-4112-9B9D-6276AD53F3FB}"/>
+											</ToolOrder>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{498DE575-CB69-4B2A-A12B-33012D265464}">
+											<ToolSource>
+												<Palette ID="{498DE575-CB69-4B2A-A12B-33012D265464}">Architectural</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{5B6AC051-A4D1-4191-A86C-DFD866841B64}">
+											<ToolSource>
+												<Palette ID="{5B6AC051-A4D1-4191-A86C-DFD866841B64}">Mechanical</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{EA899C91-EF57-45F1-9CEB-2CE79A3B09EC}">
+											<ToolSource>
+												<Palette ID="{EA899C91-EF57-45F1-9CEB-2CE79A3B09EC}">Electrical</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{5E3BD7D5-5F44-422D-8643-64C5C033202C}">
+											<ToolSource>
+												<Palette ID="{5E3BD7D5-5F44-422D-8643-64C5C033202C}">Civil</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{1BAC5354-C9CD-42E2-BD35-300929BC6140}">
+											<ToolSource>
+												<Palette ID="{1BAC5354-C9CD-42E2-BD35-300929BC6140}">Structural</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{3D96B628-B9A6-4BE7-9A54-4063288C5CE6}">
+											<ToolSource>
+												<Palette ID="{3D96B628-B9A6-4BE7-9A54-4063288C5CE6}">Hatches and Fills</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{3B3603EA-7EB6-42D5-AFB9-C094F24CD71E}">
+											<ToolSource>
+												<Palette ID="{3B3603EA-7EB6-42D5-AFB9-C094F24CD71E}">Tables</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{4BE848C7-50A4-41BF-929E-ECE60FE5422F}">
+											<ToolSource>
+												<Palette ID="{4BE848C7-50A4-41BF-929E-ECE60FE5422F}">Command Tool Samples</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{92CDB627-A8DF-4466-AFBD-FD5DC1351ED1}">
+											<ToolSource>
+												<Palette ID="{92CDB627-A8DF-4466-AFBD-FD5DC1351ED1}">Leaders</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{775C6DF8-BCB6-48BA-8F98-9D4621E908F5}">
+											<ToolSource>
+												<Palette ID="{775C6DF8-BCB6-48BA-8F98-9D4621E908F5}">Visual Styles</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{0937C731-E045-4C09-8487-7E84CB5DB6DC}">
+											<ToolSource>
+												<Palette ID="{0937C731-E045-4C09-8487-7E84CB5DB6DC}">Generic Lights</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{B45C75E1-94A1-4461-B78A-1D97964A5120}">
+											<ToolSource>
+												<Palette ID="{B45C75E1-94A1-4461-B78A-1D97964A5120}">Fluorescent</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{01533F50-BCB3-42E4-B111-985FEC4D5D0A}">
+											<ToolSource>
+												<Palette ID="{01533F50-BCB3-42E4-B111-985FEC4D5D0A}">High Intensity Discharge</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{7EF257FB-3DA2-4091-9C6E-412C05465869}">
+											<ToolSource>
+												<Palette ID="{7EF257FB-3DA2-4091-9C6E-412C05465869}">Incandescent</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{31032267-7792-4ED9-996A-6750949C3364}">
+											<ToolSource>
+												<Palette ID="{31032267-7792-4ED9-996A-6750949C3364}">Low Pressure Sodium</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="1"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{D6BC41CF-FCAA-4FF7-8CDD-64D952C632E0}">
+											<ToolSource>
+												<Palette ID="{D6BC41CF-FCAA-4FF7-8CDD-64D952C632E0}">Modeling</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>493570</Style>
+											<ToolOrder>
+												<Tool ID="{9D7A9A9F-320F-4E3B-9266-E7C0D28C3F2C}"/>
+												<Tool ID="{AB741E04-A733-4A8F-9947-295DAED23DD8}"/>
+												<Tool ID="{76A00F1F-7C75-4AA7-AF87-B43616D15C12}"/>
+												<Tool ID="{A56082F6-E82C-4975-9A01-BDA82930B56E}"/>
+												<Tool ID="{DA699A7F-E281-4DDC-82F2-30CCE5D3DBCA}"/>
+												<Tool ID="{21A4A999-5FF8-489F-A588-DD4F7B538E55}"/>
+												<Tool ID="{13367C5B-9D4D-4BEA-B868-879A7387CDBB}"/>
+												<Tool ID="{74A5539F-5A37-411C-BEC9-49FEC3BC9AD3}"/>
+											</ToolOrder>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{8331A300-122F-4425-A7FF-467A42D79166}">
+											<ToolSource>
+												<Palette ID="{8331A300-122F-4425-A7FF-467A42D79166}">Draw</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{2DCDEF9A-7358-4CA4-837C-9AC674AE5317}">
+											<ToolSource>
+												<Palette ID="{2DCDEF9A-7358-4CA4-837C-9AC674AE5317}">Modify</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{07E218EF-7B2F-4BE5-9C28-39565D0E477A}">
+											<ToolSource>
+												<Palette ID="{07E218EF-7B2F-4BE5-9C28-39565D0E477A}">Cameras</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<!--Civil 3D - Imperial Palettes-->
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="1"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{A2BA5F7D-DA8A-4abf-9829-83DB684A7696}">
+											<ToolSource>
+												<Palette ID="{A2BA5F7D-DA8A-4abf-9829-83DB684A7696}">Imperial - Basic</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{87078200-43D6-48e1-B031-D6A09C258E3C}">
+											<ToolSource>
+												<Palette ID="{87078200-43D6-48e1-B031-D6A09C258E3C}">Imperial - Lanes</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{D50D61A1-DF01-4b3b-B1C6-B5B3EE5461CB}">
+											<ToolSource>
+												<Palette ID="{D50D61A1-DF01-4b3b-B1C6-B5B3EE5461CB}">Imperial - Shoulders</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{F6BBF3E5-36F2-4230-8E4F-DA9D85F5359C}">
+											<ToolSource>
+												<Palette ID="{F6BBF3E5-36F2-4230-8E4F-DA9D85F5359C}">Imperial - Medians</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{F3F57B18-1CF3-4868-95C2-DE16EE2D1961}">
+											<ToolSource>
+												<Palette ID="{F3F57B18-1CF3-4868-95C2-DE16EE2D1961}">Imperial - Curbs</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{3244E777-B3AC-4a33-B357-12176990FFE9}">
+											<ToolSource>
+												<Palette ID="{3244E777-B3AC-4a33-B357-12176990FFE9}">Imperial - Daylight</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{0CAD244F-480A-4b26-B76E-4F515117CCE6}">
+											<ToolSource>
+												<Palette ID="{0CAD244F-480A-4b26-B76E-4F515117CCE6}">Imperial - Generic</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{21634C77-FA27-4605-9DEF-E898130E5029}">
+											<ToolSource>
+												<Palette ID="{21634C77-FA27-4605-9DEF-E898130E5029}">Imperial - Conditional</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{7DC23694-3638-4ec6-8D94-FD14FF7ADA08}">
+											<ToolSource>
+												<Palette ID="{7DC23694-3638-4ec6-8D94-FD14FF7ADA08}">Imperial - Trenches and Channels</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{EF567CFA-8540-4a45-A543-C351F8851007}">
+											<ToolSource>
+												<Palette ID="{EF567CFA-8540-4a45-A543-C351F8851007}">Imperial - Retaining Walls</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{211CBAD4-D02C-470f-AEFF-3536BC7D5829}">
+											<ToolSource>
+												<Palette ID="{211CBAD4-D02C-470f-AEFF-3536BC7D5829}">Imperial - Rehab</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{43790CC8-A3D9-4055-A814-AB31404DEE64}">
+											<ToolSource>
+												<Palette ID="{43790CC8-A3D9-4055-A814-AB31404DEE64}">Imperial - New Rehab</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{6DF425E6-4EF3-4913-8236-672A6251F44A}">
+											<ToolSource>
+												<Palette ID="{6DF425E6-4EF3-4913-8236-672A6251F44A}">Imperial - Bridge</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{8bc24e72-042a-11e9-8eb2-f2801f1b9fd1}">
+											<ToolSource>
+												<Palette ID="{8bc24e72-042a-11e9-8eb2-f2801f1b9fd1}">Imperial - Rail</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<!--Civil 3D - Metric Palettes-->
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="1"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{C0EBE299-B04D-45C3-8F04-FDEB5F5B305D}">
+											<ToolSource>
+												<Palette ID="{C0EBE299-B04D-45C3-8F04-FDEB5F5B305D}">Metric - Basic</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{18165CE9-FBAC-4114-9B19-EA790E7528AE}">
+											<ToolSource>
+												<Palette ID="{18165CE9-FBAC-4114-9B19-EA790E7528AE}">Metric - Lanes</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{F3ADA874-A721-4185-B6BA-AD324D4099B5}">
+											<ToolSource>
+												<Palette ID="{F3ADA874-A721-4185-B6BA-AD324D4099B5}">Metric - Shoulders</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{477C5277-DFA4-404c-8223-2527503D5D05}">
+											<ToolSource>
+												<Palette ID="{477C5277-DFA4-404c-8223-2527503D5D05}">Metric - Medians</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{9944E303-CD9F-47aa-A06D-C92E17F72FD9}">
+											<ToolSource>
+												<Palette ID="{9944E303-CD9F-47aa-A06D-C92E17F72FD9}">Metric - Curbs</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{F20CB4D8-7E64-482f-9906-A8BBE434A91D}">
+											<ToolSource>
+												<Palette ID="{F20CB4D8-7E64-482f-9906-A8BBE434A91D}">Metric - Daylight</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{70FFF1E8-E1E9-49ed-BFE4-87DFC16E460D}">
+											<ToolSource>
+												<Palette ID="{70FFF1E8-E1E9-49ed-BFE4-87DFC16E460D}">Metric - Generic</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{4E33B8D3-62AD-415b-9E79-8B7EFBB8FB26}">
+											<ToolSource>
+												<Palette ID="{4E33B8D3-62AD-415b-9E79-8B7EFBB8FB26}">Metric - Conditional</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{C10DD35D-D14E-4531-9F81-9976DADA345C}">
+											<ToolSource>
+												<Palette ID="{C10DD35D-D14E-4531-9F81-9976DADA345C}">Metric - Trenches and Channels</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{6CA6390F-0CBB-4a94-8E05-CC28F35B55A5}">
+											<ToolSource>
+												<Palette ID="{6CA6390F-0CBB-4a94-8E05-CC28F35B55A5}">Metric - Retaining Walls</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{814BD6A6-0E51-43e3-BCB2-D09B0C4B47D5}">
+											<ToolSource>
+												<Palette ID="{814BD6A6-0E51-43e3-BCB2-D09B0C4B47D5}">Metric - Rehab</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{901F98EF-EFE6-4F0A-AA25-79CF14FEB38E}">
+											<ToolSource>
+												<Palette ID="{901F98EF-EFE6-4F0A-AA25-79CF14FEB38E}">Metric - New Rehab</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{F3A992A5-2A21-4f4b-954F-4DDAC89534ED}">
+											<ToolSource>
+												<Palette ID="{F3A992A5-2A21-4f4b-954F-4DDAC89534ED}">Metric - Bridge</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{d15c2e8a-042a-11e9-8eb2-f2801f1b9fd1}">
+											<ToolSource>
+												<Palette ID="{d15c2e8a-042a-11e9-8eb2-f2801f1b9fd1}">Metric - Rail</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{D5F2AE54-D62C-47C1-ACCD-52D2DF2A6D29}">
+											<ToolSource>
+												<Palette ID="{D5F2AE54-D62C-47C1-ACCD-52D2DF2A6D29}">Assorted</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{82F57AB9-3DC3-412F-BE03-EB7B7B64CEB8}">
+											<ToolSource>
+												<Palette ID="{82F57AB9-3DC3-412F-BE03-EB7B7B64CEB8}">MV Blocks - Highways</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{6F9C7B8B-9503-44D9-8C0C-894C4C6D2888}">
+											<ToolSource>
+												<Palette ID="{6F9C7B8B-9503-44D9-8C0C-894C4C6D2888}">MV Blocks - External Works</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{C61AEC19-AF1E-4B34-A9E9-A048A5271A75}">
+											<ToolSource>
+												<Palette ID="{C61AEC19-AF1E-4B34-A9E9-A048A5271A75}">MV Blocks - Landscape</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{F9957737-A43F-4C9D-B7D7-5D062920AF91}">
+											<ToolSource>
+												<Palette ID="{F9957737-A43F-4C9D-B7D7-5D062920AF91}">MV Blocks - Building Footprints</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{54542720-C370-4A1A-98C1-5716AD1FC802}">
+											<ToolSource>
+												<Palette ID="{54542720-C370-4A1A-98C1-5716AD1FC802}">Assemblies - Imperial</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{AA40AB04-A0D9-4256-B854-BD8193409640}">
+											<ToolSource>
+												<Palette ID="{AA40AB04-A0D9-4256-B854-BD8193409640}">Assemblies - Metric</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{68FCC725-A6B5-4A14-99C4-053CE9FF9325}">
+											<ToolSource>
+												<Palette ID="{68FCC725-A6B5-4A14-99C4-053CE9FF9325}">Concrete - Materials Sample</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{A38BC6F2-6EC6-4558-BAAA-E031CC533BC8}">
+											<ToolSource>
+												<Palette ID="{A38BC6F2-6EC6-4558-BAAA-E031CC533BC8}">Doors and Windows - Materials Sample</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{60763613-F7D6-41D4-BBBF-750DBB622295}">
+											<ToolSource>
+												<Palette ID="{60763613-F7D6-41D4-BBBF-750DBB622295}">Fabric - Materials Sample</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{B01DAE07-D43D-45A7-9A2E-2908D89505A2}">
+											<ToolSource>
+												<Palette ID="{B01DAE07-D43D-45A7-9A2E-2908D89505A2}">Finishes - Materials Sample</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{84C58344-3962-4ABF-9010-D6139359DA54}">
+											<ToolSource>
+												<Palette ID="{84C58344-3962-4ABF-9010-D6139359DA54}">Flooring - Materials Sample</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{4EADC391-4DB5-4F1E-B1AB-DC83B902F207}">
+											<ToolSource>
+												<Palette ID="{4EADC391-4DB5-4F1E-B1AB-DC83B902F207}">Masonry - Materials Sample</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{2D450476-FFD3-47B6-A635-7636ECDE86B8}">
+											<ToolSource>
+												<Palette ID="{2D450476-FFD3-47B6-A635-7636ECDE86B8}">Metals - Materials Sample</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{6B1EF87E-251F-4894-99B4-2AB3D3E44DBF}">
+											<ToolSource>
+												<Palette ID="{6B1EF87E-251F-4894-99B4-2AB3D3E44DBF}">Woods and Plastics - Materials Sample</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{BB1B2344-8ADF-4731-917B-5952A1F260DF}">
+											<ToolSource>
+												<Palette ID="{BB1B2344-8ADF-4731-917B-5952A1F260DF}">Concrete - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{3E317A9E-19B8-4C3A-950F-CFA863AB1721}">
+											<ToolSource>
+												<Palette ID="{3E317A9E-19B8-4C3A-950F-CFA863AB1721}">Doors and Windows - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{53E454E9-4EAE-47E4-887D-CF1F3DF71E5E}">
+											<ToolSource>
+												<Palette ID="{53E454E9-4EAE-47E4-887D-CF1F3DF71E5E}">Finishes - Carpet and Rugs - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{72E16C96-DB90-4A89-BE3E-9B0EA1A4E079}">
+											<ToolSource>
+												<Palette ID="{72E16C96-DB90-4A89-BE3E-9B0EA1A4E079}">Finishes - Ceiling and Tiles - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{A8DDB845-1105-4D95-99FB-46E20008E7CC}">
+											<ToolSource>
+												<Palette ID="{A8DDB845-1105-4D95-99FB-46E20008E7CC}">Finishes - Flooring - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{E9D9B580-62F4-4507-BFF7-5D536D1378A4}">
+											<ToolSource>
+												<Palette ID="{E9D9B580-62F4-4507-BFF7-5D536D1378A4}">Finishes - Paint, Plaster, Walls, Wax - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{033C975A-BE21-4994-9632-2ED654F84A64}">
+											<ToolSource>
+												<Palette ID="{033C975A-BE21-4994-9632-2ED654F84A64}">Furnishings - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{9202F74F-C169-4B35-9715-55E9CA964B20}">
+											<ToolSource>
+												<Palette ID="{9202F74F-C169-4B35-9715-55E9CA964B20}">Masonry - Bricks - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{B4DD0798-F161-4C84-B916-52862233147A}">
+											<ToolSource>
+												<Palette ID="{B4DD0798-F161-4C84-B916-52862233147A}">Masonry - General - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{2C0AB449-9A0C-402A-8711-C5BA5458901B}">
+											<ToolSource>
+												<Palette ID="{2C0AB449-9A0C-402A-8711-C5BA5458901B}">Masonry - Stones - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{6D6092E1-427E-40CE-9DF7-C5777B537872}">
+											<ToolSource>
+												<Palette ID="{6D6092E1-427E-40CE-9DF7-C5777B537872}">Metals - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{AEA73B99-8E75-49BF-9F55-E2FA559926A6}">
+											<ToolSource>
+												<Palette ID="{AEA73B99-8E75-49BF-9F55-E2FA559926A6}">SiteWork - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{BAB51B9B-F6F7-46F5-B501-B166F2A505B4}">
+											<ToolSource>
+												<Palette ID="{BAB51B9B-F6F7-46F5-B501-B166F2A505B4}">Thermal and Moisture - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+								<ToolPalette>
+									<CAdUiPalette PaletteStyle="0"/>
+									<CAcTcUiToolPalette>
+										<CatalogView ID="{6A3A20BC-87D1-4C39-A095-BE0A205F74C0}">
+											<ToolSource>
+												<Palette ID="{6A3A20BC-87D1-4C39-A095-BE0A205F74C0}">Woods and Plastics - Materials Library</Palette>
+											</ToolSource>
+											<Image SizeCX="32" SizeCY="32"/>
+											<Style>0</Style>
+											<ToolOrder/>
+										</CatalogView>
+									</CAcTcUiToolPalette>
+								</ToolPalette>
+							</ToolPalettes>
+						</CAcTcUiToolPaletteSet>
+					</Tool>
+					<Tool CLSID="{B1AC3ED0-9573-4569-A97A-D9CAE382F5D2}">
+						<CAdUiDockControlBar Orientation="59419" AllowDocking="1">
+							<FloatInfo Left="50" Top="50" Width="300" Height="300"/>
+							<DockInfo Left="0" Top="26" Width="1920" Height="117" MRUDockID="59419"/>
+						</CAdUiDockControlBar>
+						<CAdUiPaletteSet ActivePaletteIndex="0" TitleBarLocation="0" AutoRollup="0" Name="Ribbon" Style="1574" Opacity="100" RolloverOpacity="100" Visible="1"/>
+					</Tool>
+				</ToolsInfo>
+				<StartupInfo>
+					<Tool ToolName="Ribbon" Command="_RIBBON"/>
+					<Tool ToolName="COMMANDLINE" Command="COMMANDLINE"/>
+					<CAdUiAnchorBar>
+						<LeftAnchorBar ActiveAnchorTab="-1" JustifyAnchorTabs="1" AnchorTabsDisplayText="1"/>
+						<RightAnchorBar ActiveAnchorTab="-1" JustifyAnchorTabs="1" AnchorTabsDisplayText="1"/>
+					</CAdUiAnchorBar>
+					<Tool ToolName="AxUiBarToolSpace" Command="ShowTS"/>
+				</StartupInfo>
+			</AdUiTools>
+		</AcApData>
+		<ToolPaletteScheme>
+			<ToolPaletteSets>
+				<ToolPaletteSet>
+					<CAdUiDockControlBar Orientation="-1" AllowDocking="1">
+						<FloatInfo Left="75" Top="79" Width="175" Height="350"/>
+						<DockInfo Left="0" Top="0" Width="200" Height="300" MRUDockID="0"/>
+					</CAdUiDockControlBar>
+					<CAdUiPaletteSet ActivePaletteIndex="16" TitleBarLocation="0" AutoRollup="0" Name="Tool Palettes - All Palettes" Style="126" Opacity="100" RolloverOpacity="100" Visible="0"/>
+					<CAcTcUiToolPaletteSet ID="{B17B40A6-2761-4BCC-BC48-2B8A465AA5EB}">
+						<ToolPalettes>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="1"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{A0CCA60A-AB56-4EFD-83A5-8764BC08CDA8}">
+										<ToolSource>
+											<Palette ID="{A0CCA60A-AB56-4EFD-83A5-8764BC08CDA8}">Annotation</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>493570</Style>
+										<ToolOrder>
+											<Tool ID="{6342C1CC-6FB0-4660-824C-6EA0CE3B536C}"/>
+											<Tool ID="{185E1386-15B1-4984-91A8-17EC6FB79758}"/>
+											<Tool ID="{B839E309-DA08-4E95-8967-F94EBF3956D7}"/>
+											<Tool ID="{B4C884DC-948F-40B4-BA34-DA069ABB4728}"/>
+											<Tool ID="{3AF3C153-7987-41EC-9C98-D7DA5FC8084B}"/>
+											<Tool ID="{2F0BC441-C79D-4662-9110-3CCE3581ED0C}"/>
+											<Tool ID="{91C0C11C-B491-4F46-BAA1-CCEDA254169A}"/>
+											<Tool ID="{DF05FC38-674B-46EF-A2AB-9628D8F8521C}"/>
+											<Tool ID="{D674704D-4926-4080-BFDF-0176A6B83EB5}"/>
+											<Tool ID="{DA899EF1-762A-495D-875A-5DF38E758F0B}"/>
+											<Tool ID="{1B4BBEE4-D091-45F1-A057-6899BA74F41F}"/>
+											<Tool ID="{BB17C126-4A89-40D4-820F-2BD60F3788C8}"/>
+											<Tool ID="{89259F3D-E52D-4D93-95CB-F9F14E928E72}"/>
+											<Tool ID="{7253D0C8-BA83-42F0-9A15-E70DBACD1D1E}"/>
+											<Tool ID="{1E751C55-B0FB-4BC0-9AEB-212BACE4A59B}"/>
+											<Tool ID="{96959186-5B61-424E-8B5B-3B108C371BFE}"/>
+											<Tool ID="{B7AED20A-4B10-4D3A-BC06-42C8578CD34C}"/>
+											<Tool ID="{1D22E231-DF22-4D48-B459-8DFBB49A2D91}"/>
+											<Tool ID="{22F7D0F5-9081-4094-AB7E-82033E31EC1C}"/>
+											<Tool ID="{9D658EE7-EFD2-43F5-A11D-998737AFAF00}"/>
+											<Tool ID="{A448AE17-C942-42F7-893A-F60B573B4CF0}"/>
+											<Tool ID="{CB2752A4-A293-4112-9B9D-6276AD53F3FB}"/>
+										</ToolOrder>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{498DE575-CB69-4B2A-A12B-33012D265464}">
+										<ToolSource>
+											<Palette ID="{498DE575-CB69-4B2A-A12B-33012D265464}">Architectural</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{5B6AC051-A4D1-4191-A86C-DFD866841B64}">
+										<ToolSource>
+											<Palette ID="{5B6AC051-A4D1-4191-A86C-DFD866841B64}">Mechanical</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{EA899C91-EF57-45F1-9CEB-2CE79A3B09EC}">
+										<ToolSource>
+											<Palette ID="{EA899C91-EF57-45F1-9CEB-2CE79A3B09EC}">Electrical</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{5E3BD7D5-5F44-422D-8643-64C5C033202C}">
+										<ToolSource>
+											<Palette ID="{5E3BD7D5-5F44-422D-8643-64C5C033202C}">Civil</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{1BAC5354-C9CD-42E2-BD35-300929BC6140}">
+										<ToolSource>
+											<Palette ID="{1BAC5354-C9CD-42E2-BD35-300929BC6140}">Structural</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{3D96B628-B9A6-4BE7-9A54-4063288C5CE6}">
+										<ToolSource>
+											<Palette ID="{3D96B628-B9A6-4BE7-9A54-4063288C5CE6}">Hatches and Fills</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{3B3603EA-7EB6-42D5-AFB9-C094F24CD71E}">
+										<ToolSource>
+											<Palette ID="{3B3603EA-7EB6-42D5-AFB9-C094F24CD71E}">Tables</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{4BE848C7-50A4-41BF-929E-ECE60FE5422F}">
+										<ToolSource>
+											<Palette ID="{4BE848C7-50A4-41BF-929E-ECE60FE5422F}">Command Tool Samples</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{92CDB627-A8DF-4466-AFBD-FD5DC1351ED1}">
+										<ToolSource>
+											<Palette ID="{92CDB627-A8DF-4466-AFBD-FD5DC1351ED1}">Leaders</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{775C6DF8-BCB6-48BA-8F98-9D4621E908F5}">
+										<ToolSource>
+											<Palette ID="{775C6DF8-BCB6-48BA-8F98-9D4621E908F5}">Visual Styles</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{0937C731-E045-4C09-8487-7E84CB5DB6DC}">
+										<ToolSource>
+											<Palette ID="{0937C731-E045-4C09-8487-7E84CB5DB6DC}">Generic Lights</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{B45C75E1-94A1-4461-B78A-1D97964A5120}">
+										<ToolSource>
+											<Palette ID="{B45C75E1-94A1-4461-B78A-1D97964A5120}">Fluorescent</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{01533F50-BCB3-42E4-B111-985FEC4D5D0A}">
+										<ToolSource>
+											<Palette ID="{01533F50-BCB3-42E4-B111-985FEC4D5D0A}">High Intensity Discharge</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{7EF257FB-3DA2-4091-9C6E-412C05465869}">
+										<ToolSource>
+											<Palette ID="{7EF257FB-3DA2-4091-9C6E-412C05465869}">Incandescent</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{31032267-7792-4ED9-996A-6750949C3364}">
+										<ToolSource>
+											<Palette ID="{31032267-7792-4ED9-996A-6750949C3364}">Low Pressure Sodium</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="1"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{D6BC41CF-FCAA-4FF7-8CDD-64D952C632E0}">
+										<ToolSource>
+											<Palette ID="{D6BC41CF-FCAA-4FF7-8CDD-64D952C632E0}">Modeling</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>493570</Style>
+										<ToolOrder>
+											<Tool ID="{9D7A9A9F-320F-4E3B-9266-E7C0D28C3F2C}"/>
+											<Tool ID="{AB741E04-A733-4A8F-9947-295DAED23DD8}"/>
+											<Tool ID="{76A00F1F-7C75-4AA7-AF87-B43616D15C12}"/>
+											<Tool ID="{A56082F6-E82C-4975-9A01-BDA82930B56E}"/>
+											<Tool ID="{DA699A7F-E281-4DDC-82F2-30CCE5D3DBCA}"/>
+											<Tool ID="{21A4A999-5FF8-489F-A588-DD4F7B538E55}"/>
+											<Tool ID="{13367C5B-9D4D-4BEA-B868-879A7387CDBB}"/>
+											<Tool ID="{74A5539F-5A37-411C-BEC9-49FEC3BC9AD3}"/>
+										</ToolOrder>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{8331A300-122F-4425-A7FF-467A42D79166}">
+										<ToolSource>
+											<Palette ID="{8331A300-122F-4425-A7FF-467A42D79166}">Draw</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{2DCDEF9A-7358-4CA4-837C-9AC674AE5317}">
+										<ToolSource>
+											<Palette ID="{2DCDEF9A-7358-4CA4-837C-9AC674AE5317}">Modify</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{07E218EF-7B2F-4BE5-9C28-39565D0E477A}">
+										<ToolSource>
+											<Palette ID="{07E218EF-7B2F-4BE5-9C28-39565D0E477A}">Cameras</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<!--Civil 3D - Imperial Palettes-->
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="1"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{A2BA5F7D-DA8A-4abf-9829-83DB684A7696}">
+										<ToolSource>
+											<Palette ID="{A2BA5F7D-DA8A-4abf-9829-83DB684A7696}">Imperial - Basic</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{87078200-43D6-48e1-B031-D6A09C258E3C}">
+										<ToolSource>
+											<Palette ID="{87078200-43D6-48e1-B031-D6A09C258E3C}">Imperial - Lanes</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{D50D61A1-DF01-4b3b-B1C6-B5B3EE5461CB}">
+										<ToolSource>
+											<Palette ID="{D50D61A1-DF01-4b3b-B1C6-B5B3EE5461CB}">Imperial - Shoulders</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{F6BBF3E5-36F2-4230-8E4F-DA9D85F5359C}">
+										<ToolSource>
+											<Palette ID="{F6BBF3E5-36F2-4230-8E4F-DA9D85F5359C}">Imperial - Medians</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{F3F57B18-1CF3-4868-95C2-DE16EE2D1961}">
+										<ToolSource>
+											<Palette ID="{F3F57B18-1CF3-4868-95C2-DE16EE2D1961}">Imperial - Curbs</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{3244E777-B3AC-4a33-B357-12176990FFE9}">
+										<ToolSource>
+											<Palette ID="{3244E777-B3AC-4a33-B357-12176990FFE9}">Imperial - Daylight</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{0CAD244F-480A-4b26-B76E-4F515117CCE6}">
+										<ToolSource>
+											<Palette ID="{0CAD244F-480A-4b26-B76E-4F515117CCE6}">Imperial - Generic</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{21634C77-FA27-4605-9DEF-E898130E5029}">
+										<ToolSource>
+											<Palette ID="{21634C77-FA27-4605-9DEF-E898130E5029}">Imperial - Conditional</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{7DC23694-3638-4ec6-8D94-FD14FF7ADA08}">
+										<ToolSource>
+											<Palette ID="{7DC23694-3638-4ec6-8D94-FD14FF7ADA08}">Imperial - Trenches and Channels</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{EF567CFA-8540-4a45-A543-C351F8851007}">
+										<ToolSource>
+											<Palette ID="{EF567CFA-8540-4a45-A543-C351F8851007}">Imperial - Retaining Walls</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{211CBAD4-D02C-470f-AEFF-3536BC7D5829}">
+										<ToolSource>
+											<Palette ID="{211CBAD4-D02C-470f-AEFF-3536BC7D5829}">Imperial - Rehab</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{43790CC8-A3D9-4055-A814-AB31404DEE64}">
+										<ToolSource>
+											<Palette ID="{43790CC8-A3D9-4055-A814-AB31404DEE64}">Imperial - New Rehab</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{6DF425E6-4EF3-4913-8236-672A6251F44A}">
+										<ToolSource>
+											<Palette ID="{6DF425E6-4EF3-4913-8236-672A6251F44A}">Imperial - Bridge</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{8bc24e72-042a-11e9-8eb2-f2801f1b9fd1}">
+										<ToolSource>
+											<Palette ID="{8bc24e72-042a-11e9-8eb2-f2801f1b9fd1}">Imperial - Rail</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<!--Civil 3D - Metric Palettes-->
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="1"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{C0EBE299-B04D-45C3-8F04-FDEB5F5B305D}">
+										<ToolSource>
+											<Palette ID="{C0EBE299-B04D-45C3-8F04-FDEB5F5B305D}">Metric - Basic</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{18165CE9-FBAC-4114-9B19-EA790E7528AE}">
+										<ToolSource>
+											<Palette ID="{18165CE9-FBAC-4114-9B19-EA790E7528AE}">Metric - Lanes</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{F3ADA874-A721-4185-B6BA-AD324D4099B5}">
+										<ToolSource>
+											<Palette ID="{F3ADA874-A721-4185-B6BA-AD324D4099B5}">Metric - Shoulders</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{477C5277-DFA4-404c-8223-2527503D5D05}">
+										<ToolSource>
+											<Palette ID="{477C5277-DFA4-404c-8223-2527503D5D05}">Metric - Medians</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{9944E303-CD9F-47aa-A06D-C92E17F72FD9}">
+										<ToolSource>
+											<Palette ID="{9944E303-CD9F-47aa-A06D-C92E17F72FD9}">Metric - Curbs</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{F20CB4D8-7E64-482f-9906-A8BBE434A91D}">
+										<ToolSource>
+											<Palette ID="{F20CB4D8-7E64-482f-9906-A8BBE434A91D}">Metric - Daylight</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{70FFF1E8-E1E9-49ed-BFE4-87DFC16E460D}">
+										<ToolSource>
+											<Palette ID="{70FFF1E8-E1E9-49ed-BFE4-87DFC16E460D}">Metric - Generic</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{4E33B8D3-62AD-415b-9E79-8B7EFBB8FB26}">
+										<ToolSource>
+											<Palette ID="{4E33B8D3-62AD-415b-9E79-8B7EFBB8FB26}">Metric - Conditional</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{C10DD35D-D14E-4531-9F81-9976DADA345C}">
+										<ToolSource>
+											<Palette ID="{C10DD35D-D14E-4531-9F81-9976DADA345C}">Metric - Trenches and Channels</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{6CA6390F-0CBB-4a94-8E05-CC28F35B55A5}">
+										<ToolSource>
+											<Palette ID="{6CA6390F-0CBB-4a94-8E05-CC28F35B55A5}">Metric - Retaining Walls</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{814BD6A6-0E51-43e3-BCB2-D09B0C4B47D5}">
+										<ToolSource>
+											<Palette ID="{814BD6A6-0E51-43e3-BCB2-D09B0C4B47D5}">Metric - Rehab</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{901F98EF-EFE6-4F0A-AA25-79CF14FEB38E}">
+										<ToolSource>
+											<Palette ID="{901F98EF-EFE6-4F0A-AA25-79CF14FEB38E}">Metric - New Rehab</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{F3A992A5-2A21-4f4b-954F-4DDAC89534ED}">
+										<ToolSource>
+											<Palette ID="{F3A992A5-2A21-4f4b-954F-4DDAC89534ED}">Metric - Bridge</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{d15c2e8a-042a-11e9-8eb2-f2801f1b9fd1}">
+										<ToolSource>
+											<Palette ID="{d15c2e8a-042a-11e9-8eb2-f2801f1b9fd1}">Metric - Rail</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{D5F2AE54-D62C-47C1-ACCD-52D2DF2A6D29}">
+										<ToolSource>
+											<Palette ID="{D5F2AE54-D62C-47C1-ACCD-52D2DF2A6D29}">Assorted</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{82F57AB9-3DC3-412F-BE03-EB7B7B64CEB8}">
+										<ToolSource>
+											<Palette ID="{82F57AB9-3DC3-412F-BE03-EB7B7B64CEB8}">MV Blocks - Highways</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{6F9C7B8B-9503-44D9-8C0C-894C4C6D2888}">
+										<ToolSource>
+											<Palette ID="{6F9C7B8B-9503-44D9-8C0C-894C4C6D2888}">MV Blocks - External Works</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{C61AEC19-AF1E-4B34-A9E9-A048A5271A75}">
+										<ToolSource>
+											<Palette ID="{C61AEC19-AF1E-4B34-A9E9-A048A5271A75}">MV Blocks - Landscape</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{F9957737-A43F-4C9D-B7D7-5D062920AF91}">
+										<ToolSource>
+											<Palette ID="{F9957737-A43F-4C9D-B7D7-5D062920AF91}">MV Blocks - Building Footprints</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{54542720-C370-4A1A-98C1-5716AD1FC802}">
+										<ToolSource>
+											<Palette ID="{54542720-C370-4A1A-98C1-5716AD1FC802}">Assemblies - Imperial</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{AA40AB04-A0D9-4256-B854-BD8193409640}">
+										<ToolSource>
+											<Palette ID="{AA40AB04-A0D9-4256-B854-BD8193409640}">Assemblies - Metric</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{68FCC725-A6B5-4A14-99C4-053CE9FF9325}">
+										<ToolSource>
+											<Palette ID="{68FCC725-A6B5-4A14-99C4-053CE9FF9325}">Concrete - Materials Sample</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{A38BC6F2-6EC6-4558-BAAA-E031CC533BC8}">
+										<ToolSource>
+											<Palette ID="{A38BC6F2-6EC6-4558-BAAA-E031CC533BC8}">Doors and Windows - Materials Sample</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{60763613-F7D6-41D4-BBBF-750DBB622295}">
+										<ToolSource>
+											<Palette ID="{60763613-F7D6-41D4-BBBF-750DBB622295}">Fabric - Materials Sample</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{B01DAE07-D43D-45A7-9A2E-2908D89505A2}">
+										<ToolSource>
+											<Palette ID="{B01DAE07-D43D-45A7-9A2E-2908D89505A2}">Finishes - Materials Sample</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{84C58344-3962-4ABF-9010-D6139359DA54}">
+										<ToolSource>
+											<Palette ID="{84C58344-3962-4ABF-9010-D6139359DA54}">Flooring - Materials Sample</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{4EADC391-4DB5-4F1E-B1AB-DC83B902F207}">
+										<ToolSource>
+											<Palette ID="{4EADC391-4DB5-4F1E-B1AB-DC83B902F207}">Masonry - Materials Sample</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{2D450476-FFD3-47B6-A635-7636ECDE86B8}">
+										<ToolSource>
+											<Palette ID="{2D450476-FFD3-47B6-A635-7636ECDE86B8}">Metals - Materials Sample</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{6B1EF87E-251F-4894-99B4-2AB3D3E44DBF}">
+										<ToolSource>
+											<Palette ID="{6B1EF87E-251F-4894-99B4-2AB3D3E44DBF}">Woods and Plastics - Materials Sample</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{BB1B2344-8ADF-4731-917B-5952A1F260DF}">
+										<ToolSource>
+											<Palette ID="{BB1B2344-8ADF-4731-917B-5952A1F260DF}">Concrete - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{3E317A9E-19B8-4C3A-950F-CFA863AB1721}">
+										<ToolSource>
+											<Palette ID="{3E317A9E-19B8-4C3A-950F-CFA863AB1721}">Doors and Windows - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{53E454E9-4EAE-47E4-887D-CF1F3DF71E5E}">
+										<ToolSource>
+											<Palette ID="{53E454E9-4EAE-47E4-887D-CF1F3DF71E5E}">Finishes - Carpet and Rugs - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{72E16C96-DB90-4A89-BE3E-9B0EA1A4E079}">
+										<ToolSource>
+											<Palette ID="{72E16C96-DB90-4A89-BE3E-9B0EA1A4E079}">Finishes - Ceiling and Tiles - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{A8DDB845-1105-4D95-99FB-46E20008E7CC}">
+										<ToolSource>
+											<Palette ID="{A8DDB845-1105-4D95-99FB-46E20008E7CC}">Finishes - Flooring - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{E9D9B580-62F4-4507-BFF7-5D536D1378A4}">
+										<ToolSource>
+											<Palette ID="{E9D9B580-62F4-4507-BFF7-5D536D1378A4}">Finishes - Paint, Plaster, Walls, Wax - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{033C975A-BE21-4994-9632-2ED654F84A64}">
+										<ToolSource>
+											<Palette ID="{033C975A-BE21-4994-9632-2ED654F84A64}">Furnishings - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{9202F74F-C169-4B35-9715-55E9CA964B20}">
+										<ToolSource>
+											<Palette ID="{9202F74F-C169-4B35-9715-55E9CA964B20}">Masonry - Bricks - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{B4DD0798-F161-4C84-B916-52862233147A}">
+										<ToolSource>
+											<Palette ID="{B4DD0798-F161-4C84-B916-52862233147A}">Masonry - General - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{2C0AB449-9A0C-402A-8711-C5BA5458901B}">
+										<ToolSource>
+											<Palette ID="{2C0AB449-9A0C-402A-8711-C5BA5458901B}">Masonry - Stones - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{6D6092E1-427E-40CE-9DF7-C5777B537872}">
+										<ToolSource>
+											<Palette ID="{6D6092E1-427E-40CE-9DF7-C5777B537872}">Metals - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{AEA73B99-8E75-49BF-9F55-E2FA559926A6}">
+										<ToolSource>
+											<Palette ID="{AEA73B99-8E75-49BF-9F55-E2FA559926A6}">SiteWork - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{BAB51B9B-F6F7-46F5-B501-B166F2A505B4}">
+										<ToolSource>
+											<Palette ID="{BAB51B9B-F6F7-46F5-B501-B166F2A505B4}">Thermal and Moisture - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+							<ToolPalette>
+								<CAdUiPalette PaletteStyle="0"/>
+								<CAcTcUiToolPalette>
+									<CatalogView ID="{6A3A20BC-87D1-4C39-A095-BE0A205F74C0}">
+										<ToolSource>
+											<Palette ID="{6A3A20BC-87D1-4C39-A095-BE0A205F74C0}">Woods and Plastics - Materials Library</Palette>
+										</ToolSource>
+										<Image SizeCX="32" SizeCY="32"/>
+										<Style>0</Style>
+										<ToolOrder/>
+									</CatalogView>
+								</CAcTcUiToolPalette>
+							</ToolPalette>
+						</ToolPalettes>
+						<ToolPaletteGroup>
+							<Name resource="157" src="AcTcUiRes.dll"/>
+							<ActivePaletteIndex>-1</ActivePaletteIndex>
+							<Contents>
+								<!--Civil - Imperial group-->
+								<ToolPaletteGroup>
+									<Name>Civil Imperial Subassemblies</Name>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{54542720-C370-4A1A-98C1-5716AD1FC802}"/>
+										<ToolPalette ID="{A2BA5F7D-DA8A-4abf-9829-83DB684A7696}"/>
+										<ToolPalette ID="{87078200-43D6-48e1-B031-D6A09C258E3C}"/>
+										<ToolPalette ID="{D50D61A1-DF01-4b3b-B1C6-B5B3EE5461CB}"/>
+										<ToolPalette ID="{F6BBF3E5-36F2-4230-8E4F-DA9D85F5359C}"/>
+										<ToolPalette ID="{F3F57B18-1CF3-4868-95C2-DE16EE2D1961}"/>
+										<ToolPalette ID="{3244E777-B3AC-4a33-B357-12176990FFE9}"/>
+										<ToolPalette ID="{0CAD244F-480A-4b26-B76E-4F515117CCE6}"/>
+										<ToolPalette ID="{21634C77-FA27-4605-9DEF-E898130E5029}"/>
+										<ToolPalette ID="{7DC23694-3638-4ec6-8D94-FD14FF7ADA08}"/>
+										<ToolPalette ID="{EF567CFA-8540-4a45-A543-C351F8851007}"/>
+										<ToolPalette ID="{211CBAD4-D02C-470f-AEFF-3536BC7D5829}"/>
+										<ToolPalette ID="{43790CC8-A3D9-4055-A814-AB31404DEE64}"/>
+										<ToolPalette ID="{6DF425E6-4EF3-4913-8236-672A6251F44A}"/>
+										<ToolPalette ID="{8bc24e72-042a-11e9-8eb2-f2801f1b9fd1}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Civil - Metric group-->
+								<ToolPaletteGroup>
+									<Name>Civil Metric Subassemblies</Name>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{AA40AB04-A0D9-4256-B854-BD8193409640}"/>
+										<ToolPalette ID="{C0EBE299-B04D-45C3-8F04-FDEB5F5B305D}"/>
+										<ToolPalette ID="{18165CE9-FBAC-4114-9B19-EA790E7528AE}"/>
+										<ToolPalette ID="{F3ADA874-A721-4185-B6BA-AD324D4099B5}"/>
+										<ToolPalette ID="{477C5277-DFA4-404c-8223-2527503D5D05}"/>
+										<ToolPalette ID="{9944E303-CD9F-47aa-A06D-C92E17F72FD9}"/>
+										<ToolPalette ID="{F20CB4D8-7E64-482f-9906-A8BBE434A91D}"/>
+										<ToolPalette ID="{70FFF1E8-E1E9-49ed-BFE4-87DFC16E460D}"/>
+										<ToolPalette ID="{4E33B8D3-62AD-415b-9E79-8B7EFBB8FB26}"/>
+										<ToolPalette ID="{C10DD35D-D14E-4531-9F81-9976DADA345C}"/>
+										<ToolPalette ID="{6CA6390F-0CBB-4a94-8E05-CC28F35B55A5}"/>
+										<ToolPalette ID="{814BD6A6-0E51-43e3-BCB2-D09B0C4B47D5}"/>
+										<ToolPalette ID="{901F98EF-EFE6-4F0A-AA25-79CF14FEB38E}"/>
+										<ToolPalette ID="{F3A992A5-2A21-4f4b-954F-4DDAC89534ED}"/>
+										<ToolPalette ID="{d15c2e8a-042a-11e9-8eb2-f2801f1b9fd1}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Civil Materials group-->
+								<ToolPaletteGroup>
+									<Name>Civil Materials</Name>
+									<CustomData/>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{AEA73B99-8E75-49BF-9F55-E2FA559926A6}"/>
+										<ToolPalette ID="{BB1B2344-8ADF-4731-917B-5952A1F260DF}"/>
+										<ToolPalette ID="{B4DD0798-F161-4C84-B916-52862233147A}"/>
+										<ToolPalette ID="{D5F2AE54-D62C-47C1-ACCD-52D2DF2A6D29}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Civil - MV Blocks group-->
+								<ToolPaletteGroup>
+									<Name>Civil Multiview Blocks</Name>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{82F57AB9-3DC3-412F-BE03-EB7B7B64CEB8}"/>
+										<ToolPalette ID="{6F9C7B8B-9503-44D9-8C0C-894C4C6D2888}"/>
+										<ToolPalette ID="{C61AEC19-AF1E-4B34-A9E9-A048A5271A75}"/>
+										<ToolPalette ID="{F9957737-A43F-4C9D-B7D7-5D062920AF91}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Dynamic Blocks group-->
+								<ToolPaletteGroup>
+									<Name resource="156" src="AcTcUiRes.dll"/>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{A0CCA60A-AB56-4EFD-83A5-8764BC08CDA8}"/>
+										<ToolPalette ID="{498DE575-CB69-4B2A-A12B-33012D265464}"/>
+										<ToolPalette ID="{5B6AC051-A4D1-4191-A86C-DFD866841B64}"/>
+										<ToolPalette ID="{EA899C91-EF57-45F1-9CEB-2CE79A3B09EC}"/>
+										<ToolPalette ID="{1BAC5354-C9CD-42E2-BD35-300929BC6140}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Samples group-->
+								<ToolPaletteGroup>
+									<Name resource="155" src="AcTcUiRes.dll"/>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{3D96B628-B9A6-4BE7-9A54-4063288C5CE6}"/>
+										<ToolPalette ID="{4BE848C7-50A4-41BF-929E-ECE60FE5422F}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--3d Make group-->
+								<ToolPaletteGroup>
+									<Name resource="164" src="AcTcUiRes.dll"/>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{D6BC41CF-FCAA-4FF7-8CDD-64D952C632E0}"/>
+										<ToolPalette ID="{8331A300-122F-4425-A7FF-467A42D79166}"/>
+										<ToolPalette ID="{2DCDEF9A-7358-4CA4-837C-9AC674AE5317}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Materials Library group-->
+								<ToolPaletteGroup>
+									<Name resource="169" src="AcTcUiRes.dll"/>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{BB1B2344-8ADF-4731-917B-5952A1F260DF}"/>
+										<ToolPalette ID="{3E317A9E-19B8-4C3A-950F-CFA863AB1721}"/>
+										<ToolPalette ID="{53E454E9-4EAE-47E4-887D-CF1F3DF71E5E}"/>
+										<ToolPalette ID="{72E16C96-DB90-4A89-BE3E-9B0EA1A4E079}"/>
+										<ToolPalette ID="{A8DDB845-1105-4D95-99FB-46E20008E7CC}"/>
+										<ToolPalette ID="{E9D9B580-62F4-4507-BFF7-5D536D1378A4}"/>
+										<ToolPalette ID="{033C975A-BE21-4994-9632-2ED654F84A64}"/>
+										<ToolPalette ID="{9202F74F-C169-4B35-9715-55E9CA964B20}"/>
+										<ToolPalette ID="{B4DD0798-F161-4C84-B916-52862233147A}"/>
+										<ToolPalette ID="{2C0AB449-9A0C-402A-8711-C5BA5458901B}"/>
+										<ToolPalette ID="{6D6092E1-427E-40CE-9DF7-C5777B537872}"/>
+										<ToolPalette ID="{AEA73B99-8E75-49BF-9F55-E2FA559926A6}"/>
+										<ToolPalette ID="{BAB51B9B-F6F7-46F5-B501-B166F2A505B4}"/>
+										<ToolPalette ID="{6A3A20BC-87D1-4C39-A095-BE0A205F74C0}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Lights group-->
+								<ToolPaletteGroup>
+									<Name resource="166" src="AcTcUiRes.dll"/>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{0937C731-E045-4C09-8487-7E84CB5DB6DC}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Cameras group-->
+								<ToolPaletteGroup>
+									<Name resource="168" src="AcTcUiRes.dll"/>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{07E218EF-7B2F-4BE5-9C28-39565D0E477A}"/>
+									</Contents>
+								</ToolPaletteGroup>
+								<!--Visual Styles group-->
+								<ToolPaletteGroup>
+									<Name resource="167" src="AcTcUiRes.dll"/>
+									<ActivePaletteIndex>0</ActivePaletteIndex>
+									<Contents>
+										<ToolPalette ID="{775C6DF8-BCB6-48BA-8F98-9D4621E908F5}"/>
+									</Contents>
+								</ToolPaletteGroup>
+							</Contents>
+						</ToolPaletteGroup>
+						<ActiveToolPaletteGroup>0</ActiveToolPaletteGroup>
+					</CAcTcUiToolPaletteSet>
+				</ToolPaletteSet>
+			</ToolPaletteSets>
+		</ToolPaletteScheme>
+	</StorageRoot>
+	<Name>&lt;&lt;C3D_Imperial&gt;&gt;</Name>
+	<Description></Description>
+</Profile>
+
+__END_PROFILE_STORAGE_R16__

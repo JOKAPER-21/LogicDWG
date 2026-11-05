@@ -4,6 +4,8 @@
 ;;; Labels the distance from a boundary polyline to a rail track, with an
 ;;; optional chainage line ("@ KM 21/000").
 ;;;
+;;; v04: Added SMART position (corner vertices + even distance, no clutter).
+;;;      Labels are now created on layer 1-BOUNDARY.
 ;;; v03: Distance mode places a label every <spacing> along the boundary curve
 ;;;      (not only at vertices). Text is placed on the side INSIDE the boundary.
 ;;; ============================================================================
@@ -11,7 +13,7 @@
 (vl-load-com)
 
 ;; ---- remembered dialog values ---------------------------------------------
-(if (not *vrb-mode*)  (setq *vrb-mode*  "Distance"))
+(setq *vrb-mode* "Smart")   ; Smart / Vertex / Distance
 (if (not *vrb-dist*)  (setq *vrb-dist*  "40"))
 (if (not *vrb-usekm*) (setq *vrb-usekm* "1"))
 (if (not *vrb-km*)    (setq *vrb-km*    "0/000"))
@@ -101,6 +103,87 @@
   (reverse pts)
 )
 
+;; SMART: labels at real corners (turn >= 10 deg) + even distance fill.
+;;  - a corner vertex is skipped if it is closer than spacing/2 to the previous
+;;    label (so dense vertices / curves never crowd)
+;;  - any gap bigger than spacing is split into equal steps (<= spacing)
+(defun vrb:ceil (x)
+  (if (> (- x (fix x)) 1e-9) (1+ (fix x)) (fix x))
+)
+
+(defun vrb:smart-points (en vlist spacing /
+                         total closed n i p pv nx a1 a2 turn d last minGap angTol
+                         anchors ends gap k step j out pt sig)
+  (setq total  (vlax-curve-getDistAtParam en (vlax-curve-getEndParam en))
+        closed (vlax-curve-isClosed en)
+        minGap (* 0.5 spacing)
+        angTol (/ (* 10.0 pi) 180.0)
+        n      (length vlist)
+        i 0 last nil anchors nil)
+
+  ;; 1) pick significant vertices
+  (while (< i n)
+    (setq p (nth i vlist)
+          d (vlax-curve-getDistAtPoint en p))
+    (if d
+      (progn
+        (setq sig nil)
+        (cond
+          ((= i 0) (setq sig T))
+          ((and (= i (1- n)) (not closed)) (setq sig T))
+          (T
+           (setq pv (nth (1- i) vlist)
+                 nx (nth (if (= i (1- n)) 0 (1+ i)) vlist)
+                 a1 (angle pv p)
+                 a2 (angle p nx)
+                 turn (abs (- a2 a1)))
+           (if (> turn pi) (setq turn (- (* 2.0 pi) turn)))
+           (if (>= turn angTol) (setq sig T))
+          )
+        )
+        (if (and sig
+                 (or (null last) (>= (- d last) minGap))
+                 (or (not closed) (= i 0) (>= (- total d) minGap)))
+          (setq anchors (cons d anchors) last d)
+        )
+      )
+    )
+    (setq i (1+ i))
+  )
+  (setq anchors (reverse anchors))
+  (if (null anchors) (setq anchors (list 0.0)))
+
+  ;; 2) fill the gaps evenly
+  (setq ends (append anchors (list total)) out nil)
+  (while (cdr ends)
+    (setq d   (car ends)
+          gap (- (cadr ends) d))
+    (setq out (cons d out))
+    (if (> gap spacing)
+      (progn
+        (setq k (vrb:ceil (/ gap spacing))
+              step (/ gap k)
+              j 1)
+        (while (< j k)
+          (setq out (cons (+ d (* j step)) out))
+          (setq j (1+ j))
+        )
+      )
+    )
+    (setq ends (cdr ends))
+  )
+  (setq out (reverse out))
+
+  ;; 3) distances -> points
+  (setq anchors nil)
+  (foreach d out
+    (if (setq pt (vlax-curve-getPointAtDist en d))
+      (setq anchors (cons (list (car pt) (cadr pt) 0.0) anchors))
+    )
+  )
+  (reverse anchors)
+)
+
 ;; vertices, skipping ones closer than minLen to the previous kept one
 (defun vrb:filter-vertices (vlist minLen / out last)
   (foreach p vlist
@@ -160,6 +243,7 @@
       "  : boxed_radio_row {"
       "    label = \"Label position\";"
       "    key = \"mode\";"
+      "    : radio_button { key = \"r_smart\";  label = \"Smart\"; }"
       "    : radio_button { key = \"r_vertex\"; label = \"Vertex\"; }"
       "    : radio_button { key = \"r_dist\";   label = \"Distance\"; }"
       "  }"
@@ -190,13 +274,15 @@
 
 ;; enable / disable the fields that depend on the radio and the check box
 (defun vrb:update-tiles ()
-  (mode_tile "e_dist" (if (= (get_tile "r_dist") "1") 0 1))
+  (mode_tile "e_dist" (if (or (= (get_tile "r_dist") "1") (= (get_tile "r_smart") "1")) 0 1))
   (mode_tile "e_km"   (if (= (get_tile "t_km") "1") 0 1))
 )
 
 ;; copy tile values into the remembered globals
 (defun vrb:save-tiles ()
-  (setq *vrb-mode*  (if (= (get_tile "r_vertex") "1") "Vertex" "Distance")
+  (setq *vrb-mode*  (cond ((= (get_tile "r_smart") "1") "Smart")
+                              ((= (get_tile "r_vertex") "1") "Vertex")
+                              (T "Distance"))
         *vrb-dist*  (get_tile "e_dist")
         *vrb-usekm* (get_tile "t_km")
         *vrb-km*    (get_tile "e_km"))
@@ -209,7 +295,7 @@
     (cond
       ((null *vrb-bnd*) "Select the boundary polyline.")
       ((null *vrb-trk*) "Select the track.")
-      ((and (= *vrb-mode* "Distance")
+      ((and (/= *vrb-mode* "Vertex")
             (or (not (vrb:number-p (vl-string-trim " " *vrb-dist*)))
                 (<= (atof *vrb-dist*) 0.0)))
        "Enter a distance greater than 0.")
@@ -231,13 +317,14 @@
     (if (not (new_dialog "vidRwBoundary" id))
       (setq go nil r 0)
       (progn
-        (set_tile (if (= *vrb-mode* "Vertex") "r_vertex" "r_dist") "1")
+        (set_tile (cond ((= *vrb-mode* "Smart") "r_smart") ((= *vrb-mode* "Vertex") "r_vertex") (T "r_dist")) "1")
         (set_tile "e_dist" *vrb-dist*)
         (set_tile "t_km"   *vrb-usekm*)
         (set_tile "e_km"   *vrb-km*)
         (set_tile "x_bnd" (if *vrb-bnd* (strcat "Selected (" (vrb:type *vrb-bnd*) ")") "Not selected"))
         (set_tile "x_trk" (if *vrb-trk* (strcat "Selected (" (vrb:type *vrb-trk*) ")") "Not selected"))
         (vrb:update-tiles)
+        (action_tile "r_smart"  "(vrb:update-tiles)")
         (action_tile "r_vertex" "(vrb:update-tiles)")
         (action_tile "r_dist"   "(vrb:update-tiles)")
         (action_tile "t_km"     "(vrb:update-tiles)")
@@ -289,17 +376,27 @@
     )
   )
 
-  ;; layer for the labels
-  (if (not (tblsearch "LAYER" "1-boundary"))
+  ;; layer for the labels: 1-BOUNDARY
+  (if (not (tblsearch "LAYER" "1-BOUNDARY"))
     (entmake
       (list
         '(0 . "LAYER")
         '(100 . "AcDbSymbolTableRecord")
         '(100 . "AcDbLayerTableRecord")
-        '(2 . "1-boundary")
+        '(2 . "1-BOUNDARY")
         '(70 . 0)
         '(62 . 7)
       )
+    )
+    ;; layer already exists in lower/mixed case -> rename to 1-BOUNDARY
+    (if (/= (cdr (assoc 2 (tblsearch "LAYER" "1-BOUNDARY"))) "1-BOUNDARY")
+      (vl-catch-all-apply
+        '(lambda ()
+           (vla-put-name
+             (vla-item
+               (vla-get-layers (vla-get-activedocument (vlax-get-acad-object)))
+               (cdr (assoc 2 (tblsearch "LAYER" "1-BOUNDARY"))))
+             "1-BOUNDARY")))
     )
   )
 
@@ -311,9 +408,10 @@
 
   ;; where to put labels
   (setq ptlist
-    (if (= placeMode "Vertex")
-      (vrb:filter-vertices vlist minSegLen)
-      (vrb:sample-curve bnd spacing)
+    (cond
+      ((= placeMode "Smart")  (vrb:smart-points bnd vlist spacing))
+      ((= placeMode "Vertex") (vrb:filter-vertices vlist minSegLen))
+      (T                      (vrb:sample-curve bnd spacing))
     )
   )
 
@@ -373,7 +471,7 @@
           (list
             '(0 . "MTEXT")
             '(100 . "AcDbEntity")
-            '(8 . "1-boundary")
+            '(8 . "1-BOUNDARY")
             '(100 . "AcDbMText")
             (cons 7 stylename)
             (cons 10 txtpt)

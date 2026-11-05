@@ -1,31 +1,7 @@
 ;;; ============================================================================
 ;;; Vid Dgps To Line
 ;;; Release: 1.5.8 | Civil 3D 2026
-;;; Version: 18
-;;;   v18: * Codes are matched ignoring case, spaces, "_" and "-":
-;;;            R1 / r1 / R 1  = the same line.
-;;;          A BS or END code is joined to its base code, BS / END can be
-;;;          written before or after the base code:
-;;;            R1 + R1 BS / BS R1         -> one line "R1"
-;;;            R3 + R3 END / END R3       -> one line "R3"
-;;;            R5 + BS R5 + END R5        -> one line "R5"
-;;;          (the list in window 01 auto-selects all of them)
-;;;        * Window 02: new section "Symbol" (between Line Types and Settings)
-;;;            [x] Symbol                       (check box, default ON)
-;;;            Symbol Name [vid_bufferStop_002] (default)
-;;;          The block is imported from vid_blocks_tools.dwg when the drawing
-;;;          does not have it.  It is placed on the TRACK CENTER polyline
-;;;          (the offset polyline of "Polyline Center"; when that type is not
-;;;          ticked a temporary one is made and erased again) at the end that
-;;;          has a BS / END point:
-;;;            block rotation = (polyline tangent pointing INTO the line) + 180:
-;;;                start of the polyline = tangent + 180,  end = tangent + 360
-;;;            bufferStop_rot = polyline tangent + 180 + 180:
-;;;                start of the polyline = tangent + 360,  end = tangent + 180
-;;;            Offsets (degrees): DGPS-SymRotOffset = 180 (block rotation),
-;;;                               DGPS-SymPropOffset = 180 (bufferStop_rot)
-;;;          <block(a+180, bs a)>-------------<block(a, bs a+180)>
-;;;          The polylines are never changed or reversed.
+;;; Version: 17
 ;;;   v17: Two windows.
 ;;;        Window 01 "Selected layers" : list of CSV codes.
 ;;;        Window 02 : Line Types (Polyline / 3D Polyline / Polyline Center),
@@ -153,19 +129,6 @@
 (if (null DGPS-CenterOffset) (setq DGPS-CenterOffset 0.86))
 (if (null DGPS-CustomLayerTxt) (setq DGPS-CustomLayerTxt "1-TRACK"))
 (setq dgps-*old-offerase* nil)
-;; Symbol (placed at BS / END points)
-(if (null DGPS-SymbolName)  (setq DGPS-SymbolName  "vid_bufferStop_002")) ; blank = no symbol
-(if (null DGPS-SymRotProp)  (setq DGPS-SymRotProp  "bufferStop_rot"))     ; dynamic rotation property
-(if (null DGPS-UseSymbol)   (setq DGPS-UseSymbol   T))                    ; Symbol check box
-;; These two are set every time the file is loaded (not "if null"), so an old
-;; value left over from an earlier load in the same AutoCAD session can never
-;; override the value written here.
-(setq DGPS-SymRotOffset  180.0)   ; degrees added to the BLOCK rotation (block rotation + 180)
-(setq DGPS-SymPropOffset 180.0)   ; degrees added to bufferStop_rot
-(setq DGPS-SymbolOK nil)
-(setq DGPS-SymTotal 0)
-(setq DGPS-SymFail  0)
-(setq DGPS-RegKey "HKEY_CURRENT_USER\\Software\\VID\\Tools")   ; same as vidBankCutting
 
 ;; ---------------------------------------------------------------------------
 ;; Basic string helpers
@@ -654,105 +617,9 @@
 ;; ---------------------------------------------------------------------------
 ;; v14 helpers
 ;; ---------------------------------------------------------------------------
-;; Normalised text: upper case, spaces / tabs / "_" / "-" removed
-(defun DGPS-NormCode (code / u i ch out)
-  (setq u (strcase (DGPS-Trim code)) i 1 out "")
-  (while (<= i (strlen u))
-    (setq ch (substr u i 1))
-    (if (not (member ch '(" " "\t" "_" "-")))
-      (setq out (strcat out ch)))
-    (setq i (1+ i))
-  )
-  out
-)
-
-;; split on spaces / tabs / "_" / "-" (empty pieces dropped, case kept)
-(defun DGPS-SplitTokens (code / s i ch cur out)
-  (setq s (DGPS-Trim code) i 1 cur "" out '())
-  (while (<= i (strlen s))
-    (setq ch (substr s i 1))
-    (if (member ch '(" " "\t" "_" "-"))
-      (progn
-        (if (/= cur "") (setq out (cons cur out)))
-        (setq cur ""))
-      (setq cur (strcat cur ch)))
-    (setq i (1+ i))
-  )
-  (if (/= cur "") (setq out (cons cur out)))
-  (reverse out)
-)
-
-;; T for  R  or  R<digits>  (upper case text)
-(defun DGPS-RNameP (u / rest)
-  (cond
-    ((= u "R") T)
-    ((and (> (strlen u) 1) (= (substr u 1 1) "R"))
-     (setq rest (substr u 2))
-     (= (vl-string-trim "0123456789" rest) ""))
-    (T nil)
-  )
-)
-
-;; Split a code into its BASE and its BS / END marker.
-;; Returns (base marker display)
-;;   base    = normalised key (upper case, no separators)  "R1"
-;;   marker  = "BS" / "END" / nil
-;;   display = the base text of the code (original case)   "R1"
-;; BS / END may come after OR before the base code:
-;;   "R1 BS"  "BS R1"  "r1 bs"  "R1-BS"  "R1BS"  "BSR1"  -> ("R1" "BS" "R1")
-;; A glued BS / END (no space) is only taken for R codes (R1BS, ENDR3), so
-;; codes such as SLABS or TREND are never split.
-(defun DGPS-ParseCode (code / tk n u first lastT rest tkU)
-  (setq tk (DGPS-SplitTokens code)
-        n  (length tk))
-  (cond
-    ((= n 0) (list "" nil ""))
-    ;; several words: BS / END as the last or the first word
-    ((and (>= n 2) (member (strcase (last tk)) '("BS" "END")))
-     (setq rest (reverse (cdr (reverse tk))))
-     (list (DGPS-NormCode (apply 'strcat rest)) (strcase (last tk))
-           (DGPS-JoinTokens rest)))
-    ((and (>= n 2) (member (strcase (car tk)) '("BS" "END")))
-     (setq rest (cdr tk))
-     (list (DGPS-NormCode (apply 'strcat rest)) (strcase (car tk))
-           (DGPS-JoinTokens rest)))
-    ;; one word, glued:  R1BS  R3END  BSR1  ENDR3
-    ((= n 1)
-     (setq first (car tk) u (strcase first))
-     (cond
-       ((and (> (strlen u) 3) (= (substr u (- (strlen u) 2)) "END")
-             (DGPS-RNameP (substr u 1 (- (strlen u) 3))))
-        (list (substr u 1 (- (strlen u) 3)) "END" (substr first 1 (- (strlen first) 3))))
-       ((and (> (strlen u) 2) (= (substr u (- (strlen u) 1)) "BS")
-             (DGPS-RNameP (substr u 1 (- (strlen u) 2))))
-        (list (substr u 1 (- (strlen u) 2)) "BS" (substr first 1 (- (strlen first) 2))))
-       ((and (> (strlen u) 3) (= (substr u 1 3) "END")
-             (DGPS-RNameP (substr u 4)))
-        (list (substr u 4) "END" (substr first 4)))
-       ((and (> (strlen u) 2) (= (substr u 1 2) "BS")
-             (DGPS-RNameP (substr u 3)))
-        (list (substr u 3) "BS" (substr first 3)))
-       (T (list u nil first))
-     )
-    )
-    (T (list (DGPS-NormCode (apply 'strcat tk)) nil (DGPS-JoinTokens tk)))
-  )
-)
-
-(defun DGPS-JoinTokens (tk / out)
-  (setq out "")
-  (foreach w tk (setq out (strcat out (if (= out "") "" " ") w)))
-  out
-)
-
-(defun DGPS-CodeBase    (code) (car   (DGPS-ParseCode code)))   ; "R1"
-(defun DGPS-CodeMarker  (code) (cadr  (DGPS-ParseCode code)))   ; "BS" / "END" / nil
-(defun DGPS-CodeDisplay (code) (caddr (DGPS-ParseCode code)))   ; text for layer names
-
-;; T when the code is  R  or  R<digits>  (R1, R2 ... R25 ...), also
-;; "R1 BS", "r1 end", "R 1" ...  (case, spaces and BS / END ignored)
+;; T when the code is  R  or  R<digits>  (R1, R2 ... R25 ...)
 (defun DGPS-AutoRP-P (code / u rest)
-  (setq u (DGPS-CodeBase code))
+  (setq u (strcase (DGPS-Trim code)))
   (cond
     ((= u "R") T)
     ((and (> (strlen u) 1) (= (substr u 1 1) "R"))
@@ -761,258 +628,6 @@
     )
     (T nil)
   )
-)
-
-;; Group records by the BASE code (case / spaces / BS / END ignored):
-;;   R1 + R1 BS -> one group.   Result: ((displayName rec1 rec2 ...) ...)
-(defun DGPS-GroupMerged (records / groups key cell rec out disp first)
-  (setq groups '())
-  (foreach rec records
-    (setq key  (DGPS-CodeBase (DGPS-R-Code rec)))
-    (setq cell (assoc key groups))
-    (if cell
-      (setq groups (subst (append cell (list rec)) cell groups))
-      (setq groups (append groups (list (cons key (list rec)))))
-    )
-  )
-  (setq out '())
-  (foreach cell groups
-    ;; display name: from the first record that is not a BS / END record
-    (setq first nil)
-    (foreach rec (cdr cell)
-      (if (and (null first) (null (DGPS-CodeMarker (DGPS-R-Code rec))))
-        (setq first rec)))
-    (setq disp (DGPS-CodeDisplay (DGPS-R-Code (if first first (cadr cell)))))
-    (setq out (append out (list (cons disp (cdr cell)))))
-  )
-  out
-)
-
-;; ---------------------------------------------------------------------------
-;; Symbol block: locate vid_blocks_tools.dwg and import the block
-;; (same lookup as vidBankCutting.lsp)
-;; ---------------------------------------------------------------------------
-(defun DGPS-FindBlocksDwg (/ hit f dir n rel)
-  (if (and *VID-BLOCKS-DWG* (findfile *VID-BLOCKS-DWG*))
-    (setq hit (findfile *VID-BLOCKS-DWG*))
-  )
-  (if (not hit)
-    (progn
-      (setq f (vl-registry-read DGPS-RegKey "BlocksDwg"))
-      (if (and f (= (type f) 'STR) (findfile f))
-        (setq hit (findfile f))
-      )
-    )
-  )
-  (if (not hit)
-    (foreach n '("vidGradient.lsp" "vidGradientAlign.lsp" "vidBankCutting.lsp"
-                 "vidDgpsToLine.lsp" "vidLC.lsp")
-      (if (and (not hit) (setq f (findfile n)))
-        (progn
-          (setq dir (vl-filename-directory f)
-                f   (findfile (strcat dir "/vid_blocks_tools.dwg")))
-          (if f (setq hit f))
-        )
-      )
-    )
-  )
-  (if (not hit)
-    (foreach rel '("support/vid/tools/vid_blocks_tools.dwg"
-                   "vid/tools/vid_blocks_tools.dwg"
-                   "vid_blocks_tools.dwg")
-      (if (and (not hit) (setq f (findfile rel)))
-        (setq hit f)
-      )
-    )
-  )
-  (if (not hit)
-    (setq hit (getfiled "Locate vid_blocks_tools.dwg" "" "dwg" 0))
-  )
-  (if hit
-    (progn
-      (setq *VID-BLOCKS-DWG* hit)
-      (vl-catch-all-apply 'vl-registry-write
-        (list DGPS-RegKey "BlocksDwg" hit))
-    )
-  )
-  hit
-)
-
-;; Import block <name> from <dwg> when the drawing does not have it yet.
-(defun DGPS-ImportBlock (dwg name / acad doc ver dbx blks item objs path)
-  (if (not (tblsearch "BLOCK" name))
-    (progn
-      (setq acad (vlax-get-acad-object)
-            doc  (vla-get-ActiveDocument acad)
-            ver  (itoa (atoi (getvar "ACADVER")))
-            path (vl-string-translate "/" "\\" dwg))
-      (setq dbx (vl-catch-all-apply 'vla-GetInterfaceObject
-                  (list acad (strcat "ObjectDBX.AxDbDocument." ver))))
-      (if (vl-catch-all-error-p dbx)
-        (setq dbx (vl-catch-all-apply 'vla-GetInterfaceObject
-                    (list acad "ObjectDBX.AxDbDocument"))))
-      (cond
-        ((vl-catch-all-error-p dbx)
-         (prompt "\nCannot start ObjectDBX - block not imported.")
-         (setq dbx nil))
-        ((vl-catch-all-error-p
-           (vl-catch-all-apply 'vla-Open (list dbx path)))
-         (prompt (strcat "\nCannot open " path))
-         (vl-catch-all-apply 'vlax-release-object (list dbx))
-         (setq dbx nil))
-        (T
-         (setq blks (vla-get-Blocks dbx))
-         (setq item (vl-catch-all-apply 'vla-Item (list blks name)))
-         (if (vl-catch-all-error-p item)
-           (prompt (strcat "\nBlock not found in DWG: " name))
-           (progn
-             (setq objs (vlax-make-safearray vlax-vbObject '(0 . 0)))
-             (vlax-safearray-put-element objs 0 item)
-             (if (vl-catch-all-error-p
-                   (vl-catch-all-apply 'vla-CopyObjects
-                     (list dbx objs (vla-get-Blocks doc))))
-               (prompt (strcat "\nCould not import block: " name))
-               (prompt (strcat "\nImported block: " name))
-             )
-           )
-         )
-         (vl-catch-all-apply 'vlax-release-object (list dbx))
-        )
-      )
-    )
-  )
-  (if (tblsearch "BLOCK" name) T nil)
-)
-
-;; Set a dynamic block property by name (case-insensitive). T on success.
-(defun DGPS-SetDynProp (ent name val / obj props p res)
-  (setq obj (vlax-ename->vla-object ent))
-  (setq props (vl-catch-all-apply 'vlax-invoke (list obj 'GetDynamicBlockProperties)))
-  (if (vl-catch-all-error-p props) (setq props nil))
-  (setq p
-    (car
-      (vl-remove-if-not
-        '(lambda (q) (= (strcase (vla-get-PropertyName q)) (strcase name)))
-        props)))
-  (if p
-    (progn
-      (setq res (vl-catch-all-apply 'vla-put-Value
-                  (list p (vlax-make-variant val vlax-vbDouble))))
-      (not (vl-catch-all-error-p res))
-    )
-    nil
-  )
-)
-
-(defun DGPS-DynPropNames (ent / obj props out)
-  (setq obj (vlax-ename->vla-object ent) out "")
-  (setq props (vl-catch-all-apply 'vlax-invoke (list obj 'GetDynamicBlockProperties)))
-  (if (not (vl-catch-all-error-p props))
-    (foreach q props
-      (setq out (strcat out (if (= out "") "" ", ") (vla-get-PropertyName q)))))
-  out
-)
-
-;; T when one of the records is a BS / END record
-(defun DGPS-HasMarker (recs)
-  (vl-some '(lambda (r) (DGPS-CodeMarker (DGPS-R-Code r))) recs)
-)
-
-;; Reads the Symbol part of window 02. T = OK to continue.
-(defun DGPS-SymbolBoxOK (/ nm)
-  (setq nm (DGPS-Trim (get_tile "edt_sym")))
-  (cond
-    ((and (= (get_tile "tg_sym") "1") (= nm ""))
-     (alert "Enter the Symbol Name, or untick Symbol.")
-     (mode_tile "edt_sym" 2)
-     nil)
-    (T
-     (setq DGPS-UseSymbol (= (get_tile "tg_sym") "1"))
-     (if (/= nm "") (setq DGPS-SymbolName nm))
-     T)
-  )
-)
-
-;; Place the symbol on the TRACK CENTER polyline <ce> at the end that has a
-;; BS / END point (the nearest end to that point):
-;;     block rotation  = tangent pointing INTO the line + DGPS-SymRotOffset (180):
-;;                       start = tangent + 180, end = tangent + 360
-;;     bufferStop_rot  = polyline tangent (start + 180, end) + DGPS-SymPropOffset (180)
-;;                       = the same angle as the block rotation
-;; The polyline is only read.  Returns the number of blocks placed.
-(defun DGPS-PlaceSymbols (recs ce lay / sp ep sDone eDone cnt rec mk x y z
-                          atStart pt drv tang prop brot ent)
-  (setq cnt 0 sDone nil eDone nil)
-  (if (and DGPS-SymbolOK ce)
-    (progn
-      (setq sp (vlax-curve-getStartPoint ce)
-            ep (vlax-curve-getEndPoint ce))
-      (foreach rec recs
-        (setq mk (DGPS-CodeMarker (DGPS-R-Code rec)))
-        (if mk
-          (progn
-            (setq x (atof (DGPS-R-East  rec))
-                  y (atof (DGPS-R-North rec))
-                  z (atof (DGPS-R-Elev  rec)))
-            ;; end of the track center polyline nearest to this BS / END point
-            (setq atStart
-              (<= (DGPS-Dist2DPt (list x y) sp) (DGPS-Dist2DPt (list x y) ep)))
-            (if (not (if atStart sDone eDone))
-              (progn
-                (if atStart (setq sDone T) (setq eDone T))
-                (setq pt (if atStart sp ep))
-                ;; polyline tangent at that end (as drawn)
-                (setq drv
-                  (vl-catch-all-apply 'vlax-curve-getFirstDeriv
-                    (list ce (if atStart
-                               (vlax-curve-getStartParam ce)
-                               (vlax-curve-getEndParam ce)))))
-                (setq tang
-                  (if (vl-catch-all-error-p drv)
-                    0.0
-                    (angle (list 0.0 0.0) (list (car drv) (cadr drv)))))
-                ;; bufferStop_rot: start of the polyline = tangent + 180, end = tangent
-                (setq prop (+ (if atStart (+ tang pi) tang)
-                              (* DGPS-SymPropOffset (/ pi 180.0))))
-                (while (>= prop (* 2.0 pi)) (setq prop (- prop (* 2.0 pi))))
-                (while (< prop 0.0)         (setq prop (+ prop (* 2.0 pi))))
-                ;; block rotation: tangent pointing into the line
-                ;; (start = tangent, end = tangent + 180)
-                (setq brot (+ (if atStart tang (+ tang pi))
-                              (* DGPS-SymRotOffset (/ pi 180.0))))
-                (while (>= brot (* 2.0 pi)) (setq brot (- brot (* 2.0 pi))))
-                (while (< brot 0.0)         (setq brot (+ brot (* 2.0 pi))))
-                (setq ent
-                  (entmakex
-                    (list '(0 . "INSERT")
-                          (cons 8 lay)
-                          (cons 2 DGPS-SymbolName)
-                          (cons 10 (list (car pt) (cadr pt) z))
-                          '(41 . 1.0) '(42 . 1.0) '(43 . 1.0)
-                          (cons 50 brot))))
-                (if ent
-                  (progn
-                    (setq cnt (1+ cnt))
-                    (if (not (DGPS-SetDynProp ent DGPS-SymRotProp prop))
-                      (progn
-                        (setq DGPS-SymFail (1+ DGPS-SymFail))
-                        (if (= DGPS-SymFail 1)
-                          (princ (strcat "\n  Could not set block property \"" DGPS-SymRotProp
-                                         "\". Dynamic properties found: "
-                                         (DGPS-DynPropNames ent))))
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
-    )
-  )
-  (setq DGPS-SymTotal (+ DGPS-SymTotal cnt))
-  cnt
 )
 
 ;; Reads the angle box in the open dialog. T = OK to continue.
@@ -1179,15 +794,6 @@
       "  }\n"
       "\n"
       "  : boxed_column {\n"
-      "    label = \"Symbol\";\n"
-      "    : toggle { key = \"tg_sym\"; label = \"Symbol\"; alignment = left; }\n"
-      "    : row {\n"
-      "      : text     { label = \"Symbol Name\"; width = 14; fixed_width = true; }\n"
-      "      : edit_box { key = \"edt_sym\"; label = \"\"; edit_width = 24; }\n"
-      "    }\n"
-      "  }\n"
-      "\n"
-      "  : boxed_column {\n"
       "    label = \"Settings\";\n"
       "    : row {\n"
       "      : edit_box   { key = \"edt_off\";  label = \"Track offset:\"; edit_width = 8; }\n"
@@ -1232,11 +838,6 @@
       (set_tile "tg_3d"     (if DGPS-Use3D     "1" "0"))
       (set_tile "tg_center" (if DGPS-UseCenter "1" "0"))
 
-      ;; Symbol
-      (set_tile "edt_sym" DGPS-SymbolName)
-      (set_tile "tg_sym"  (if DGPS-UseSymbol "1" "0"))
-      (mode_tile "edt_sym" (if DGPS-UseSymbol 0 1))
-
       ;; Settings
       (set_tile "edt_off" DGPS-CenterOffTxt)
       (start_list "pop_side")
@@ -1263,9 +864,6 @@
           "(mode_tile \"pop_side\" (if (= $value \"1\") 0 1))"
         )
       )
-      (action_tile "tg_sym"
-        "(mode_tile \"edt_sym\" (if (= $value \"1\") 0 1))"
-      )
       (action_tile "tg_angle"
         "(mode_tile \"edt_angle\" (if (= $value \"1\") 0 1))"
       )
@@ -1288,7 +886,7 @@
       )
       (action_tile "accept"
         (strcat
-          "(if (and (DGPS-LineTypesOK) (DGPS-AngleOK) (DGPS-SymbolBoxOK)) (progn"
+          "(if (and (DGPS-LineTypesOK) (DGPS-AngleOK)) (progn"
           "(setq DGPS-UseAngle (= (get_tile \"tg_angle\") \"1\"))"
           "(setq DGPS-UseTime  (= (get_tile \"tg_time\")  \"1\"))"
           "(setq customName (get_tile \"edt_custom\"))"
@@ -2076,7 +1674,7 @@
                              pairedPts only2D survivedPairs filterQueue
                              filterResult filteredPts removedCt
                              final2D final3D emit made fails
-                             fromName toName symCt symCe symSrc symTmp symLay)
+                             fromName toName)
 
   (setq nPts (length codeRecs))
 
@@ -2226,35 +1824,6 @@
      (setq made  (nth 3 emit)
            fails (nth 4 emit))
 
-     ;; Symbol on the TRACK CENTER polyline, at the end with a BS / END point
-     (setq symCt 0)
-     (if (and DGPS-SymbolOK (DGPS-HasMarker chainedRecs))
-       (progn
-         (setq symCe (nth 2 emit) symTmp nil)
-         (if (null symCe)
-           (progn
-             ;; Polyline Center not ticked: temporary center polyline,
-             ;; erased again after the symbols are placed
-             (setq symSrc (DGPS-Make2DPolyline final2D "0"))
-             (if symSrc
-               (progn
-                 (setq symCe (DGPS-OffsetCenter symSrc side offset "0")
-                       symTmp T)
-                 (DGPS-MoveToZeroAndErase symSrc)
-               )
-             )
-           )
-         )
-         (setq symLay
-           (cond ((member "Center"   types) (nth 1 lays))
-                 ((member "Polyline" types) (nth 0 lays))
-                 (T                         (nth 2 lays))))
-         (if symCe
-           (setq symCt (DGPS-PlaceSymbols chainedRecs symCe symLay)))
-         (if (and symTmp symCe) (DGPS-MoveToZeroAndErase symCe))
-       )
-     )
-
      ;; Report
      (princ (strcat "\n" code))
      (princ (strcat "\n  Points (chained) : " (itoa nPts)))
@@ -2279,8 +1848,6 @@
        )
      )
      (princ (strcat "\n  Final Points     : " (itoa (length final2D))))
-     (if (> symCt 0)
-       (princ (strcat "\n  Symbols placed   : " (itoa symCt) "  (" DGPS-SymbolName ")")))
      (if (member "Polyline" types)
        (princ (strcat "\n  Polyline layer   : " (nth 0 lays))))
      (if (member "Center" types)
@@ -2318,7 +1885,7 @@
      g codeRecs geomResult
      geomCount singleCount geomFailures totalMoved
      layersCreated i sampleCount lyr
-     hpRecs otherRecs hpCh hpGeom symDwg mergedGroups selRecs)
+     hpRecs otherRecs hpCh hpGeom)
 
   (setq dgps-*old-error* *error*)
   (setq *error* DGPS-Error)
@@ -2478,35 +2045,6 @@
   ;; (CSV mode builds them per Code inside the loop below)
   (setq lays (DGPS-TypeLayers layMode layBase))
 
-  ;; Symbol: import the block when a Symbol Name was typed (blank = none)
-  (setq DGPS-SymbolOK nil DGPS-SymTotal 0 DGPS-SymFail 0)
-  (if (and DGPS-UseSymbol (/= DGPS-SymbolName ""))
-    (if (tblsearch "BLOCK" DGPS-SymbolName)
-      (setq DGPS-SymbolOK T)
-      (progn
-        (setq symDwg (DGPS-FindBlocksDwg))
-        (if (and symDwg (DGPS-ImportBlock symDwg DGPS-SymbolName))
-          (setq DGPS-SymbolOK T)
-          (princ (strcat "\nSymbol \"" DGPS-SymbolName
-                         "\" not found - no symbols will be placed."))
-        )
-      )
-    )
-  )
-
-  ;; Merge the selected codes: R1 + R1 BS / R3 + R3 END / R5 + R5 BS + R5 END
-  ;; (case, spaces, BS and END ignored) -> one line per base code
-  (setq selRecs '())
-  (foreach rec otherRecs
-    (if (or (null selectedCodes)
-            (= (length selectedCodes) 0)
-            (member (DGPS-R-Code rec) selectedCodes))
-      (setq selRecs (cons rec selRecs))
-    )
-  )
-  (setq selRecs      (reverse selRecs))
-  (setq mergedGroups (DGPS-GroupMerged selRecs))
-
   ;; -------------------------------------------------------------------------
   ;; 5. Report input summary
   ;; -------------------------------------------------------------------------
@@ -2532,11 +2070,6 @@
   (princ (strcat "\nValid:        " (itoa validRows)))
   (princ (strcat "\nSkipped:      " (itoa skippedRows)))
   (princ (strcat "\nUnique Codes: " (itoa (length groups))))
-  (princ (strcat "\nLines (BS / END merged): " (itoa (length mergedGroups))))
-  (princ (strcat "\nSymbol:       "
-                 (cond ((or (not DGPS-UseSymbol) (= DGPS-SymbolName "")) "none")
-                       (DGPS-SymbolOK DGPS-SymbolName)
-                       (T (strcat DGPS-SymbolName " (not available)")))))
 
   (if (and selectedCodes (> (length selectedCodes) 0))
     (progn
@@ -2586,12 +2119,14 @@
     (setq hpGeom (DGPS-BuildHP hpRecs "Polyline"))
   )
 
-  (foreach g mergedGroups
+  (foreach g groups
     (setq code     (car  g))
     (setq codeRecs (cdr  g))
 
-    ;; the groups were already filtered by the selected codes (see above)
-    (if T
+    ;; Filter: skip codes not in the user's selection (if a selection was made)
+    (if (or (null selectedCodes)
+            (= (length selectedCodes) 0)
+            (member code selectedCodes))
       (progn
         (setq codeLays
           (if (= layMode "csv")
@@ -2645,13 +2180,6 @@
   (princ (strcat "\nGeometry created: " (itoa geomCount)))
   (princ (strcat "\nGeometry failed:  " (itoa geomFailures)))
   (princ (strcat "\nSingle-point:     " (itoa singleCount)))
-  (princ (strcat "\nSymbol offsets:   block +" (rtos DGPS-SymRotOffset 2 0)
-                 " deg, bufferStop_rot +" (rtos DGPS-SymPropOffset 2 0) " deg"))
-  (princ (strcat "\nSymbols placed:   " (itoa DGPS-SymTotal)
-                 (if (and DGPS-UseSymbol (/= DGPS-SymbolName "")) (strcat "  (" DGPS-SymbolName ")") "")))
-  (if (> DGPS-SymFail 0)
-    (princ (strcat "\nSymbol property \"" DGPS-SymRotProp "\" not set on "
-                   (itoa DGPS-SymFail) " block(s).")))
   (princ (strcat "\nHP rows:          " (itoa (length hpRecs))
                  (if hpGeom (if DGPS-HPKeep "  (HP curve kept)" "  (HP curve used, then removed)") "")))
   (princ (strcat "\nAlgorithm:        "
@@ -2674,5 +2202,5 @@
   (princ)
 )
 
-(princ "\nVIDDGPSTOLINE_v28 loaded. Type VIDDGPSTOLINE to run.")
+(princ "\nVIDDGPSTOLINE_v26 loaded. Type VIDDGPSTOLINE to run.")
 (princ)

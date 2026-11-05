@@ -1083,7 +1083,7 @@
 ;; ===========================================================================
 ;; MAIN COMMAND
 ;; ===========================================================================
-(defun c:VIDLC
+(defun c:VIDDGPSTOLC
   (/ *error* csvFile dwg fh headerLine headers idxC idxN idxE idxZ
      line fields code north east elev pt recs codes selRes selCodes setRes sym hgSym
      gates locks hgPts pairRes hgPairs hgExtras hgLeft tracks ord pa pb sideTxt doc space blk lock ang dist res
