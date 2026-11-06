@@ -1,5 +1,5 @@
 ;;; ======================================================================
-;;; vidPageLayout.lsp  (final, rev 19)
+;;; vidPageLayout.lsp  (final, rev 21)
 ;;; Commands : VIDPAGELAYOUT - new layout + PDF page setup + viewport,
 ;;;                            all driven by the selected block
 ;;;            VIDLAYOUTGEN  - dialog + rough box -> inserts the block, then runs VIDPAGELAYOUT
@@ -1152,15 +1152,17 @@
 ;;; ============================================================ VIDLAYOUTGEN
 ;;; Dialog (Layout Block + Sheet Name) -> import block -> rough dashed box ->
 ;;; nearest paper size of the PDF device -> insert block with layout_width/height.
-(setq *vidgen-blk-default* "VID_layout_generate_001")
+(setq *vidgen-blk-default* "vid_layout_generate_001")
+(setq *vidgen-mode-default* "Draw")      ; "Draw" or "Select"
+(setq *vidgen-mode*  nil)
 (setq *vidgen-na-default*  "vid_north_arrow_001")
 (setq *vidgen-blk*   nil)
 (setq *vidgen-na*    nil)
 (setq *vidgen-sheet* nil)
 
 ;; ---- dialog: writes a temporary DCL file, returns T on OK (values in *vidgen-blk* / *vidgen-sheet*)
-(defun vidgen:ui (blk na sheet / fn f dcl res)
-  (setq *vidgen-blk* nil *vidgen-na* nil *vidgen-sheet* nil)
+(defun vidgen:ui (mode blk na sheet / fn f dcl res)
+  (setq *vidgen-blk* nil *vidgen-na* nil *vidgen-sheet* nil *vidgen-mode* nil)
   (setq fn (vl-filename-mktemp "vidgen.dcl"))
   (setq f  (open fn "w"))
   (if (null f)
@@ -1168,9 +1170,20 @@
   (foreach l (list
                "vidgen_ui : dialog {"
                "  label = \"VID Layout Generate\";"
-               "  : edit_box { key = \"blk\"; label = \"Layout Block\"; edit_width = 30; }"
-               "  : edit_box { key = \"na\"; label = \"North Arrow Symbol\"; edit_width = 30; }"
-               "  : edit_box { key = \"sheet\"; label = \"Sheet Name\"; edit_width = 30; }"
+               "  : boxed_radio_row {"
+               "    label = \"Layout Methods\";"
+               "    : radio_button { key = \"sel\"; label = \"Select Layout\"; }"
+               "    : radio_button { key = \"drw\"; label = \"Draw Layout\"; }"
+               "  }"
+               "  : boxed_column {"
+               "    label = \"Symbols\";"
+               "    : edit_box { key = \"blk\"; label = \"Layout Block\"; edit_width = 30; }"
+               "    : edit_box { key = \"na\"; label = \"North Arrow Symbol\"; edit_width = 30; }"
+               "  }"
+               "  : boxed_column {"
+               "    label = \"Sheet\";"
+               "    : edit_box { key = \"sheet\"; label = \"Sheet Name\"; edit_width = 30; }"
+               "  }"
                "  : errtile { width = 44; }"
                "  ok_cancel;"
                "}")
@@ -1187,6 +1200,11 @@
      (blkpdf:fail "Cannot open the dialog."))
     (T
      (set_tile "blk" blk)
+     (set_tile "sel" (if (= mode "Select") "1" "0"))
+     (set_tile "drw" (if (= mode "Select") "0" "1"))
+     (mode_tile "blk" (if (= mode "Select") 1 0))
+     (action_tile "sel" "(mode_tile \"blk\" 1)")
+     (action_tile "drw" "(mode_tile \"blk\" 0)")
      (set_tile "na" na)
      (set_tile "sheet" sheet)
      (mode_tile "blk" 2)
@@ -1195,8 +1213,9 @@
                " (setq *vidgen-blk* (vl-string-trim \" \" (get_tile \"blk\")))"
                " (setq *vidgen-na* (vl-string-trim \" \" (get_tile \"na\")))"
                " (setq *vidgen-sheet* (vl-string-trim \" \" (get_tile \"sheet\")))"
+               " (setq *vidgen-mode* (if (= (get_tile \"sel\") \"1\") \"Select\" \"Draw\"))"
                " (cond"
-               "   ((= *vidgen-blk* \"\") (set_tile \"error\" \"Layout Block name is required.\"))"
+               "   ((and (= *vidgen-mode* \"Draw\") (= *vidgen-blk* \"\")) (set_tile \"error\" \"Layout Block name is required.\"))"
                "   ((= *vidgen-na* \"\") (set_tile \"error\" \"North Arrow Symbol name is required.\"))"
                "   (T (done_dialog 1))))"))
      (action_tile "cancel" "(done_dialog 0)")
@@ -1325,7 +1344,7 @@
         b (vidgen:set-att obj key val))
   (or a b))
 
-(defun c:VIDLAYOUTGEN ( / *error* doc undo blk na sheet def dwg bx p1 p2 x1 y1 dx dy
+(defun c:VIDLAYOUTGEN ( / *error* doc undo mode blk na sheet def dwg bx p1 p2 x1 y1 dx dy
                           media near w h ip rot obj)
   (defun *error* (msg)
     (redraw)
@@ -1339,19 +1358,23 @@
   (if (= (getvar "BLOCKEDITOR") 1)
     (blkpdf:fail "Not available while the Block Editor is open."))
   (if (/= (getvar "TILEMODE") 1)
-    (blkpdf:fail "Switch to the Model tab first; the layout block is inserted in model space."))
+    (blkpdf:fail "Switch to the Model tab first; the layout block is drawn/selected in model space."))
 
   ;; ---- 1. UI
   (blkpdf:step "1 dialog")
   (setq def (blkpdf:sheet-base))
-  (if (not (vidgen:ui *vidgen-blk-default* *vidgen-na-default* (if def def "")))
+  (if (not (vidgen:ui *vidgen-mode-default* *vidgen-blk-default* *vidgen-na-default* (if def def "")))
     (progn (prompt "\nVIDLAYOUTGEN: cancelled.") (exit)))
-  (setq blk   *vidgen-blk*
+  (setq mode  *vidgen-mode*
+        blk   *vidgen-blk*
         na    *vidgen-na*
         sheet *vidgen-sheet*)
 
   (setq undo (not (vl-catch-all-error-p (vl-catch-all-apply 'vla-StartUndoMark (list doc)))))
 
+  ;; ---- 2-5 only in "Draw" mode (in "Select" mode the block is picked by VIDPAGELAYOUT)
+  (if (= mode "Draw")
+   (progn
   ;; ---- 2. import the block from vid_blocks_tools.dwg (skipped if already in the drawing)
   (blkpdf:step "2 import layout block")
   (cond
@@ -1412,15 +1435,18 @@
                   ", layout_height " (rtos h 2 2)
                   (if (/= sheet "") (strcat ", sheet \"" sheet "\"") "")
                   ". Creating layout ..."))
+  (setq *vidgen-auto-ename* (vlax-vla-object->ename obj))))
 
-  ;; ---- 6. create the layout automatically from the block just inserted (no pick)
+  ;; ---- 6. create the layout: Draw = from the block just inserted (no pick);
+  ;;         Select = VIDPAGELAYOUT asks the user to select the layout block
   (blkpdf:step "6 create layout")
-  (setq *vidgen-auto-ename* (vlax-vla-object->ename obj)
-        *vidgen-auto-sheet* (if (/= sheet "") sheet nil)
+  (if undo (vl-catch-all-apply 'vla-EndUndoMark (list doc)))
+  (setq undo nil)
+  (setq *vidgen-auto-sheet* (if (/= sheet "") sheet nil)
         *vidgen-auto-na*    na)
   (c:VIDPAGELAYOUT)
   (setq *vidgen-auto-ename* nil *vidgen-auto-sheet* nil *vidgen-auto-na* nil)
   (princ))
 
-(prompt "\nVIDPAGELAYOUT rev 19 loaded. Commands: VIDPAGELAYOUT, VIDLAYOUTGEN, VIDMEDIA, UCSF.")
+(prompt "\nVIDPAGELAYOUT rev 21 loaded. Commands: VIDPAGELAYOUT, VIDLAYOUTGEN, VIDMEDIA, UCSF.")
 (princ)
