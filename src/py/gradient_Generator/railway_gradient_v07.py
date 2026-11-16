@@ -17,9 +17,10 @@ Method : template rule, per segment:  N = length / (end existing RL - start desi
          gradient is one segment; then it is cut and the next segment starts from the
          design RL reached (same as the template: start = design RL, end = existing RL).
 Zones  : marker rows (text in the chainage column, e.g. "C-2 TTC 1", "SRJ 50A") are kept in the
-         table.  No new gradient segment is cut inside an SRJ zone (marker +/- radius, default 50 m)
-         or inside a curve zone (From TTC1 To TCC1, From TCC2 To TTC2); the cut is made before or
-         after the zone instead.
+         table.  No new gradient segment is cut inside a 50 m zone (25 m each side) around every SRJ,
+         every TTC and every TCC marker; the cut is made before or after the zone instead.
+         (Optional: the whole transition TTC1->TCC1 and TCC2->TTC2.)
+AutoCAD: "Export AutoCAD CSV" writes vid_ch, rw_ch, railLevel, lineType, before, current, note.
 Signs  : RISE -> E = E(prev) + F      FALL -> E = E(prev) - F      (F always +)
 
 Theme   : Light / System / Dark selector in the top bar (System follows Windows, remembered).
@@ -356,8 +357,14 @@ def design_profile(b, c, gmin, gmax, level_n=10000, allowed=None):
 class ZoneConfig:
     srj_on: bool = True
     srj_kw: str = "SRJ"
-    srj_length: float = 50.0          # total zone length, centred on the SRJ point (25 m each side)
-    curve_on: bool = True
+    srj_length: float = 50.0          # total zone length, centred on the point (25 m each side)
+    ttc_on: bool = True
+    ttc_kw: str = "TTC"               # every TTC marker (TTC1 and TTC2 of every curve)
+    ttc_length: float = 50.0
+    tcc_on: bool = True
+    tcc_kw: str = "TCC"               # every TCC marker (TCC1 and TCC2 of every curve)
+    tcc_length: float = 50.0
+    curve_on: bool = False            # optional extra: also no cut anywhere between the two ends of a transition
     curve1_from: str = "TTC1"
     curve1_to: str = "TCC1"
     curve2_from: str = "TCC2"
@@ -373,24 +380,36 @@ def _norm(t):
     return re.sub(r"[\s_\-.]+", "", str(t)).upper()
 
 
+def _point_zones(markers, zones, kw_text, length, kind):
+    """One zone per marker whose label contains kw_text: marker +/- length/2 (50 m -> 25 m each side)."""
+    kw = _norm(kw_text)
+    if not kw or length <= 0:
+        return
+    half = length / 2.0
+    for m in markers:
+        if m.get("b") is not None and kw in _norm(m["label"]):
+            m["type"] = kind
+            zones.append(dict(kind=kind, lo=m["b"] - half, hi=m["b"] + half, name=m["label"].strip()))
+
+
 def build_zones(markers, cfg):
     """Zones (company chainage) where no gradient segment may be cut.
-    SRJ   : every marker whose label contains the SRJ text -> marker +/- length/2 (50 m -> 25 m each side).
-    Curve : in marker order, From-text ... next To-text (TTC1 -> TCC1 and TCC2 -> TTC2).
+    TTC / TCC : every marker whose label contains the text -> marker +/- length/2   (both TTC and both TCC
+                of every curve; 50 m -> 25 m each side)
+    SRJ       : same, for the SRJ markers (50 m -> SRJ at 423/500 gives 423/475 to 423/525)
+    Whole transition (optional): From-text ... next To-text (TTC1 -> TCC1 and TCC2 -> TTC2)
     Also tags each marker with its type ('SRJ' / 'CURVE' / '') for colouring."""
     zones, warns = [], []
     for m in markers:
         m["type"] = ""
     if cfg is None:
         return zones, warns
-    if cfg.srj_on and cfg.srj_length > 0 and _norm(cfg.srj_kw):
-        half = cfg.srj_length / 2.0                      # SRJ at 423/500 and length 50 -> 423/475 to 423/525
-        kw = _norm(cfg.srj_kw)
-        for m in markers:
-            if m.get("b") is not None and kw in _norm(m["label"]):
-                m["type"] = "SRJ"
-                zones.append(dict(kind="SRJ", lo=m["b"] - half, hi=m["b"] + half,
-                                  name=m["label"]))
+    if cfg.ttc_on:
+        _point_zones(markers, zones, cfg.ttc_kw, cfg.ttc_length, "CURVE")
+    if cfg.tcc_on:
+        _point_zones(markers, zones, cfg.tcc_kw, cfg.tcc_length, "CURVE")
+    if cfg.srj_on:
+        _point_zones(markers, zones, cfg.srj_kw, cfg.srj_length, "SRJ")
     if cfg.curve_on:
         for f, t in ((cfg.curve1_from, cfg.curve1_to), (cfg.curve2_from, cfg.curve2_to)):
             kf, kt = _norm(f), _norm(t)
@@ -813,6 +832,37 @@ def export_excel(res, path):
     wb.save(path)
 
 
+ACAD_HEADER = ["vid_ch", "rw_ch", "railLevel", "lineType", "before", "current", "note"]
+
+
+def export_autocad_csv(res, path, line_type="(DN LINE)", note="FOR EXIST - ALL LINES"):
+    """CSV for AutoCAD: one row per gradient change point (line start, every cut, line end).
+        vid_ch = company chainage, rw_ch = 'KM: km/m', railLevel = 'RL: new rail level' (column E),
+        before / current = gradient before and after the point ('F 1 IN 357', 'R 1 IN 540', 'LEVEL')."""
+    def trim(v, nd=3):
+        return f"{v:.{nd}f}".rstrip("0").rstrip(".")
+
+    def grad(sg):
+        return "LEVEL" if sg.level else f"{'R' if sg.g > 0 else 'F'} 1 IN {sg.n}"
+
+    def km(i):
+        t = res.rail_txt[i]
+        if t:
+            return t
+        bi = float(res.b[i])                                   # no railway chainage in the data: km/m of company ch
+        return f"{int(bi // 1000)}/{bi % 1000:07.3f}"
+
+    pts = [res.segs[0].s] + [sg.e for sg in res.segs]
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        wr = csv.writer(f, lineterminator="\r\n")
+        wr.writerow(ACAD_HEADER)
+        for t, i in enumerate(pts):
+            bi = float(res.b[i])
+            wr.writerow([int(bi) if bi.is_integer() else trim(bi), f"KM: {km(i)}", f"RL: {trim(float(res.E[i]))}",
+                         line_type, grad(res.segs[t - 1]) if t > 0 else "",
+                         grad(res.segs[t]) if t < len(res.segs) else "", note])
+
+
 # =============================================================================
 #  5. TABLE (tab 1)
 # =============================================================================
@@ -1215,38 +1265,66 @@ class MainWindow(QtWidgets.QMainWindow):
         h.addWidget(self.btn_export)
 
         zbar = QtWidgets.QGroupBox("No new gradient segment inside   (a cut is made before or after the zone instead)")
-        zh = QtWidgets.QHBoxLayout(zbar)
-        self.ck_srj = QtWidgets.QCheckBox("SRJ")
-        self.ck_srj.setChecked(True)
-        self.ed_srj = QtWidgets.QLineEdit("SRJ")
-        self.ed_srj.setFixedWidth(60)
-        self.ed_srj.setToolTip("Marker rows whose label contains this text are SRJ points.")
-        self.sp_srj = QtWidgets.QDoubleSpinBox()
-        self.sp_srj.setRange(0.0, 1000.0)
-        self.sp_srj.setDecimals(1)
-        self.sp_srj.setValue(50.0)
-        self.sp_srj.setSuffix(" m zone")
-        self.sp_srj.setToolTip("Total length of the SRJ zone, centred on the SRJ point: 50 m = 25 m before + 25 m after "
-                               "(SRJ at 423/500 -> zone 423/475 to 423/525). Cuts exactly on the edge are allowed.")
-        self.ck_curve = QtWidgets.QCheckBox("Curve")
-        self.ck_curve.setChecked(True)
+        zv = QtWidgets.QVBoxLayout(zbar)
+        zh, zh2 = QtWidgets.QHBoxLayout(), QtWidgets.QHBoxLayout()
+        zv.addLayout(zh)
+        zv.addLayout(zh2)
+
+        def zone_row(title, kw, tip):
+            ck = QtWidgets.QCheckBox(title)
+            ck.setChecked(True)
+            ed = QtWidgets.QLineEdit(kw)
+            ed.setFixedWidth(60)
+            ed.setToolTip("Marker rows whose label contains this text (spaces and hyphens ignored).")
+            sp = QtWidgets.QDoubleSpinBox()
+            sp.setRange(0.0, 1000.0)
+            sp.setDecimals(1)
+            sp.setValue(50.0)
+            sp.setSuffix(" m zone")
+            sp.setToolTip(tip)
+            ck.toggled.connect(lambda on, e=ed, s_=sp: (e.setEnabled(on), s_.setEnabled(on)))
+            for wdg in (ck, ed, sp):
+                zh.addWidget(wdg)
+            zh.addSpacing(24)
+            return ck, ed, sp
+
+        tip = ("Total length of the zone, centred on the marker: 50 m = 25 m before + 25 m after "
+               "(marker at 423/500 -> zone 423/475 to 423/525). Cuts exactly on the edge are allowed.")
+        self.ck_srj, self.ed_srj, self.sp_srj = zone_row("SRJ", "SRJ", tip)
+        self.ck_ttc, self.ed_ttc, self.sp_ttc = zone_row("TTC", "TTC", tip + " Applies to every TTC of every curve (TTC1 and TTC2).")
+        self.ck_tcc, self.ed_tcc, self.sp_tcc = zone_row("TCC", "TCC", tip + " Applies to every TCC of every curve (TCC1 and TCC2).")
+        zh.addStretch(1)
+
+        self.ck_curve = QtWidgets.QCheckBox("Also the whole transition:")
+        self.ck_curve.setChecked(False)
         self.ed_c1f, self.ed_c1t = QtWidgets.QLineEdit("TTC1"), QtWidgets.QLineEdit("TCC1")
         self.ed_c2f, self.ed_c2t = QtWidgets.QLineEdit("TCC2"), QtWidgets.QLineEdit("TTC2")
-        for ed in (self.ed_c1f, self.ed_c1t, self.ed_c2f, self.ed_c2t):
-            ed.setFixedWidth(60)
-            ed.setToolTip("Text searched in the marker label (spaces and hyphens ignored), e.g. 'C-2 TTC 1' and 'C-6 TTC-1' match TTC1.")
-        zh.addWidget(self.ck_srj)
-        zh.addWidget(self.ed_srj)
-        zh.addWidget(self.sp_srj)
-        zh.addSpacing(24)
-        zh.addWidget(self.ck_curve)
+        zh2.addWidget(self.ck_curve)
         for text, ed in (("From", self.ed_c1f), ("To", self.ed_c1t), ("   and From", self.ed_c2f), ("To", self.ed_c2t)):
-            zh.addWidget(QtWidgets.QLabel(text))
-            zh.addWidget(ed)
-        zh.addStretch(1)
-        self.ck_srj.toggled.connect(lambda on: (self.ed_srj.setEnabled(on), self.sp_srj.setEnabled(on)))
+            ed.setFixedWidth(60)
+            ed.setEnabled(False)
+            ed.setToolTip("No cut anywhere between these two markers (spaces and hyphens ignored).")
+            zh2.addWidget(QtWidgets.QLabel(text))
+            zh2.addWidget(ed)
+        zh2.addStretch(1)
         self.ck_curve.toggled.connect(lambda on: [e.setEnabled(on) for e in
                                                   (self.ed_c1f, self.ed_c1t, self.ed_c2f, self.ed_c2t)])
+
+        abar = QtWidgets.QGroupBox("AutoCAD CSV")
+        ah = QtWidgets.QHBoxLayout(abar)
+        self.ed_line = QtWidgets.QLineEdit("(DN LINE)")
+        self.ed_line.setFixedWidth(110)
+        self.ed_note = QtWidgets.QLineEdit("FOR EXIST - ALL LINES")
+        self.ed_note.setMinimumWidth(240)
+        self.btn_acad = QtWidgets.QPushButton("Export AutoCAD CSV…")
+        self.btn_acad.setEnabled(False)
+        self.btn_acad.setToolTip("vid_ch, rw_ch, railLevel, lineType, before, current, note - one row per gradient change point")
+        ah.addWidget(QtWidgets.QLabel("lineType"))
+        ah.addWidget(self.ed_line)
+        ah.addWidget(QtWidgets.QLabel("note"))
+        ah.addWidget(self.ed_note)
+        ah.addWidget(self.btn_acad)
+        ah.addStretch(1)
 
         self.model = TableModel()
         self.table = QtWidgets.QTableView()
@@ -1302,6 +1380,7 @@ class MainWindow(QtWidgets.QMainWindow):
         v = QtWidgets.QVBoxLayout(central)
         v.addWidget(bar)
         v.addWidget(zbar)
+        v.addWidget(abar)
         v.addWidget(self.tabs, 1)
         v.addWidget(self.lbl_sum)
         self.setCentralWidget(central)
@@ -1309,6 +1388,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_open.clicked.connect(self.on_open)
         self.btn_calc.clicked.connect(self.calculate)
         self.btn_export.clicked.connect(self.on_export)
+        self.btn_acad.clicked.connect(self.on_export_acad)
 
         # ---- theme: remembered between runs; System follows the operating system live
         saved = str(self.settings.value("theme", "System"))
@@ -1386,9 +1466,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.table.setSpan(i, 1, 1, 6)
 
     def zone_config(self):
-        return ZoneConfig(self.ck_srj.isChecked(), self.ed_srj.text(), self.sp_srj.value(),
-                          self.ck_curve.isChecked(), self.ed_c1f.text(), self.ed_c1t.text(),
-                          self.ed_c2f.text(), self.ed_c2t.text())
+        return ZoneConfig(
+            srj_on=self.ck_srj.isChecked(), srj_kw=self.ed_srj.text(), srj_length=self.sp_srj.value(),
+            ttc_on=self.ck_ttc.isChecked(), ttc_kw=self.ed_ttc.text(), ttc_length=self.sp_ttc.value(),
+            tcc_on=self.ck_tcc.isChecked(), tcc_kw=self.ed_tcc.text(), tcc_length=self.sp_tcc.value(),
+            curve_on=self.ck_curve.isChecked(), curve1_from=self.ed_c1f.text(), curve1_to=self.ed_c1t.text(),
+            curve2_from=self.ed_c2f.text(), curve2_to=self.ed_c2t.text())
 
     def load_file(self, path, sheet=None):
         try:
@@ -1439,6 +1522,21 @@ class MainWindow(QtWidgets.QMainWindow):
             msg += "\n⚠ " + "  ⚠ ".join(shown)
         self.lbl_sum.setText(msg)
         self.btn_export.setEnabled(True)
+        self.btn_acad.setEnabled(True)
+
+    def on_export_acad(self):
+        if self.res is None:
+            return
+        base = os.path.splitext(self.path or "gradient")[0] + "_AUTOCAD.csv"
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Export AutoCAD CSV", base, "CSV (*.csv)")
+        if not path:
+            return
+        try:
+            export_autocad_csv(self.res, path, self.ed_line.text(), self.ed_note.text())
+        except Exception as ex:                                  # noqa: BLE001
+            QtWidgets.QMessageBox.critical(self, "Export failed", str(ex))
+            return
+        self.statusBar().showMessage(f"Saved {path}", 8000)
 
     def on_export(self):
         if self.res is None:
