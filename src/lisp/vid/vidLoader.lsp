@@ -47,6 +47,7 @@
     "vidRwBoundaryText.lsp"
     "vidSurveySettings.lsp"
     "vidUnitSettings.lsp"
+    "vidChCal.lsp"
   )
 )
 ;; ============================================================
