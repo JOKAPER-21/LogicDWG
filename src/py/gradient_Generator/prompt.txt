@@ -1,0 +1,49 @@
+Updated UI more simpler and clear, like a real software
+
+eg: 
+SRJ (vertical line) TTC (vertical line) TCC (vertical line) Also the whole transition: 
+
+- MENU BAR
+     - File
+          - Import
+               - Excel 
+               - CSV
+          - Export
+               - Excel
+               - CSV (vidGradient Tool)
+                    - pop-up window (UI)
+                         - label: "Line Type : " btn-dropDown[(DN LINE), (UP LINE), (LOOP LINE), Custom (defaultValue: "(DN LINE)")] 
+                              - If custom selected then show text box to enter manually
+                         - label: "Note : " [(defaultValue: "FOR EXIST - ALL LINES")]
+
+     - Conditions
+          - Railway Requriments
+               - pop-up window (UI)
+                    - G Min : [(defaultValue: "0.250")]
+                    - G Max : [(defaultValue: "0.250")]
+                    - Level : [(defaultValue: "10000")]
+          - Zone
+               - SRJ
+                    - pop-up window (UI)
+                         - label: "SRJ:", btn-numBox: [(defaultValue: "50.00"m)] Eg: SRJ : 50.00m
+               - Curve
+                    - pop-up window (UI)
+                         - label: "Connect transition", btn-dropDown: [(defaultValue: "TRUE")] Eg: Connect trasition: [TRUE(Tick)]
+                         - label: "TTC", btn-numBox: [(defaultValue: "50.00")] Eg: TTC : 50.00m
+                         - label: "TCC", btn-numBox: [(defaultValue: "50.00")] Eg: TCC : 50.00m
+     - Run
+          - Calculate
+
+     - Theme
+          - System
+          - Dark
+          - Light
+     
+     - About
+
+- TOOL BAR
+     - Railway Requriments (row 1) + [Calculate (NOTE: green color button)] (remove Export Excel, Open CSV buttons and AutoCAD CSV section - (becuase these are moved to menubar))
+     - Zone (row 2)
+
+- TABLE/GRAPH (TABS)
+- Abstraction/Gradient (SHEETS)
