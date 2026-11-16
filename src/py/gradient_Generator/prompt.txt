@@ -1,7 +1,7 @@
-Updated UI more simpler and clear, like a real software
+- If user enter 50 in SRJ or Curve then split the value like 25 LHS and 25 RHS, 
+     - Do, use both LHS and RHS to have value 50
 
-eg: 
-SRJ (vertical line) TTC (vertical line) TCC (vertical line) Also the whole transition: 
+- Updated UI more simpler and clear, like a real software
 
 - MENU BAR
      - File
@@ -22,7 +22,7 @@ SRJ (vertical line) TTC (vertical line) TCC (vertical line) Also the whole trans
                     - G Min : [(defaultValue: "0.250")]
                     - G Max : [(defaultValue: "0.250")]
                     - Level : [(defaultValue: "10000")]
-          - Zone
+          - No-Cut Zones
                - SRJ
                     - pop-up window (UI)
                          - label: "SRJ:", btn-numBox: [(defaultValue: "50.00"m)] Eg: SRJ : 50.00m
@@ -40,10 +40,11 @@ SRJ (vertical line) TTC (vertical line) TCC (vertical line) Also the whole trans
           - Light
      
      - About
+          - How to use (open this link: "https://jokaper-21.github.io/LogicDWG/src/onlineTools/src/Railway_Gradient_Designer.html")
 
 - TOOL BAR
-     - Railway Requriments (row 1) + [Calculate (NOTE: green color button)] (remove Export Excel, Open CSV buttons and AutoCAD CSV section - (becuase these are moved to menubar))
-     - Zone (row 2)
+     - Railway Requriments (section) (row 1) + [Calculate (NOTE: green color button)] (remove Export Excel, Open CSV buttons and AutoCAD CSV section - (becuase these are moved to menubar))
+     - Zone (section) (row 2) SRJ (vertical line), TTC (vertical line), TCC (vertical line), Whole transition: 
 
-- TABLE/GRAPH (TABS)
-- Abstraction/Gradient (SHEETS)
+- TABLE/GRAPH (TABS) Top 
+- Abstraction/Gradient (SHEETS) Bottom
